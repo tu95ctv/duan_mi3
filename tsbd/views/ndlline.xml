@@ -1,0 +1,34 @@
+<odoo>
+    <data>
+       
+       
+        
+         <record model="ir.ui.view" id="ndlline_list">
+            <field name="name">tsbd.ndlline.list</field>
+            <field name="model">tsbd.ndlline</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="ngay_gio"></field>
+                    <field name="ngay"></field>
+                    <field name="team1"></field>
+                    <field name="team2"></field>
+                    <field name="score1"></field>
+                    <field name="score2"></field>
+                     <field name="link"></field>
+                    <field name="state"></field>
+                    <field name="manual_updated_score"></field>
+                    <field name="match_id"></field>
+                    <field name="predict_id"></field>
+                </tree>
+            </field>
+        </record>
+        
+
+        <record model="ir.actions.act_window" id="ndlline_action">
+            <field name="name">ndlline action</field>
+            <field name="res_model">tsbd.ndlline</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+     <menuitem name="ndlline menu" id="tsbd.ndlline_menu" parent="tsbd.menu_root" action="ndlline_action" />
+    </data>
+</odoo>

@@ -1,0 +1,70 @@
+<odoo>
+  <data>
+ 
+    <record model="ir.ui.view" id="test_tree">
+      <field name="name">module_test.test.tree</field>
+      <field name="model">module_test.test</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="log"/>
+        </tree>
+      </field>
+    </record>
+    
+    <record model="ir.ui.view" id="test_form">
+      <field name="name">module_test.test.form</field>
+      <field name="model">module_test.test</field>
+      <field name="arch" type="xml">
+        <form>
+        <header>
+                  <button name="test" string="test" type="object" class="btn-primary" />
+        </header>
+        <sheet>
+        	<group>
+          	<field name="log"/>
+          	</group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="test_action">
+      <field name="name">module_test.test.action</field>
+      <field name="res_model">module_test.test</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="module_testmedia/sf__c__drive/d4/duan_mi/.action_server">
+      <field name="name">module_testmedia/sf_C_DRIVE/D4/duan_mi/ server</field>
+      <field name="model_id" ref="model_module_testmedia/sf__c__drive/d4/duan_mi/_module_testmedia/sf__c__drive/d4/duan_mi/"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    
+    <menuitem name="Test" id="test_root"/>
+   
+    <!-- menu categories -->
+   
+    <menuitem name="Test" id="menu_test_1" parent="test_root" action="test_action"/>
+  
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="module_testmedia/sf__c__drive/d4/duan_mi/.menu_1_list" parent="module_testmedia/sf__c__drive/d4/duan_mi/.menu_1"
+              action="module_testmedia/sf__c__drive/d4/duan_mi/.action_window"/>
+    <menuitem name="Server to list" id="module_testmedia/sf__c__drive/d4/duan_mi/" parent="module_testmedia/sf__c__drive/d4/duan_mi/.menu_2"
+              action="module_testmedia/sf__c__drive/d4/duan_mi/.action_server"/>
+    -->
+  </data>
+</odoo>

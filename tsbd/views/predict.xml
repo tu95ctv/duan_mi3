@@ -1,0 +1,80 @@
+<odoo>
+	<data>
+		  <record model="ir.ui.view" id="predict_list">
+            <field name="name">tsbd.predict.list</field>
+            <field name="model">tsbd.predict</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="date" ></field>
+                    <field name="match_id"></field>
+                    <field name="site_id"></field>
+                    <field name="link"></field>
+                    <field name="state"></field>
+                    <field name="match_state"></field>
+                    <field name="amount"></field>
+    				 <field name="team1"></field>
+                    <field name="team2"></field>
+                    <field name="begin_handicap"></field>
+                    <field name="begin_ou"></field>
+                    <field name="predict_score1"></field>
+                    <field name="predict_score2"></field>
+                    <field name="predict_handicap"></field>
+                    <field name="predict_handicap_winning_mount"></field>
+                    <field name="predict_ou"></field>
+                    <field name="predict_ou_winning_mount"></field>
+                    <field name="predict_exact_score_winning_amount"></field>
+                </tree>
+            </field>
+        </record>
+        
+        
+        <record model="ir.ui.view" id="predict_search">
+            <field name="name">tsbd.predict.search</field>
+            <field name="model">tsbd.predict</field>
+            <field name="arch" type="xml">
+                <search string="predict search">
+                	
+                    <field name="site_id"></field>
+                    <field name="amount"></field>
+                    <field name="predict_score1"></field>
+                    <field name="predict_score2"></field>
+                    <field name="predict_handicap"></field>
+                    <field name="predict_handicap_winning_mount"></field>
+                    <field name="predict_ou"></field>
+                    <field name="predict_ou_winning_mount"></field>
+                    <field name="predict_exact_score_winning_amount"></field>
+                     
+                     
+                    <filter string="Today" name="today" domain="[('date', '=', context_today().strftime('%%Y-%%m-%%d'))]" />
+                    <!-- <filter string="Yesterday and Today" name="yesterday_today" domain="['|',('date', '=', context_today().strftime('%%Y-%%m-%%d')),('date', '=',(context_today()+relativedelta(days=-1)).strftime('%%Y-%%m-%%d'))]" /> -->
+                    <filter string="yesterday" name="yesterday" domain="[('date', '=',(context_today()+relativedelta(days=-1)).strftime('%%Y-%%m-%%d'))]" />
+                    <filter string="tomorrow" name="tomorrow" domain="[('date', '=',(context_today()+relativedelta(days=1)).strftime('%%Y-%%m-%%d'))]" />
+                    <filter string="3 last day" name="last_3_day" domain="[('date', '=',(context_today()+relativedelta(days=-4)).strftime('%%Y-%%m-%%d'))]" />
+                    <filter string="Trận đã và đang đá" name="match_state" domain="[('match_state', '!=', 'Chưa bắt đầu')]" />
+                    <group expand="0" string="Group By">
+                    <filter string="group_site_id" context="{'group_by':'site_id'}"/>
+                    <filter string="match_id" context="{'group_by':'match_id'}"/>
+                    <filter string="predict_handicap" context="{'group_by':'predict_handicap'}"/>
+                    <filter string="predict_ou" context="{'group_by':'predict_ou'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        
+        
+        
+        <record model="ir.actions.act_window" id="predict_action">
+            <field name="name">Predict action</field>
+            <field name="res_model">tsbd.predict</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem name="predict  menu" id="tsbd.predict_menu" parent="tsbd.menu_root" action="predict_action" />
+        
+        
+        
+        
+        
+	</data>
+</odoo>

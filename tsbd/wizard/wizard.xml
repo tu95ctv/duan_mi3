@@ -1,0 +1,66 @@
+<odoo>
+	<data>
+		 <record id="wizard" model="ir.ui.view">
+            <field name="name">tsbd.wizard.form</field>
+            <field name="model">tsbd.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Draft Invoices">
+                    <p class="oe_grey">
+                        Mời bạn xóa
+                    </p>
+                    <group>
+                    <field name = "name"></field>
+                    <field name = "res_model"></field>
+                    </group>
+                    <footer>
+                        <button string="Xóa bxh not cate" name="xoa_bxh_not_cated" type="object" default_focus="1" class="btn-primary"/>
+                        <button string="trig" name="trig" type="object" class="btn-primary"/>
+                        <button string="xoa_bxh" name="xoa_bxh" type="object"  class="btn-primary"/>
+                        <button string="gen_bxh" name="gen_bxh" type="object"  class="btn-primary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="wizard_xoa_bxh_action"
+            multi="True"
+            key2="client_action_multi" name="Xóa bxh"
+            res_model="tsbd.wizard" src_model="tsbd.bxh"
+            view_mode="form" target="new" view_type="form" />
+            
+          <act_window id="wizard_predict_action"
+            multi="True"
+            key2="client_action_multi" name="Trig"
+            res_model="tsbd.wizard" src_model="tsbd.predict"
+            view_mode="form" target="new" view_type="form" />
+            
+            <act_window id="wizard_cate_action"
+            multi="True"
+            key2="client_action_multi" name="Xóa và Gen BXH"
+            res_model="tsbd.wizard" src_model="tsbd.cate"
+            view_mode="form" target="new" view_type="form" />
+            
+            
+            <act_window id="wizard_team_action"
+            multi="True"
+            key2="client_action_multi" name="Trig"
+            res_model="tsbd.wizard" src_model="tsbd.team"
+            view_mode="form" target="new" view_type="form" />
+            
+            
+             <act_window id="wizard_bxh_action"
+            multi="True"
+            key2="client_action_multi" name="Trig"
+            res_model="tsbd.wizard" src_model="tsbd.bxh"
+            view_mode="form" target="new" view_type="form" />
+            
+            
+            
+            
+            
+            
+            
+            
+            
+    </data>
+</odoo>

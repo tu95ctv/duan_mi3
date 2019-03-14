@@ -1,0 +1,95 @@
+<odoo>
+    <data>
+       
+        <record model="ir.ui.view" id="cate_form">
+            <field name="name">tsbd.cate.form</field>
+            <field name="model">tsbd.cate</field>
+            <field name="arch" type="xml">
+                <form>
+                	<header>
+                    <button name="trig" string="trig" type="object"  class="oe_highlight" ></button> 
+                    <button name="bxh" string="bxh" type="object"  class="oe_highlight" ></button> 
+                    <button name="bxh" string="Bet bxh" type="object"  class="oe_highlight" context="{'for_bet':True}"></button> 
+                    <button name="clear_bxh" string="clear_bxh" type="object"  class="oe_highlight" ></button> 
+                    <button name="avg_button" string="avg_button" type="object"  class="oe_highlight" ></button> 
+                    <button name="gen_team" string="gen_team" type="object"  class="oe_highlight" ></button> 
+                    <button name="find_late_soon_match" string="find_late_soon_match" type="object"  class="oe_highlight" ></button> 
+                    <button name="find_late_soon_match" string="find_late_soon_match" type="object"  class="oe_highlight" ></button> 
+                </header>
+                
+                	<group>
+               		<field name="name"></field>
+               		 <field name="no_match"></field>
+                    <field name="large_cate"></field>
+               		<field name="cate_id"></field>
+               		
+               		<field name="avg_score1"></field>
+                    <field name="avg_score2"></field>
+               		<field name="avg_score"></field>
+               		
+               		
+               		 
+               		
+               		
+               		</group>
+               		<notebook>
+               		 	<page string="BXH">
+               				<field name="cate_ids"></field>
+               		 	</page>
+               		 	<!-- 
+               		 	<page string="BXH BET">
+               		 		<field name="bet_bxh_ids"/>
+               		 	</page>
+               		 	 -->
+               		   <page string="BXH OU">
+               				<field name="ou_bxh_ids" context="{'tree_view_ref':'tsbd.oubxh_list'}"></field>
+               		 	</page>
+               		 	
+               		 	<page string="Match">
+               		 		<field name="bang_match_ids"></field>
+               				<field name="match_ids"></field>
+               		 	</page>
+               		 	
+               		 	<page string="Team">
+               		 		<field name="team_ids"></field>
+               		 	</page>
+               		 	
+               		 	
+               		 	
+               		 </notebook>
+                </form>
+            </field>
+        </record>
+        
+         <record model="ir.ui.view" id="cate_list">
+            <field name="name">tsbd.cate.list</field>
+            <field name="model">tsbd.cate</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"></field>
+                    <field name="cate_id"></field>
+                    <field name="no_match"></field>
+                    <field name="large_cate"></field>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="tsbd_cate_search" model="ir.ui.view">
+        <field name="name">tsbd.cate.search</field>
+        <field name="model">tsbd.cate</field>
+        <field name="arch" type="xml">
+            <search string="cate search">
+            	<field name="name"></field>
+                 <filter name="large_cate" domain="[('large_cate','=',True)]"/>
+                </search>
+                </field>
+                </record>
+        <record model="ir.actions.act_window" id="cate_action">
+            <field name="name">cate action</field>
+            <field name="res_model">tsbd.cate</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_large_cate':1}</field>
+        </record>
+     <menuitem name="cate menu" id="tsbd.cate_menu" parent="tsbd.menu_root" action="cate_action" />
+    </data>
+</odoo>
