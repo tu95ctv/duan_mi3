@@ -78,22 +78,27 @@
       </record>
        -->
       
-        <record id="cvi_rule_1" model="ir.rule">
+       <record id="cvi_rule_1" model="ir.rule">
+         <field name="name">User có công ty cùng hoặc là cha của công ty trong cvi mới được xem cvi</field>
+         <field ref="model_cvi" name="model_id" />
+         <field name="domain_force">['|','&amp;',('loai_record','=','Công Việc'),('department_id','=',[user.department_id.id]),('loai_record','!=','Công Việc')]</field>
+         <field name="groups" eval="[(4, ref('base.group_user'))]" />
+      </record>
+       <record id="cvi_rule_2" model="ir.rule">
          <field name="name">User có công ty cùng hoặc là cha của công ty trong cvi mới được xem cvi</field>
          <field ref="model_cvi" name="model_id" />
          <field name="domain_force">['|','&amp;',('loai_record','=','Công Việc'),('department_id','child_of',[user.department_id.id]),('loai_record','!=','Công Việc')]</field>
-         <field name="groups" eval="[(4, ref('base.group_user'))]" />
+         <field name="groups" eval="[(4, ref('dai_tgg.group_thay_doi_thu_vien'))]" />
       </record>
       
-      
+      <!-- 
         <record id="cvi_rule_time" model="ir.rule">
          <field name="name">User có công ty cùng hoặc là cha của công ty trong cvi mới được xem cvi</field>
          <field ref="model_cvi" name="model_id" />
          <field name="domain_force">[('write_date','&lt;',time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))]</field>
          <field name="groups" eval="[(4, ref('base.group_user'))]" />
       </record>
-      
-      
+       -->
        <record id="ctr_rule" model="ir.rule">
          <field name="name">Cho thấy ca trực nếu là công ty là con của công ty người dùng</field>
          <field ref="model_ctr" name="model_id" />

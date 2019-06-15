@@ -566,19 +566,12 @@ def importthuvien(odoo_or_self_of_wizard,
                   check_file = False,
                   mode=u'1'):
     self = odoo_or_self_of_wizard
-    
-    
-    
     self_key_tram =  getattr(self,'key_tram',False) or key_tram
-
-    
     if not model_dict:
         ALL_MODELS_DICT = gen_model_dict(self=self, 
                                          key_tram = self_key_tram,mode=mode)
     else:
         ALL_MODELS_DICT =  model_dict
-    
-#     for r in self:
     if not self.file:
         raise UserError(u'Bạn phải upload file để import')
     file_content = base64.decodestring(self.file)
@@ -588,7 +581,6 @@ def importthuvien(odoo_or_self_of_wizard,
         formatting_info = True
     xl_workbook = xlrd.open_workbook(file_contents = file_content, formatting_info=formatting_info)
     noti_dict = {}
-#     noti_dict['skip because required'] = 0
     if not key:
         CHOOSED_MODEL_DICT = ALL_MODELS_DICT[self.type_choose]
     else:
@@ -598,8 +590,6 @@ def importthuvien(odoo_or_self_of_wizard,
     if context_get:
         context.update(context_get)
     self = self.with_context(context)
-   
-    
     key_allow = CHOOSED_MODEL_DICT.get('key_allow',False)
     key_tram = key_allow and self_key_tram
     if key_allow and not key_tram:
@@ -614,21 +604,7 @@ def importthuvien(odoo_or_self_of_wizard,
     
     #R3
     recursive_add_model_name_to_field_attr(self,CHOOSED_MODEL_DICT,key_tram=key_tram)
-#     dac_tinhs = {}
-#     xuat_het_dac_tinh(CHOOSED_MODEL_DICT,key_tram,dac_tinhs)
-#     self.test_result_2 =u'kaka %s'% dac_tinhs 
-#     return False
 
-#     ghom_dac_tinh = {}
-#     rs = muon_xuat_dac_tinh_gi(CHOOSED_MODEL_DICT,attr_muon_xuats = ['skip_this_field'],ghom_dac_tinh=ghom_dac_tinh)
-#     self.test_result_1 = rs
-#     return False
-#     self.test_result_1 = ghom_dac_tinh
-
-    #R3 check_xem_att_co_nam_ngoai_khong
-#     check_xem_att_co_nam_ngoai_khong(CHOOSED_MODEL_DICT,key_tram)
-
-    
     sheet_names = get_key(CHOOSED_MODEL_DICT, 'sheet_names')
     if callable(sheet_names):
         try:
@@ -647,63 +623,13 @@ def importthuvien(odoo_or_self_of_wizard,
     needdata = {}
     needdata['sheet_names'] = sheet_names
     needdata['key_tram'] = key_tram
-    
-
-
-    
     setting = CHOOSED_MODEL_DICT.get('setting',{})
     setting.setdefault('allow_write_from_False_to_not_false',True)
-        
-#     if hasattr(self, 'not_update_field_if_instance_exist_default'):
-#         not_update_field_if_instance_exist_default =  self.not_update_field_if_instance_exist_default
-#     else:
-#         not_update_field_if_instance_exist_default = CHOOSED_MODEL_DICT.get('not_update_field_if_instance_exist_default',False)
-#     
-#     
-#     setting['not_update_field_if_instance_exist_default'] = not_update_field_if_instance_exist_default
-    
-#     if hasattr(self, 'bypass_this_field_if_value_equal_False_default'):
-#         bypass_this_field_if_value_equal_False_default =  self.bypass_this_field_if_value_equal_False_default
-#     else:
-#         bypass_this_field_if_value_equal_False_default = CHOOSED_MODEL_DICT.get('bypass_this_field_if_value_equal_False_default',False)
-   
-    
-    
-    
     setting['bypass_this_field_if_value_equal_False_default'] =  CHOOSED_MODEL_DICT.get('bypass_this_field_if_value_equal_False_default',False)
-    
-    
-    
-    
     setting2 = CHOOSED_MODEL_DICT.get('setting2',{})
     if setting2:
         setting.update(setting2)
     setting.setdefault('allow_write',True)
-#     if hasattr(self, 'not_allow_write'):
-#         not_allow_write = getattr(self,'not_allow_write')
-#     else:
-#         not_allow_write = CHOOSED_MODEL_DICT.get('not_allow_write',False)
-#     setting['allow_write'] = not not_allow_write
-#     if hasattr(self, 'write_when_val_exist'):
-#         write_when_val_exist =  self.write_when_val_exist
-#     else:
-#         write_when_val_exist = CHOOSED_MODEL_DICT.get('write_when_val_exist',True)
-#     setting['write_when_val_exist'] = write_when_val_exist
-#     
-#     
-#     if hasattr(self, 'allow_check_excel_obj_is_exist_func'):
-#         allow_check_excel_obj_is_exist_func =  self.allow_check_excel_obj_is_exist_func
-#     else:
-#         allow_check_excel_obj_is_exist_func = CHOOSED_MODEL_DICT.get('allow_check_excel_obj_is_exist_func',True)
-#     
-#     setting['allow_check_excel_obj_is_exist_func'] = allow_check_excel_obj_is_exist_func
-    
-    
-    
-    
-    
-#     print ('**setting**',setting)
-#     raise UserError(u'%s'%setting)
     prepare_func = CHOOSED_MODEL_DICT.get('prepare_func')
     if prepare_func:
         prepare_func(needdata,self)
@@ -713,9 +639,6 @@ def importthuvien(odoo_or_self_of_wizard,
         COPY_MODEL_DICT = deepcopy(CHOOSED_MODEL_DICT)
         needdata['vof_dict'] = COPY_MODEL_DICT.get('fields') 
         needdata['sheet_name'] = sheet_name
-#         needdata['key_tram'] = key_tram
-#         if key_tram:
-#             rut_gon_key(COPY_MODEL_DICT,key_tram)
         sheet = xl_workbook.sheet_by_name(sheet_name)
         #R3 xuat dac tinh
         if getattr(self,'dac_tinh',None):

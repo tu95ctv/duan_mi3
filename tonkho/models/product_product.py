@@ -103,24 +103,24 @@ class Product(models.Model):
             product.qty_available_dai_hcm = res_all_tram[product.id]['qty_available']
     
     
-    @api.model
-    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
-        res = super(Product, self).fields_view_get(
-            view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
-        if view_type !='search':
-            doc = etree.XML(res['arch'])
-            kho_du_phong_name = self.env.user.department_id.default_location_id.name
-            nodes =  doc.xpath("//field[@name='qty_available_du_phong']")
-            nodes[0].set('string',u'Số lượng trong %s'%kho_du_phong_name)
-            
-            kho_dang_chay_name = self.env.user.department_id.default_location_running_id.name
-            nodes =  doc.xpath("//field[@name='qty_available_dang_chay']")
-            nodes[0].set('string',u'Số lượng trong %s'%kho_dang_chay_name)
-            
-            
-            
-            res['arch'] = etree.tostring(doc, encoding='unicode')
-        return res
+#     @api.model
+#     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+#         res = super(Product, self).fields_view_get(
+#             view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
+#         if view_type !='search':
+#             doc = etree.XML(res['arch'])
+#             kho_du_phong_name = self.env.user.department_id.default_location_id.name
+#             nodes =  doc.xpath("//field[@name='qty_available_du_phong']")
+#             nodes[0].set('string',u'Số lượng trong %s'%kho_du_phong_name)
+#             
+#             kho_dang_chay_name = self.env.user.department_id.default_location_running_id.name
+#             nodes =  doc.xpath("//field[@name='qty_available_dang_chay']")
+#             nodes[0].set('string',u'Số lượng trong %s'%kho_dang_chay_name)
+#             
+#             
+#             
+#             res['arch'] = etree.tostring(doc, encoding='unicode')
+#         return res
         
         
     

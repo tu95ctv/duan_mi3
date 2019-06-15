@@ -31,7 +31,6 @@ FIELDNAME_FIELDATTR_tvcv = [
 Export_Para_tvcv = {
     'exported_model':'tvcv',
     'FIELDNAME_FIELDATTR':FIELDNAME_FIELDATTR_tvcv,
-#     'gen_domain':gen_domain_stock_quant,
     'search_para':{'order': 'cong_viec_cate_id asc'},#desc
     }
     

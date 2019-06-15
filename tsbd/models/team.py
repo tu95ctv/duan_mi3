@@ -16,9 +16,11 @@ class Team(models.Model):
     @api.depends('bxh_ids','trig')
     def large_bxh_id_(self):
         for r in self:
-            if r.bxh_ids:
-                bxh_ids =  r.bxh_ids.sorted(key=lambda r: r.cate_id.no_match)
-                r.large_bxh_id = r.bxh_ids[-1]
+#             if r.bxh_ids:
+            bxh = self.env['tsbd.bxh'].search([('team_id','=', r.id), ('round','=', False), ('cate_id.no_match','>', 5)])
+            if bxh:
+#                 bxh_ids =  r.bxh_ids.sorted(key=lambda r: r.cate_id.no_match)
+                r.large_bxh_id = bxh[0]
     def take_name(self):
         if self.large_bxh_id:
             return self.large_bxh_id.take_name(is_name_gon=True)

@@ -1,0 +1,40 @@
+<odoo>
+    <data>
+         <record model="ir.ui.view" id="event_list">
+            <field name="name">tsbd.event.list</field>
+            <field name="model">tsbd.event</field>
+            <field name="arch" type="xml">
+                <tree >
+                    <field name="match_id"></field>
+                    <field name="event"></field>
+                    <field name="current_time"></field>
+                    <field name="adding_time"></field>
+                    <field name="range_time"></field>
+                    <field name="str_score"></field>
+                    <field name="des"></field>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="tsbd_event_search" model="ir.ui.view">
+            <field name="name">tsbd.event.search</field>
+            <field name="model">tsbd.event</field>
+            <field name="arch" type="xml">
+                <search string="event search">
+                    <field name="current_time" string="Greater minute" filter_domain="[('current_time','&gt;=',self)]" />
+                        <filter string="range_time" domain="[]" context="{'group_by':'range_time'}" />
+                    
+                    
+                    
+                </search>
+                </field>
+                </record>
+               
+        <record model="ir.actions.act_window" id="event_action">
+            <field name="name">event action</field>
+            <field name="res_model">tsbd.event</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+     <menuitem name="event menu" id="tsbd.event_menu" parent="tsbd.menu_root" action="event_action" />
+    </data>
+</odoo>

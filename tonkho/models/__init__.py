@@ -18,7 +18,8 @@ stock_inventory,\
 stock_picking_return,\
 download_tk,\
 cvi_tk,\
-pn_nhom_brand_thiet_bi
+pn_nhom_brand_thiet_bi,\
+statistics
 
 # res_config_setting,\
 # part_number,\

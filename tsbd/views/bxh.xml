@@ -1,6 +1,26 @@
 <odoo>
 	<data>
 	
+	<record model="ir.ui.view" id="sample_bxh_list2">
+            <field name="name">tsbd.bxh.tree</field>
+            <field name="model">tsbd.bxh</field>
+            <field name="priority">19</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="team_id" />
+                    <field name="stt"></field>
+                    <field name="match_number" />
+                    <field name="diem" />
+                    <field name="hsbt" />
+                 	 <field name="diem_dd" />  
+
+                </tree>
+            </field>
+        </record>
+        
+        
+        
+	
 	    <record model="ir.ui.view" id="sample_bxh_list">
             <field name="name">tsbd.bxh.tree</field>
             <field name="model">tsbd.bxh</field>
@@ -39,6 +59,7 @@
                     <field name="team_id" />
                     <field name="stt"></field>
                     <field name="match_number" />
+                    <field name="round" />
                     <field name="diem" />
                     <field name="bet_diem" />
                  	 <field name="diem_dd" />  

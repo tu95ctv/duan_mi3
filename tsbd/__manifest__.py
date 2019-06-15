@@ -37,6 +37,10 @@
         'views/ndleech.xml',
         'views/ndlline.xml',
         'views/errorlog.xml',
+        'views/event.xml',
+        'views/player.xml',
+        'views/playerline.xml',
+        'views/assets.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

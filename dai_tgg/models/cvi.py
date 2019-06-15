@@ -257,22 +257,26 @@ class Cvi(models.Model):
     @api.onchange('loai_record','tvcv_id')
     def tvcv_id_oc_(self):
         member_ids = self._context.get('member_ids')
-        if self.loai_record==u'Công Việc' and member_ids !=None:
-            if not self.cd_children_ids:
+        if self.loai_record==u'Công Việc':
+            if member_ids:
                 member_ids = member_ids[0][2]#[[6, False, [1, 46]]]
-                member_ids = [member_id for member_id in member_ids if member_id != self.user_id.id]
-                if member_ids:
-                    defaults = self.default_get(self._fields)
-                    cd_children_ids  = []
-                    for m in member_ids:
-                        a_defaults = defaults.copy()
-                        a_defaults['user_id']= m
-                        a_cd_children_id = (0,0,a_defaults)
-                        cd_children_ids.append(a_cd_children_id)
-                    return {'value':
-                            {'cd_children_ids':cd_children_ids
-                             }
-                            }
+            member_ids = member_ids or ([self.env.user.chung_ca_user_id] if self.env.user.chung_ca_user_id else [])
+#             if member_ids !=None:
+            if member_ids:
+                if not self.cd_children_ids:
+                    member_ids = [member_id for member_id in member_ids if member_id != self.user_id.id]
+                    if member_ids:
+                        defaults = self.default_get(self._fields)
+                        cd_children_ids  = []
+                        for m in member_ids:
+                            a_defaults = defaults.copy()
+                            a_defaults['user_id']= m
+                            a_cd_children_id = (0,0,a_defaults)
+                            cd_children_ids.append(a_cd_children_id)
+                        return {'value':
+                                {'cd_children_ids':cd_children_ids
+                                 }
+                                }
         else:
             return {'value':
                             {'cd_children_ids':[]

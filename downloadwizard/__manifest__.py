@@ -26,7 +26,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/downloadwizard.xml',
-        'views/statistics.xml',
+#         'views/statistics.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

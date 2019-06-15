@@ -30,6 +30,8 @@
                         <field name="name" />
                         <field name="login" />
                         <field name="date" string="Ngày sinh" />
+                        <field name="chung_ca_user_id" domain="[('department_id','=',department_id)]"></field>
+                        
                      </group>
                      <group>
                         <!--   <field name="contact_address" string="Địa chỉ" /> -->

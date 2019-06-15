@@ -17,6 +17,7 @@
                         <button string="trig" name="trig" type="object" class="btn-primary"/>
                         <button string="xoa_bxh" name="xoa_bxh" type="object"  class="btn-primary"/>
                         <button string="gen_bxh" name="gen_bxh" type="object"  class="btn-primary"/>
+                        <button string="save_avatar_player" name="save_avatar_player" type="object"  class="btn-primary"/>
                     </footer>
                 </form>
             </field>
@@ -53,6 +54,15 @@
             key2="client_action_multi" name="Trig"
             res_model="tsbd.wizard" src_model="tsbd.bxh"
             view_mode="form" target="new" view_type="form" />
+            
+            
+             <act_window id="wizard_player_action"
+            multi="True"
+            key2="client_action_multi" name="Save Image Player"
+            res_model="tsbd.wizard" src_model="tsbd.player"
+            view_mode="form" target="new" view_type="form" />
+            
+            
             
             
             

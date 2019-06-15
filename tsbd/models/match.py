@@ -77,15 +77,27 @@ class Match(models.Model):
     
     @api.multi
     def get_events(self):
-        get_events('59387',self)
+        
+        get_events('59387',self,'team1', 'team2')
     
     @api.multi
     def create_match_for_test(self):
         m = self.env['tsbd.match'].create({'team1':1,'score1':False})
         print ('match',m)
+        
+        
     @api.multi
     def trig_button(self):
         self.write({'trig':True})
+        
+    @api.multi
+    def test(self):
+        ratio,amount = handicap_winning_(None, bet_kind='eu1',mode='predict', match_id =self, skip_tinh_tien=False)
+        ratio2,amount2 = handicap_winning_(None, bet_kind='eu2',mode='predict', match_id =self, skip_tinh_tien=False)
+        raise UserError(u'%s-%s- %s-%s'%(ratio,amount, ratio2,amount2 ))
+        
+        
+        
     @api.multi
     def get_infor_test(self):
         large_bxh_id_of_team2 = self.team2.large_bxh_id
@@ -162,6 +174,12 @@ class Match(models.Model):
             du_doans.append(du_doan)
             
         self.parse_log =du_doans
+    
+    
+    
+    playerline_ids = fields.One2many('tsbd.playerline', 'match_id')
+    away_main_playerline_ids = fields.One2many('tsbd.playerline', 'match_id', domain=[('home_or_away','=','away'), ('da_chinh_hay_du_bi','=','da_chinh')])
+    away_standby_playerline_ids = fields.One2many('tsbd.playerline', 'match_id', domain=[('home_or_away','=','away'), ('da_chinh_hay_du_bi','=','du_bi')])
     round = fields.Integer()
     errorlog_ids = fields.One2many('tsbd.errorlog','match_id')
     cate_id_selection = fields.Selection('cate_id_selection_')
@@ -170,7 +188,7 @@ class Match(models.Model):
         rs = list(map(lambda i:(i.name,i.name),rs))
 #         print ('***cate****',rs)
         return rs    
-        
+    attr_match = fields.Selection([('single_match','tran don'), ('soon_match','tran son'), ('late_match','tran muon'), ('sametime_match','tran cung gio')])
     str_score = fields.Char(compute='str_score_',store=True)
     @api.depends('score1','score2','trig','state')
     @adecorator
@@ -183,12 +201,17 @@ class Match(models.Model):
     link = fields.Char()
     trig = fields.Boolean()
     betscoreline_ids = fields.One2many('tsbd.betscoreline', 'match_id')
-    def default_time(self):
-        if 'leech_all_match_function' in self._context:
-            return False
-        else:
-            return fields.Datetime.now()
-        
+   
+    shots_on_target1 = fields.Integer()
+    shots_off_target1 = fields.Integer()
+    possession1 = fields.Integer()
+    
+    shots_on_target2 = fields.Integer()
+    shots_off_target2 = fields.Integer()
+    possession2 = fields.Integer()
+    
+    du_bi_players2_ids = fields.Many2many('tsbd.player','match_du_bi_players2_rel','match_id' 'player_id')
+    da_chinh_players2_ids = fields.Many2many('tsbd.player','match_du_bi_players2_rel','match_id' 'player_id')
     is_min_time = fields.Boolean()
     time= fields.Datetime()#[('cate_id','=',self.id),
     date = fields.Date()
@@ -431,6 +454,18 @@ class Match(models.Model):
         for r in self:
             r.sum_score12 = r.score1 + r.score2
     event_ids =  fields.One2many('tsbd.event','match_id')
+    event_show = fields.Char(compute='event_show_')
+    @api.depends('event_ids')
+    def event_show_(self):
+        for r in self:
+            goal_event_ids = r.event_ids.filtered(lambda r: r.event == 'goal')
+            event_shows = []
+            for event in goal_event_ids:
+                minute = u'%s%s'%(event.current_time, u'+%s'%event.adding_time if event.adding_time else '')
+                a_show = u'%s:%s'%(minute, event.str_score)
+                event_shows.append(a_show)
+            event_show = u','.join(event_shows)
+            r.event_show = event_show
     bet_ids =  fields.One2many('tsbd.bet','match_id')
     
     hd_ou_show = fields.Char(compute='hd_ou_show_')
@@ -492,12 +527,43 @@ class Match(models.Model):
                                        compute='handicap_wl_compute_', store=True)
     handicap_bet_winner = fields.Selection([('team1',u'Team1'), ('team2',u'Team 2'), ('hoa',u'Hòa')], compute='handicap_wl_compute_', store= True)
     handicap_bet_loser = fields.Selection([('team1',u'Team1'), ('team2',u'Team 2'), ('hoa',u'Hòa')], compute='handicap_wl_compute_', store= True)
+    
     handicap_wl1 = fields.Float(compute='handicap_wl_compute_', store=True)
     handicap_wl2 = fields.Float(compute='handicap_wl_compute_', store=True)
     handicap_win_amount = fields.Float(compute='handicap_wl_compute_', store=True)
     handicap_lost_amount = fields.Float(compute='handicap_wl_compute_', store=True)
     handicap_wl_amount1 = fields.Float(compute='handicap_wl_compute_', store=True)
     handicap_wl_amount2 = fields.Float(compute='handicap_wl_compute_', store=True)
+    
+    eu1_odd = fields.Float()
+    eu_draw_odd = fields.Float()
+    eu2_odd= fields.Float()
+    
+    
+    eu1_amount = fields.Float(compute='eu_amount_', store= True)
+    eu_draw_amount = fields.Float(compute='eu_amount_', store= True)
+    eu2_amount = fields.Float(compute='eu_amount_', store= True)
+    
+    @api.depends('score1', 'score2', 'eu1_odd', 'eu2_odd', 'eu_draw_odd','state', 'trig')
+    @adecorator
+    def eu_amount_(self):
+        for r in self:
+            if r. eu1_odd:
+                ratio,amount = handicap_winning_(None, bet_kind='eu1',mode='predict', match_id =r)
+                r.eu1_amount = amount
+                
+                ratio,amount = handicap_winning_(None, bet_kind='eu_draw',mode='predict', match_id =r)
+                r.eu_draw_amount = amount
+                
+                ratio,amount = handicap_winning_(None, bet_kind='eu2',mode='predict', match_id = r)
+                r.eu2_amount = amount
+            
+            
+            
+            
+            
+            
+    
     
     @api.depends('score1', 'score2', 'begin_handicap','state', 'trig')
     @adecorator
@@ -536,7 +602,11 @@ class Match(models.Model):
                 elif r.begin_handicap < 0:
                     adict = {'team2':'cua_tren', 'team1':'cua_duoi'}
                 rs = adict.get(doi_thang, doi_thang)
-                r.cua_tren_hay_cua_duoi = rs       
+                r.cua_tren_hay_cua_duoi = rs    
+                
+                
+                
+                   
     context_team_handicap_wl = fields.Float(compute='context_team_handicap_wl_')
     @api.depends('team1','team2','handicap_wl1','handicap_wl2')
     @adecorator
@@ -645,7 +715,7 @@ class Match(models.Model):
     @api.depends('team1','team_match_limit','matchs_filter_by_cate','cate_id')
     def team1_match_ids_(self):
         for r in self:
-            limit =r.team_match_limit or None# r.team_match_limit or None
+            limit =5#r.team_match_limit or None# r.team_match_limit or None
             for no_team in ['1', '2']:
                 team = getattr(r,'team%s'%no_team).id
                 domain =['|', ('team1', '=',team ), ('team2', '=', team),('state','!=',u'Chưa bắt đầu')]
@@ -701,69 +771,107 @@ class Match(models.Model):
                     conclude = self.gen_handicap_and_over_array_str(team2_ids, ad['team'])
 #                     conclude = u'%s--domain:%s'%(conclude,domain)
                     setattr(r, '%srelated_%s_conclude'%(all_relate_or_home_away, team), conclude)
-                    
     def same_or_change(self, al):
         i_pre = None
-        sign_pre = 0
-        same = 1
-        sign=0
-        wl_same_list =[]
-        win_same_list =[]
-        lose_same_list =[]
-        change = 0
-        change_list = []
+        sign_pre ,sign,  same,change,   = 0, 0,1,0
+        wl_same_list, win_same_list,lose_same_list,change_list   =[],[],[], []
         for c, i in enumerate(al):
-         
-                if i !=0 or (i==0 and c == (len(al)-1)) :
-                    print ('c',c,'i_pre',i)
+                if i !=0 or c == (len(al)-1) :
                     if i_pre ==None:
                         i_pre = i
                         continue
                     if i !=0:
                         sign = i*i_pre
                         sign_of_sign = sign * sign_pre
-                        print ('sign_of_sign', sign_of_sign)
+                    else:
+                        sign_of_sign = 0
                     if i_pre > 0:
                         same_list = win_same_list
                     else:
                         same_list = lose_same_list
-        
-                    if sign < 0 :# change
+                    if sign < 0 :
                         if i !=0:
                             change +=1
                         if sign_of_sign < 0 :
                             same_list.append(same)
-                            append_list = same_list
-                            append_item = same
                             wl_same_list.append(same)
-                        else:
-                            if c == (len(al)-1):
-                                print ('hahahah')
-                                append_list = change_list
-                                append_item = change
-                                change_list.append(change)
-                        same = 1 
-    #                     i_pre =i
-    #                     sign_pre = sign
+                            same = 1
+                        if c == (len(al)-1):
+                            change_list.append(change)
                     elif sign > 0:
                         if i !=0:
                             same +=1
                         if sign_of_sign< 0:
                             change_list.append(change)
-                            append_list = change_list
-                            append_item = change
-                       
-                        else:
-                            if c == (len(al)-1):
-                                print ('ahahaha')
-                                append_list = same_list
-                                append_item = same
-                                same_list.append(same)
-                                wl_same_list.append(same)
-                        change =0
+                            change =0
+                        if c == (len(al)-1):
+                            same_list.append(same)
+                            wl_same_list.append(same)
                     i_pre = i
                     sign_pre = sign
-        return wl_same_list, win_same_list, lose_same_list,change_list
+        return wl_same_list, win_same_list, lose_same_list,change_list      
+#     def same_or_change(self, al):
+#         i_pre = None
+#         sign_pre = 0
+#         same = 1
+#         sign=0
+#         wl_same_list =[]
+#         win_same_list =[]
+#         lose_same_list =[]
+#         change = 0
+#         change_list = []
+#         for c, i in enumerate(al):
+#          
+#                 if i !=0 or (i==0 and c == (len(al)-1)) :
+# #                     print ('c',c,'i_pre',i)
+#                     if i_pre ==None:
+#                         i_pre = i
+#                         continue
+#                     if i !=0:
+#                         sign = i*i_pre
+#                         sign_of_sign = sign * sign_pre
+# #                         print ('sign_of_sign', sign_of_sign)
+#                     if i_pre > 0:
+#                         same_list = win_same_list
+#                     else:
+#                         same_list = lose_same_list
+#         
+#                     if sign < 0 :# change
+#                         if i !=0:
+#                             change +=1
+#                         if sign_of_sign < 0 :
+#                             same_list.append(same)
+#                             append_list = same_list
+#                             append_item = same
+#                             wl_same_list.append(same)
+#                         else:
+#                             if c == (len(al)-1):
+# #                                 print ('hahahah')
+#                                 append_list = change_list
+#                                 append_item = change
+#                                 change_list.append(change)
+#                         same = 1 
+#     #                     i_pre =i
+#     #                     sign_pre = sign
+#                     elif sign > 0:
+#                         if i !=0:
+#                             same +=1
+#                         if sign_of_sign< 0:
+#                             change_list.append(change)
+#                             append_list = change_list
+#                             append_item = change
+#                        
+#                         else:
+#                             if c == (len(al)-1):
+# #                                 print ('ahahaha')
+#                                 append_list = same_list
+#                                 append_item = same
+#                                 same_list.append(same)
+#                                 wl_same_list.append(same)
+#                         change =0
+#                     i_pre = i
+#                     sign_pre = sign
+#         return wl_same_list, win_same_list, lose_same_list,change_list
        
     
     def gen_bet_handicap_array_str(self, rs, team):

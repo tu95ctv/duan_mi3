@@ -18,12 +18,11 @@
     'depends': ['base','base_import','hr','stock','downloadwizard'],
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
         'views/ctr.xml',
         'views/cvi_form.xml',
         'views/cvi.xml',
         'views/tvcv.xml',
-        'views/importthuvien.xml',
+#         'views/importthuvien.xml',
         'views/comment.xml',
         'views/config.xml',
 #         'views/ghichucongviec.xml',

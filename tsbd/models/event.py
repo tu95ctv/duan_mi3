@@ -2,6 +2,16 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from math import ceil
+
+def goaldecorator(func):
+    def awrapper(*arg,**karg):  
+        self = arg[0]
+        for r in self:
+            if r.event =='goal' :
+                func(r)
+    return awrapper
+
 
 class Event(models.Model):
     _name = 'tsbd.event'
@@ -14,8 +24,25 @@ class Event(models.Model):
     score1 = fields.Integer()
     score2 = fields.Integer()
     current_time = fields.Integer()
+    range_time = fields.Selection([('10','10'),('20','20'),('30','30'),('40','40'),('50','50'),('60','60'),('70','70'),('80','80'),('90','90')],compute = 'range_time_',store=True)
+    
+    @api.depends('current_time')
+    @goaldecorator
+    def range_time_(self):
+        for r in self:
+            if r.current_time <= 90:
+                rs = ceil(r.current_time/10.0)
+                rs = str(rs*10)
+                r.range_time =rs
     adding_time = fields.Integer()
     des = fields.Text()
+    str_score = fields.Char(compute='str_score_',store=True)
+    @api.depends('score1','score2','event')
+    def str_score_(self):
+        for r in self:
+            if r.event =='goal':
+                r.str_score =u'%s-%s'%(r.score1, r.score2)
+    
     
     
     @api.onchange('time')

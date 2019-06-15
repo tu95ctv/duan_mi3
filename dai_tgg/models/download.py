@@ -82,6 +82,9 @@ class DownloadCVI(models.TransientModel):
         pick_func = {'tvcv':download_tvcv,'res.users':download_user,'download_bcn':dl_bcn,'cvi': dl_cvi,'download_p3':dl_p3}
         rs.update(pick_func)
         return rs
+    
+    
+    
     @api.multi
     def gen_model_verbal_dict(self): 
         rs = super(DownloadCVI, self).gen_model_verbal_dict()

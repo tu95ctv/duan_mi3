@@ -6,12 +6,10 @@ from datetime import datetime, timedelta
 from odoo.addons.tsbd.models.tool import  request_html
 from bs4 import BeautifulSoup
 
-
-
-
 class BXH(models.Model):
     _name = 'tsbd.bxh'
     _order = 'diem desc, hsbt desc, score_sum desc'
+    round =  fields.Integer()
     leech_ids = fields.Many2many('tsbd.leech','leech_bxh_rel', 'bxh_id', 'leech_id')
     team_id = fields.Many2one('tsbd.team')
     stt = fields.Integer()
@@ -119,10 +117,11 @@ class BXH(models.Model):
     @api.depends('bet_home_over','bet_away_over', 'match_number')
     def bet_over_(self):
         for r in self:
-            bet_over = r.bet_home_over +  r.bet_away_over
-            bet_over_pc = 100*bet_over/r.match_number
-            r.bet_over = bet_over
-            r.bet_over_pc = bet_over_pc
+            if r.match_number:
+                bet_over = r.bet_home_over +  r.bet_away_over
+                bet_over_pc = 100*bet_over/r.match_number
+                r.bet_over = bet_over
+                r.bet_over_pc = bet_over_pc
     stt_bet_over = fields.Integer()        
     
     home_tg = fields.Integer()
@@ -158,8 +157,8 @@ class BXH(models.Model):
         for r in self:
             r.hsbt =  r.away_tg + r.home_tg - r.away_th - r.home_th
             
-    match_number =  fields.Integer(compute='match_number_',store=True)
-    
+#     match_number =  fields.Integer(compute='match_number_',store=True)
+    match_number =  fields.Integer()
     @api.depends('home_match_number', 'away_match_number')
     def match_number_(self):
         for r in self:
@@ -174,11 +173,13 @@ class BXH(models.Model):
     @api.depends('score_sum','match_number', 'trig')
     def average_score_(self):
         for r in self:
-            r.average_score = r.score_sum/r.match_number
+            if r.match_number:
+                r.average_score = r.score_sum/r.match_number
     @api.depends('lost_score_sum','match_number', 'trig')
     def average_lost_score_(self):
         for r in self:
-            r.average_lost_score = r.lost_score_sum/r.match_number
+            if r.match_number:
+                r.average_lost_score = r.lost_score_sum/r.match_number
             
             
     home_average_score = fields.Float(compute='home_average_score_', store=True,string=u'home as')      
@@ -209,6 +210,12 @@ class BXH(models.Model):
 #     def diem_(self):
 #         for r in self:
 #             r.diem = (r.home_t + r.away_t) *3 + (r.home_h + r.away_h)
+
+# class BXHround(models.Model):
+#     _name = 'tsbd.bxhround'
+#     _inherit = 'tsbd.bxh'
+#     
+    
 class BETBXH(models.Model):
     _inherit = 'tsbd.bxh'
 #     _name = 'tsbd.betbxh'

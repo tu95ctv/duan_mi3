@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-from datetime import  timedelta
-import datetime
+from datetime import  timedelta,datetime
+# import datetime
 # from odoo.addons.tsbd.models.tool import  request_html
 from bs4 import BeautifulSoup
 import re
@@ -55,8 +55,12 @@ def thap_phan_co_2_cham(td):
 
 # 04/02
 def get_soup(link):
-    html  = request_html(link)
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = ''
+    count_try = 0
+    while not str(soup) and count_try < 2:
+        html  = request_html(link)
+        soup = BeautifulSoup(html, 'html.parser')
+        count_try +=1
     return soup
 def get_fix_id(match_link):
         if not match_link:
@@ -73,6 +77,7 @@ def get_soup_ajax_link(fix_id,template_link):
 
 def get_team_and_date(self, match_link, add_update_dict, is_set_must_get_time = True):
         soup = None
+        html = None
         if is_set_must_get_time:
             check_time_for_get_soup = 'time' not in add_update_dict
         else:
@@ -81,7 +86,9 @@ def get_team_and_date(self, match_link, add_update_dict, is_set_must_get_time = 
         is_get_soup =    any(['home' not in add_update_dict, 'away' not in add_update_dict, check_time_for_get_soup])
         
         if is_get_soup:
-            soup = get_soup(match_link)
+            html  = request_html(match_link)
+            soup = BeautifulSoup(html, 'html.parser')
+#             soup = get_soup(match_link)
         
         if  'home' not in add_update_dict:
             home = soup.select('div#scr_home a')[0].get_text()
@@ -97,7 +104,7 @@ def get_team_and_date(self, match_link, add_update_dict, is_set_must_get_time = 
         away = away.strip()
         if 'time' in add_update_dict:
             begin_time = add_update_dict['time']
-            dtime = datetime.datetime.strptime(begin_time,'%d/%m/%Y %H:%M') - timedelta(hours=7)
+            dtime = datetime.strptime(begin_time,'%d/%m/%Y %H:%M') - timedelta(hours=7)
             str_time = fields.Datetime.to_string(dtime)
             match_date = dtime.date()
             str_date = fields.Date.to_string(dtime)
@@ -105,38 +112,15 @@ def get_team_and_date(self, match_link, add_update_dict, is_set_must_get_time = 
             if is_set_must_get_time:
                 begin_time = soup.select('div#scr_start')[0].get_text()
                 begin_time = begin_time[9:]
-                dtime = datetime.datetime.strptime(begin_time,'%d/%m/%Y %H:%M') - timedelta(hours=7)
+                dtime = datetime.strptime(begin_time,'%d/%m/%Y %H:%M') - timedelta(hours=7)
                 str_time = fields.Datetime.to_string(dtime)
                 match_date = dtime.date()
                 str_date = fields.Date.to_string(match_date)
             else:
-                match_date = datetime.datetime.strptime(add_update_dict['date'],'%d/%m/%Y')
+                match_date = datetime.strptime(add_update_dict['date'],'%d/%m/%Y')
                 str_date = fields.Date.to_string(match_date)
                 str_time = None
-            
        
-                
-        
-#         if 'time' not in add_update_dict and  'date' not in add_update_dict:
-#             begin_time = soup.select('div#scr_start')[0].get_text()
-#             begin_time = begin_time[9:]
-#             dtime = datetime.datetime.strptime(begin_time,'%d/%m/%Y %H:%M') - timedelta(hours=7)
-#             str_time = fields.Datetime.to_string(dtime)
-#             match_date = dtime.date()
-#             str_date = fields.Date.to_string(match_date)
-#         else:
-#             if 'time' in add_update_dict:
-#                 begin_time = add_update_dict['time']
-#                 dtime = datetime.datetime.strptime(begin_time,'%d/%m/%Y %H:%M') - timedelta(hours=7)
-#                 str_time = fields.Datetime.to_string(dtime)
-#                 match_date = dtime.date()
-#                 str_date = fields.Date.to_string(dtime)
-#             else:
-#                 match_date = datetime.datetime.strptime(add_update_dict['date'],'%d/%m/%Y')
-#                 str_date = fields.Date.to_string(match_date)
-#                 str_time = None
-                
-                
         team1_id = get_or_create_object_sosanh(self,'tsbd.team',{'name':home})
         team2_id = get_or_create_object_sosanh(self,'tsbd.team',{'name':away})
         team_dict = {'team1': team1_id.id,
@@ -145,7 +129,7 @@ def get_team_and_date(self, match_link, add_update_dict, is_set_must_get_time = 
                             'date':str_date,
                             
                     }
-        return team_dict, match_date, str_time,home,away, soup
+        return team_dict, match_date, str_time,home,away, soup, html
     
 def get_score(fix_id, soup=None,add_update_dict = {}):
     if 'score1' in add_update_dict and 'score2' in add_update_dict and 'state' in add_update_dict and 'curent_time' in add_update_dict:
@@ -198,28 +182,34 @@ def get_score(fix_id, soup=None,add_update_dict = {}):
     return score_dict
 
 def get_odds(fix_id):
-#     txt_list_divodds = None
-#     num_try_get_html = 0
-#     while not txt_list_divodds and num_try_get_html < 5:
     template_link = u'http://bongdaso.com/_OddsInfo.aspx?FixtureID=%s&LeagueID=1&SeasonID=50&HomeClubID=14&AwayClubID=15001&HomePrimaryClubID=14&AwayPrimaryClubID=15001&HomeShortCode=NEW&AwayShortCode=WOV&Home=Newcastle&Away=Wolverhampton'
-    soup = get_soup_ajax_link(fix_id,template_link)
-    divodds = soup.select('div#ABOdds table  tr:nth-of-type(2) td')
-    txt_list_divodds = list(map(lambda td: thap_phan_co_2_cham(td) ,divodds))
-#     if not txt_list_divodds:
-#             f = open("/media/sf_C_DRIVE/D4/dl/not_odds.html", "w")
-#             f.write(str(soup))
-#             num_try_get_html +=1
-    if txt_list_divodds:
+    count_try = 0
+    divodds = None 
+    while not divodds and count_try < 5:
+        soup = get_soup_ajax_link(fix_id,template_link)
+        divodds = soup.select('div#ABOdds table  tr:nth-of-type(2) td')
+        txt_list_divodds = list(map(lambda td: thap_phan_co_2_cham(td) ,divodds))
+        count_try +=1
+    print ('***txt_list_divodds', txt_list_divodds)
+    if divodds:
         odds_dict = {
-            'begin_handicap_money1' : txt_list_divodds[0] -1  if  txt_list_divodds[0] else False,
-            'begin_handicap_money2' : txt_list_divodds[2] -1 if  txt_list_divodds[2] else False,
+            'begin_handicap_money1' : txt_list_divodds[0] -1.0  if  txt_list_divodds[0] else False,
+            'begin_handicap_money2' : txt_list_divodds[2] -1.0 if  txt_list_divodds[2] else False,
             'begin_handicap' :  txt_list_divodds[1],
             'begin_ou_money1' :txt_list_divodds[4] -1.0 if txt_list_divodds[4] else False,
             'begin_ou_money2' : txt_list_divodds[5] -1.0 if txt_list_divodds[5] else False,
             'begin_ou' :txt_list_divodds[3],
+            'eu1_odd':txt_list_divodds[6] -1.0 if txt_list_divodds[6] else False,
+            'eu_draw_odd':txt_list_divodds[7] -1.0 if txt_list_divodds[7] else False,
+            'eu2_odd':txt_list_divodds[8] -1.0 if txt_list_divodds[8] else False,
             }
+        odds_dict_new ={}
+        for k,v in odds_dict.items():
+            odds_dict_new[k] = round(v, 3) if v else v
+            odds_dict = odds_dict_new
+        print ('***odds_dict', odds_dict)
     else:
-        raise UserError(u'không có txt_list_divodds')
+        raise UserError(u'không có txt_list_divodds: %s'%divodds)
     
         
     
@@ -264,9 +254,8 @@ def get_cate(self,fix_id, league_season, match_date, soup = None):
     return cate_id
 
 
-
-
-def gen_a_match_dict(self,adict, trow, mode='stat', cate_name = False,period=False):
+def gen_a_match_dict(trow, mode='stat', cate_name = False,period=False):
+    adict = {}
     nth_datetime = 1
     date_format = '%d/%m/%y %H:%M'
     time_key = 'time'
@@ -301,24 +290,17 @@ def gen_a_match_dict(self,adict, trow, mode='stat', cate_name = False,period=Fal
         nth_home =2
         nth_away = 4
         nth_score =3
-#         
-#         match_link_td = trow.select('td:nth-of-type(5) a')
-#         if not match_link_td:
-#             continue
-#         href =  'http://bongdaso.com/' + match_link_td[0]['href']
-#         adict['match_link'] = href
-#         adict['cate'] = cate_name
-#         
-#         begin_time =  trow.select('td:nth-of-type(1)')[0].get_text()
-#         begin_times = begin_time.split(' ')
-#         begin_time = begin_times[0] + '/' + str(fields.Date.from_string(fields.Date.context_today(self)).year) +' ' + begin_times[1]
-#         adict['time']= begin_time
-#         
-#         begin_time =  trow.select('td:nth-of-type(2)')[0].get_text()
-#         adict['home']= begin_time
-#         begin_time =  trow.select('td:nth-of-type(4)')[0].get_text()
-#         adict['away']= begin_time
+    
+    elif mode == '_LiveMatches':
+        date_format = '%d/%m %H:%M'
+        time_key = 'time'
+        nth_match_link = 5
+        nth_home =2
+        nth_away = 4
+        nth_score =3
         
+        
+
     elif mode =='AsianCupSchedule':
         nth_home =4
         nth_away = 6
@@ -331,24 +313,32 @@ def gen_a_match_dict(self,adict, trow, mode='stat', cate_name = False,period=Fal
     if datem:
         datem = datem[0].get_text()
         if datem:
-            try:
-                datem_obj = datetime.datetime.strptime(datem, date_format)
-                if mode == 'SeasonID' or mode =='AsianCupSchedule':
-                    datem = datem_obj.strftime('%d/%m/%Y %H:%M')
-                elif mode == '_ComingMatches' or mode == '_PlayedMatches' :
-                    datems = datem.split(' ')
-                    datem = datems[0] + '/' + str(fields.Date.from_string(fields.Date.context_today(self)).year) +' ' + datems[1]
-            except Exception as e:
-                return 'continue'
+            if mode !='_LiveMatches':
+                try:
+                    datem_obj = datetime.strptime(datem, date_format)
+                    if mode == 'SeasonID' or mode =='AsianCupSchedule':
+                        datem = datem_obj.strftime('%d/%m/%Y %H:%M')
+                    elif mode == '_ComingMatches' or mode == '_PlayedMatches' :
+                        datems = datem.split(' ')
+                        str_year = str((datetime.now() + timedelta(hours=7)).year)
+                        datem = datems[0] + '/' + str_year +' ' + datems[1]
+                except Exception as e:
+                    return 'continue', adict
+            else:
+                datem_obj =True
+                datetime_str = datem.split('+')[0].replace("'",'')
+                raise UserError(datem)
+                adict['curent_time'] = int (datetime_str)
         else:
-            return 'continue'
+            return 'continue', adict
     else:
-        return 'continue'
+        return 'continue', adict
     
     if datem_obj:
         if mode !='_ComingMatches':
-            home =  trow.select('td:nth-of-type(%s) a'%nth_home)
-            away =  trow.select('td:nth-of-type(%s) a'%nth_away)
+            print ('trow in here** ', trow)
+            home =  trow.select('td:nth-of-type(%s)'%nth_home)
+            away =  trow.select('td:nth-of-type(%s)'%nth_away)
             home = home[0].get_text()
             away = away[0].get_text()
         else:
@@ -392,7 +382,7 @@ def gen_a_match_dict(self,adict, trow, mode='stat', cate_name = False,period=Fal
             elif '-' in score_soup:
                 score_soup = score_soup.split('-')
             else:
-                return 'continue'
+                return 'continue', 
                 raise UserError(u'Sao tỷ số lại không có định dạn -, *,~')
             try:
                 adict['score1'] = int(score_soup[0])
@@ -407,25 +397,29 @@ def gen_a_match_dict(self,adict, trow, mode='stat', cate_name = False,period=Fal
                 
         else:
             adict['state']= u'Chưa bắt đầu'
+        print ("***ok")
+        return 'ok', adict
     else:
-        return 'continue'
-   
-# if '_PlayedMatches' in all_match_link:
-#     #http://bongdaso.com/_PlayedMatches.aspx?LeagueID=-1&SeasonID=-1&Period=1
-#     mode = '_PlayedMatches'  #1
-# elif 'Data=stat' in all_match_link:
-#     #http://bongdaso.com/Everton-Leicester_City-2019_01_01-_Fix_55956.aspx.aspx?LeagueID=1&SeasonID=106&Data=stat
-#     mode = 'stat' #2
-# elif '_ComingMatches' in all_match_link:
-# #http://bongdaso.com/_ComingMatches.aspx?LeagueID=-1&SeasonID=-1&Period=1&Odd=1
-#     mode = '_ComingMatches' #4
-# else:
-#     #http://bongdaso.com/LeagueSchedule.aspx?LeagueID=1&SeasonID=106&CountryRegionID=-1&Period=5
-#     mode = 'SeasonID' #3
-#    
+        return 'continue', adict
+
+def get_list_of_match_dict(all_match_link):
     
-    
-def get_list_of_match_dict(self, soup, mode):
+    soup = get_soup(all_match_link)
+    if '_PlayedMatches' in all_match_link:
+        #http://bongdaso.com/_PlayedMatches.aspx?LeagueID=-1&SeasonID=-1&Period=1
+        mode = '_PlayedMatches'  #1
+    elif '_LiveMatches' in all_match_link:
+        mode ='_LiveMatches'
+    elif 'Data=stat' in all_match_link:
+        #http://bongdaso.com/Everton-Leicester_City-2019_01_01-_Fix_55956.aspx.aspx?LeagueID=1&SeasonID=106&Data=stat
+        mode = 'stat' #2
+    elif '_ComingMatches' in all_match_link:
+    #http://bongdaso.com/_ComingMatches.aspx?LeagueID=-1&SeasonID=-1&Period=1&Odd=1
+        mode = '_ComingMatches' #4
+    elif 'AsianCupSchedule' in all_match_link:
+        mode = 'AsianCupSchedule'
+    else:
+        mode = 'SeasonID' #3
     match_link_list = []
     trows = soup.select('table  tr')
     cate_name = False
@@ -437,35 +431,20 @@ def get_list_of_match_dict(self, soup, mode):
     elif mode =='AsianCupSchedule':
         cate_name = 'Asian Cup 2019'
     for trow in trows:
-        adict = {}
-        if mode == '_PlayedMatches' or mode == '_ComingMatches':
+#         adict = {}
+        if mode in [ '_PlayedMatches',  '_ComingMatches' , '_LiveMatches']:
             class_ = trow.get('class')
             if class_ ==['ls']:
                 cate_name = trow.get_text()
                 cate_name = cate_name.strip()
                 continue
-#         if mode == '_PlayedMatches' :
-#             match_link_td = trow.select('td:nth-of-type(5) a')
-#             if not match_link_td:
-#                 continue
-#             href =  'http://bongdaso.com/' + match_link_td[0]['href']
-#             adict['match_link'] = href
-#             adict['cate'] = cate_name
-#             begin_time =  trow.select('td:nth-of-type(1)')[0].get_text()
-#             begin_times = begin_time.split(' ')
-#             begin_time = begin_times[0] + '/' + str(fields.Date.from_string(fields.Date.context_today(self)).year) +' ' + begin_times[1]
-#             adict['time']= begin_time
-#             begin_time =  trow.select('td:nth-of-type(2)')[0].get_text()
-#             adict['home']= begin_time
-#             begin_time =  trow.select('td:nth-of-type(4)')[0].get_text()
-#             adict['away']= begin_time
-#         else:
-        rt = gen_a_match_dict(self,adict, trow,mode, cate_name,period)
-        if rt =='continue':
+
+        code, a_match_dict  = gen_a_match_dict(trow,mode, cate_name,period)
+        if code =='continue':
             continue
-        if 'home' not in adict:
-            raise UserError(' not home in adict %s in get_list_of_match_dict'%adict)
-        match_link_list.append( adict)
+        if 'home' not in a_match_dict:
+            raise UserError(' not home in adict %s in gen match adict'%a_match_dict)
+        match_link_list.append( a_match_dict)
     return  match_link_list
 def update_score_odds (self, txt_trows,match_id):  
     bet_ScoreLines = []
@@ -477,13 +456,19 @@ def update_score_odds (self, txt_trows,match_id):
         bet_ScoreLine = get_or_create_object_sosanh(self,'tsbd.betscoreline', {'betscore_id':bet_score_id, 'match_id':match_id}, {'odd':odd})
         bet_ScoreLines.append(bet_ScoreLine)
     return bet_ScoreLines
-def get_events(fix_id,self, home,away):
+
+def get_soup_of_events(fix_id, home,away):
     home =  quote(home)
     away = quote(away)
     link = 'http://bongdaso.com/_CastingInfo.aspx?FixtureID={}&SeasonID=112&Flags=&Home={}&Away={}'.format(fix_id, home, away)
-#     soup = get_soup_ajax_link(fix_id, link)
     html  = request_html(link)
     soup = BeautifulSoup(html, 'html.parser')
+    return soup
+def get_events(fix_id,self, home,away, event_soup= None):
+    if not event_soup:
+        soup = get_soup_of_events(fix_id, home,away)
+        
+        
     rs = soup.select('div.fixture_casting table tr')
     events =[]
     for tr in rs:
@@ -510,7 +495,9 @@ def get_events(fix_id,self, home,away):
                 str_scores = str_score.split(':')
                 score1 = int(str_scores[0])
                 score2 = int(str_scores[1])
-                score_event = get_or_create_object_sosanh(self,'tsbd.event', {'event':'goal','match_id':self.id, 'score1':score1,'score2':score2},{'des':des,'current_time': minute,'adding_time':adding_time}).id
+                update_dict = {'des':des,'current_time': minute,'adding_time':adding_time}
+                print ('update_dict', update_dict)
+                score_event = get_or_create_object_sosanh(self,'tsbd.event', {'event':'goal','match_id':self.id, 'score1':score1,'score2':score2},update_dict).id
                 events.append(score_event)
             event_soup = tr.select('td:nth-of-type(2) img')
             if event_soup:
@@ -519,12 +506,17 @@ def get_events(fix_id,self, home,away):
                 if src == 'img/45.gif':
                     des  = tr.select('td:nth-of-type(4)')[0].get_text()
                     rs = re.search('(\d+):(\d+)', des)
-                    score1,score2 =rs.group(1),rs.group(2)
-                    haftime_event = get_or_create_object_sosanh(self,'tsbd.event', {'event':'h1_finish','match_id':self.id},{'des':des,'score1':score1,'score2':score2, 'current_time': minute,'adding_time':adding_time}).id
+                    score1,score2 =int(rs.group(1)), int(rs.group(2))
+                    update_dict = {'des':des,'score1':score1, 'score2':score2, 'current_time': minute,'adding_time':adding_time}
+                    print ('update_dict',update_dict)
+                    haftime_event = get_or_create_object_sosanh(self,'tsbd.event', {'event':'h1_finish','match_id':self.id},update_dict).id
                     events.append(haftime_event)
     return events
                 
-def get_update_dict(self, match_link, match_date, IS_GET_STATISTICS_MATCH = False, add_update_dict = {},str_time=None, match_soup = None):
+def get_update_dict(self, match_link, match_date, IS_GET_STATISTICS_MATCH = False,
+                     add_update_dict = {},str_time=None, match_soup = None,
+                     thong_ke_dict = {},
+                     ):
         update_dict = {}
         fix_id = get_fix_id(match_link)
         #         cate = add_update_dict['cate']
@@ -538,11 +530,11 @@ def get_update_dict(self, match_link, match_date, IS_GET_STATISTICS_MATCH = Fals
             update_dict['cate_id']  = cate_id    
         if not match_soup:
             match_soup = get_soup(match_link)
-        grp_rnd_info = match_soup.select('div#grp_rnd_info')
-        if grp_rnd_info:
-            grp_rnd_info= grp_rnd_info[0].get_text()
-            if u'ảng' in grp_rnd_info:
-                update_dict['bang_id']  = get_or_create_object_sosanh(self,'tsbd.cate', {'name':grp_rnd_info, 'cate_id':cate_id}).id
+        bang_soup = match_soup.select('div#grp_rnd_info')
+        if bang_soup:
+            bang_name= bang_soup[0].get_text().replace(':','')
+            if u'ảng' in bang_name:
+                update_dict['bang_id']  = get_or_create_object_sosanh(self,'tsbd.cate', {'name':bang_name, 'cate_id':cate_id}).id
         score_and_status_dict = get_score(fix_id, add_update_dict=add_update_dict)
         update_dict.update(score_and_status_dict)
         odds_adict, score_odd_lst_strows = get_odds(fix_id)
@@ -558,6 +550,7 @@ def get_update_dict(self, match_link, match_date, IS_GET_STATISTICS_MATCH = Fals
             statictis_match_ids = self.leech_all_match_function(statictis_link, is_write = False, break_count=6, IS_GET_STATISTICS_MATCH  = False)
             statictis_match_dict = {'statictis_match_ids':[(6,0,statictis_match_ids)]}
             update_dict.update(statictis_match_dict)
+        update_dict.update(thong_ke_dict)
         return update_dict, score_odd_lst_strows
     
     

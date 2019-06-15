@@ -1,0 +1,57 @@
+<odoo>
+    <data>
+       
+        <record model="ir.ui.view" id="player_form">
+            <field name="name">tsbd.player.form</field>
+            <field name="model">tsbd.player</field>
+            <field name="arch" type="xml">
+                <form>
+                <sheet>
+                	<group>
+                	<field name="image_view" widget='image' class="oe_avatar" options='{"preview_image":"image_medium"}'/>
+                	<field name="image_link" />
+               		<field name="name"></field>
+               		<field name="birthday"></field>
+               		<field name="number"></field>
+               		</group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+         <record model="ir.ui.view" id="player_list">
+            <field name="name">tsbd.player.list</field>
+            <field name="model">tsbd.player</field>
+            <field name="arch" type="xml">
+                <tree>
+                   <field name="name"></field>
+               		<field name="birthday"></field>
+               		<field name="number"></field>
+               		<!-- <field name="image_view" widget="image"></field> -->
+               		<field name="image_link"></field>
+               		<field name="saved_image_view" widget="image"></field>
+               		<field name="team_id"></field>
+               		<field name="da_chinh_number"></field>
+               		<field name="du_bi_number"></field>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="tsbd_player_search" model="ir.ui.view">
+        <field name="name">tsbd.player.search</field>
+        <field name="model">tsbd.player</field>
+        <field name="arch" type="xml">
+            <search string="player search">
+            	<field name="name"></field>
+            	<filter  name="number" string="Cate" context="{'group_by':'number'}" />
+                </search>
+                </field>
+                </record>
+        <record model="ir.actions.act_window" id="player_action">
+            <field name="name">player action</field>
+            <field name="res_model">tsbd.player</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+     <menuitem name="player menu" id="tsbd.player_menu" parent="tsbd.menu_root" action="player_action" />
+    </data>
+</odoo>

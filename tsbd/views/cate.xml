@@ -13,8 +13,12 @@
                     <button name="clear_bxh" string="clear_bxh" type="object"  class="oe_highlight" ></button> 
                     <button name="avg_button" string="avg_button" type="object"  class="oe_highlight" ></button> 
                     <button name="gen_team" string="gen_team" type="object"  class="oe_highlight" ></button> 
+                    <button name="gen_round" string="gen_round" type="object"  class="oe_highlight" ></button> 
                     <button name="find_late_soon_match" string="find_late_soon_match" type="object"  class="oe_highlight" ></button> 
-                    <button name="find_late_soon_match" string="find_late_soon_match" type="object"  class="oe_highlight" ></button> 
+                    <button name="gan_team_cho_player" string="gan_team_cho_player" type="object"  class="oe_highlight" ></button> 
+                    <button name="thongke_so_lan_da_chinh_du_bi" string="thongke_so_lan_da_chinh_du_bi" type="object"  class="oe_highlight" ></button> 
+                    <button name="gen_temp_bxh" string="gen_temp_bxh" type="object"  class="oe_highlight" ></button> 
+                    <button name="bxh_round" string="bxh_round" type="object"  class="oe_highlight" ></button> 
                 </header>
                 
                 	<group>
@@ -22,11 +26,13 @@
                		 <field name="no_match"></field>
                     <field name="large_cate"></field>
                		<field name="cate_id"></field>
-               		
+               		<field name="log"></field>
+               		<field name="id"></field>
+               		<field name="copy_id"></field>
                		<field name="avg_score1"></field>
                     <field name="avg_score2"></field>
                		<field name="avg_score"></field>
-               		
+               		<field name="round_for_search"></field>
                		
                		 
                		
@@ -44,15 +50,39 @@
                		   <page string="BXH OU">
                				<field name="ou_bxh_ids" context="{'tree_view_ref':'tsbd.oubxh_list'}"></field>
                		 	</page>
-               		 	
+               		 	<!-- 
                		 	<page string="Match">
                		 		<field name="bang_match_ids"></field>
                				<field name="match_ids"></field>
                		 	</page>
+               		 	 -->
                		 	
                		 	<page string="Team">
                		 		<field name="team_ids"></field>
                		 	</page>
+               		 	
+               		 	<page string="BXH temp">
+               		 		<field name="temp_bxh_ids"></field>
+               		 	</page>
+               		 	
+               		<page string="round bxh_ids">
+               		 		<field name="round_bxh_ids" domain="[('round','=',round_for_search)]" ></field>
+               		 </page>
+               		 
+               		  	<page string=" round_match_ids">
+               		  	<group>
+               		  		<group>
+               		  			<field name="round_match_number"></field>
+               		 			<field name="round_match_ids" context="{'tree_view_ref':'tsbd.new_match_list2'}"></field>
+               		 		</group>
+               		 		
+               		 		<group>
+               		 			<field name="temp_bxh_ids" context="{'tree_view_ref':'tsbd.sample_bxh_list2'}"></field>
+               		 		</group>
+               		 		
+               		 		</group>
+               		 	</page>
+               		 	
                		 	
                		 	
                		 	

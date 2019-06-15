@@ -8,6 +8,12 @@ class Wizard(models.TransientModel):
     name  = fields.Char()
     res_model = fields.Char(default = lambda self: self._context.get('active_model'))
     log = fields.Text()
+    
+    @api.multi
+    def save_avatar_player(self):
+        players = self.env['tsbd.player'].search([('image_link', '!=', False)])
+        for r in players:
+            r.saved_image_view = r.image_view
     @api.multi
     def xoa_bxh_not_cated(self):
         not_cate_bxh = self.env['tsbd.bxh'].search([('cate_id','=',False)])

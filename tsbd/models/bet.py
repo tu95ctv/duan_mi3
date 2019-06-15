@@ -40,6 +40,20 @@ def handicap_winning_(r, bet_kind='handicap1',mode='bet', match_id =None, skip_t
             winning_difference = (last_score1 - score1) - (last_score2-score2) - handicap
             money1 = 'handicap_money1'
             money2 = 'handicap_money2'
+        elif 'eu' in bet_kind:
+            winning_difference = last_score1 - last_score2 
+            if bet_kind =='eu1':
+                money1 = 'eu1_odd'
+            elif bet_kind =='eu_draw':
+                money1 = 'eu_draw_odd'
+                if winning_difference ==0:
+                    winning_difference =1
+                else:
+                    winning_difference = -1
+            else:
+                winning_difference = -1*winning_difference
+                money1 = 'eu2_odd'
+            
         else:# ou
             if mode=='bet':
                 ou =r.ou
@@ -86,11 +100,13 @@ def handicap_winning_(r, bet_kind='handicap1',mode='bet', match_id =None, skip_t
                 if mode=='bet':
                     ti_le_money_get_obj =r
                 elif mode =='predict':
-                    money_key ='begin_' + money_key
+                    if 'eu' not in bet_kind:
+                        money_key ='begin_' + money_key
                     ti_le_money_get_obj =match_id
                 ti_le_money = getattr(ti_le_money_get_obj, money_key)
                 ti_le_money = ti_le_money
                 
+               
                 if winning_ratio > 0: # thắng
                     if ti_le_money < 0:
                         ti_le_money = 1

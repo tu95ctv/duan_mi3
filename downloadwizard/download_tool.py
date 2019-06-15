@@ -34,18 +34,12 @@ def download_all_model_by_url(kw):
     
     pick_func = request.env['downloadwizard.download'].gen_pick_func()
     call_func = pick_func[download_key]
-    print ('pick_func dict',pick_func,'download_key',download_key)
     if active_domain:
         workbook,name = call_func(dj_obj,active_domain)
     else:
         workbook,name = call_func(dj_obj)
-#     name = 
-    print ('name***',name)
     name = unidecode(name).replace(' ','_')
-#     now = datetime.now() + timedelta(hours=7)
-#     format='%d_%m_%Y_%H_%M' 
-#     now = now.strftime(format)
-#     name +='_' + now
+
     
     response = request.make_response(None,
         headers=[('Content-Type', 'application/vnd.ms-excel'),

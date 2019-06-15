@@ -1,0 +1,52 @@
+<odoo>
+    <data>
+       
+        <record model="ir.ui.view" id="playerline_form">
+            <field name="name">tsbd.playerline.form</field>
+            <field name="model">tsbd.playerline</field>
+            <field name="arch" type="xml">
+                <form>
+                <sheet>
+                	<group>
+               		<field name="match_id"></field>
+               		<field name="player_id"></field>
+               		<field name="team_id"></field>
+               		<field name="da_chinh_hay_du_bi"></field>
+               		<field name="home_or_away"></field>
+               		</group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+         <record model="ir.ui.view" id="playerline_list">
+            <field name="name">tsbd.playerline.list</field>
+            <field name="model">tsbd.playerline</field>
+            <field name="arch" type="xml">
+                <tree>
+               		<field name="match_id"></field>
+               		<field name="player_id"></field>
+               		<field name="team_id"></field>
+               		<field name="da_chinh_hay_du_bi"></field>
+               		<field name="home_or_away"></field>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="tsbd_playerline_search" model="ir.ui.view">
+        <field name="name">tsbd.playerline.search</field>
+        <field name="model">tsbd.playerline</field>
+        <field name="arch" type="xml">
+            <search string="playerline search">
+            	<filter  name="match_id" string="Cate" context="{'group_by':'match_id'}" />
+                </search>
+                </field>
+                </record>
+        <record model="ir.actions.act_window" id="playerline_action">
+            <field name="name">playerline action</field>
+            <field name="res_model">tsbd.playerline</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+     <menuitem name="playerline menu" id="tsbd.playerline_menu" parent="tsbd.menu_root" action="playerline_action" />
+    </data>
+</odoo>

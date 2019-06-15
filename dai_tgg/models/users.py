@@ -51,6 +51,7 @@ class User(models.Model):
     cac_linh_ids = fields.Many2many('res.users','user_sep_relate','sep_id', 'user_id',string=u'Các Nhân Viên')
     is_admin = fields.Boolean(compute='is_admin_')
     all_sep_ids = fields.Many2many('res.users','user_sep_relate','user_id','sep_id', string=u'Tất cả Lãnh Đạo',compute='all_sep_ids')
+    chung_ca_user_id = fields.Many2one('res.users')
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
         args = args or []
