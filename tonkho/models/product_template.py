@@ -5,7 +5,7 @@ from odoo.tools.translate import _
 from odoo.tools.float_utils import float_compare
 import psycopg2
 from unidecode import unidecode
-from odoo.addons.dai_tgg.mytools import name_khong_dau_compute
+from odoo.addons.tutool.mytools import name_khong_dau_compute
    
 
 class ProductTemplate(models.Model):

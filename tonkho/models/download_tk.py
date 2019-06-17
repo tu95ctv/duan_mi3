@@ -2,7 +2,6 @@
 from odoo import models, fields, api
 from odoo.addons.tonkho.models.dl_models.dl_model_quants import  download_quants
 from odoo.addons.tonkho.models.dl_models.dl_model_product import  download_product
-# from odoo.addons.dai_tgg.models.model_dict_folder.tao_instance_new import importthuvien
 from odoo.addons.tonkho.models.dl_models.xl_tranfer_bb import write_xl_bb
 from odoo.addons.tonkho.models.check_file import check_imported_file_sml
 from odoo.addons.downloadwizard.download_tool import  do_if_model_name_wrapper

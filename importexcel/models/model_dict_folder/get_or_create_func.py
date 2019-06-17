@@ -1,5 +1,5 @@
  # -*- coding: utf-8 -*-
-from odoo.addons.dai_tgg.models.model_dict_folder.tool_tao_instance import get_key
+from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import get_key
 from odoo.osv import expression
 import datetime
 from odoo import  fields

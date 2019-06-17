@@ -2,14 +2,6 @@
  #Copy tu internal ham import _thu_vien
 from odoo.exceptions import UserError
 import datetime
-
-# from odoo.addons.dai_tgg.models.model_dict_product import gen_product_model_dict
-# from odoo.addons.dai_tgg.models.model_dict_user_department import gen_user_department_model_dict
-# print ('***',type(product_model_dict))
-# class self():
-#     pass
-
-# from odoo.addons.dai_tgg.models.model_dict_folder.model_dict_product import gen_product_model_dict
 from odoo.addons.importexcel.models.model_dict_folder.model_dict_user_department import gen_user_department_model_dict
 from odoo.addons.importexcel.models.model_dict_folder.model_dict_tvcv import  gen_tvcv_model_dict
 import re
@@ -467,27 +459,18 @@ default_import_xl_setting = {'default_cho_phep_exist_val_before_loop_fields_func
              'default_cho_phep_co_pn_cap_nhat_empty_pn':False,
              }
 
-# def gen_default_import_xl_setting():  
-#     adict = {'default_cho_phep_exist_val_before_loop_fields_func':True,
-#              'default_write_when_val_exist':False,
-#              'default_allow_check_excel_obj_is_exist_func':False,
-#              'default_cho_phep_empty_pn_tuong_duong_voi_pn_duy_nhat':False,
-#              'default_cho_phep_co_pn_cap_nhat_empty_pn':False,
-#              }
-        
+
     
 def gen_model_dict(
-                    sml_title_row = False,
-                   self=None,
-                   mode=u'1',
-                   key_tram=u'sklsklskl'):     
-    mode =       getattr(self, 'mode',None)     or mode
+                sml_title_row = False,
+                self=None,
+                mode=u'1',
+                key_tram=u'sklsklskl'):     
     
+    mode =      getattr(self, 'mode',None)     or mode
     write_field_categ_id = self.env['ir.config_parameter'].sudo().get_param('tonkho.' + 'write_field_categ_id')
     not_use_default_excel_import_setting = self.env['ir.config_parameter'].sudo().get_param('tonkho.' + 'not_use_default_excel_import_setting')
-    
     use_default = not not_use_default_excel_import_setting
-    
     default_cho_phep_exist_val_before_loop_fields_func = True
     default_write_when_val_exist = False
     default_allow_check_excel_obj_is_exist_func = False
@@ -658,7 +641,7 @@ thiết bị
                         'skip_field_if_not_found_column_in_some_sheet':True ,
                         'key':{all_key_tram:True},
                         'required_force':{all_key_tram:True},
-                        'required_not_create':False
+#                         'required_not_create':False
                       }
                  ), # bỏ stt ở đây để dùng trong hàm break, function
                                 

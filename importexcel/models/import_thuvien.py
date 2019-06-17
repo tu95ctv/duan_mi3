@@ -3,7 +3,7 @@ from odoo import models, fields, api,exceptions,tools,_
 import re
 from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importthuvien
 from odoo.addons.importexcel.models.model_dict_folder.model_dict import default_import_xl_setting
-
+from odoo.addons.importexcel.models.model_dict_folder.model_dict import gen_model_dict
 # from odoo.addons.importexcel.models.tao_instance import import_strect
 
 # from odoo.addons.importexcel.models.model_dict import gen_model_dict
@@ -121,7 +121,10 @@ class ImportThuVien(models.Model):
         return True
     
     
-    
+    def gen_model_dict(self):
+        rs = gen_model_dict()
+        return rs
+        
     
     @api.onchange('type_choose')
     def import_location_id_(self):

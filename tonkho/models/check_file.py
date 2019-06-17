@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo.addons.dai_tgg.models.model_dict_folder.tao_instance_new import importthuvien
-from odoo.addons.dai_tgg.models.model_dict_folder.model_dict import gen_model_dict
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importthuvien
+from odoo.addons.importexcel.models.model_dict_folder.model_dict import gen_model_dict
 
 def check_imported_file_sml(dl_obj):
 #     title_row_for_import = [dl_obj.title_row_for_import or 0]

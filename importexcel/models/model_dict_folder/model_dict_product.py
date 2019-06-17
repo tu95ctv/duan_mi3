@@ -1,9 +1,9 @@
  # -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 import datetime
-# from odoo.addons.dai_tgg.mytools import convert_float_to_ghi_chu_ngay_xuat,lot_name_
+# from odoo.addons.importexcel.mytools import convert_float_to_ghi_chu_ngay_xuat,lot_name_
  
-from odoo.addons.dai_tgg.models.model_dict_folder.model_dict import convert_float_to_ghi_chu_ngay_xuat
+from odoo.addons.importexcel.models.model_dict_folder.model_dict import convert_float_to_ghi_chu_ngay_xuat
 
 def gen_product_model_dict():
     user_model_dict = {

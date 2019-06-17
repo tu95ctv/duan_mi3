@@ -4,7 +4,6 @@ from openerp.http import request
 from odoo.addons.tonkho.models.dl_models.xl_tranfer_bb import write_xl_bb
 import datetime
 
-from odoo.addons.dai_tgg.models.model_dict_folder.tao_instance_new import importthuvien
 from odoo.addons.tonkho.models.check_file import check_imported_file_sml
 
 

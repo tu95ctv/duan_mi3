@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,_
 from odoo.exceptions import UserError
-from odoo.addons.dai_tgg.models.model_dict_folder.tao_instance_new import importthuvien
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importthuvien
 from lxml import etree
 
 class Inventory(models.Model):

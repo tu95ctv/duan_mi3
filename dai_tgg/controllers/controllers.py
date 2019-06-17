@@ -14,7 +14,6 @@ import odoo.addons.web.controllers.pivot as pivot
 import json
 from odoo.tools import ustr
 from collections import deque
-# from tools import convert_odoo_datetime_to_vn_str
 from odoo.osv import expression
 from dateutil.relativedelta import relativedelta
 
@@ -23,11 +22,11 @@ import string
 from odoo.addons.dai_tgg.mytools import  convert_date_odoo_to_str_vn_date, convert_utc_to_gmt_7
 from unidecode import unidecode
 
-from odoo.addons.dai_tgg.models.dl_models.dl_tvcv import  download_tvcv
-from odoo.addons.dai_tgg.models.dl_models.dl_user import  download_user
-from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_bcn
-from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_cvi
-from odoo.addons.dai_tgg.models.dl_models.dl_p3 import  dl_p3
+# from odoo.addons.dai_tgg.models.dl_models.dl_tvcv import  download_tvcv
+# from odoo.addons.dai_tgg.models.dl_models.dl_user import  download_user
+# from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_bcn
+# from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_cvi
+# from odoo.addons.dai_tgg.models.dl_models.dl_p3 import  dl_p3
 
 
 from odoo.addons.downloadwizard.download_tool import  download_all_model_by_url

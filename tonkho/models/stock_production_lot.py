@@ -5,7 +5,7 @@ from odoo.tools.translate import _
 from odoo.tools.float_utils import float_compare
 from odoo.osv import expression
 import re
-from odoo.addons.dai_tgg.mytools import pn_replace
+from odoo.addons.tutool.mytools import pn_replace
 
 
 class StockProductionLot(models.Model):

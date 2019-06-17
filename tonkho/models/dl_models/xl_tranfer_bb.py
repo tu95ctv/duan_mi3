@@ -5,7 +5,7 @@ import os
 import inspect
 from xlutils.filter import process,XLRDReader,XLWTWriter
 import xlrd, xlwt
-from odoo.addons.dai_tgg.mytools import  convert_odoo_datetime_to_vn_str
+from odoo.addons.tutool.mytools import  convert_odoo_datetime_to_vn_str
 from collections import  OrderedDict
 from odoo.addons.downloadwizard.models.dl_models.dl_model import  write_all_row,generate_easyxf
 

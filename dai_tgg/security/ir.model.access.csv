@@ -4,7 +4,6 @@ access_dai_tgg_res_users,dai_tgg.res.users,base.model_res_users,base.group_user,
 access_dai_tgg_cvi,dai_tgg.cvi,model_cvi,base.group_user,1,1,1,1
 access_dai_tgg_tvcv,dai_tgg.tvcv,model_tvcv,base.group_user,1,0,1,0
 access_dai_tgg_tvcv_for_thaydoi_group,dai_tgg.tvcv_for_thaydoi,model_tvcv,dai_tgg.group_thay_doi_thu_vien,1,1,1,1
-access_dai_tgg_importthuvien,dai_tgg.importthuvien,model_importthuvien,base.group_user,1,1,1,1
 access_dai_tgg_congtytype,dai_tgg.congtytype,model_congtytype,base.group_user,1,1,1,1
 access_dai_tgg_tvcvcate,dai_tgg.tvcvcate,model_tvcvcate,base.group_user,1,1,1,1
 access_dai_tgg_dotxuathaydinhky,dai_tgg.dotxuathaydinhky,model_dotxuathaydinhky,base.group_user,1,1,1,1
@@ -17,4 +16,3 @@ access_dai_tgg_department,dai_tgg.department,hr.model_hr_department,base.group_u
 access_dai_tgg_totrinh,dai_tgg.totrinh,model_dai_tgg_totrinh,base.group_user,1,1,1,0
 access_dai_tgg_thuebaoline,dai_tgg.thuebaoline,model_dai_tgg_thuebaoline,base.group_user,1,1,1,1
 access_dai_tgg_thuebao,dai_tgg.thuebao,model_dai_tgg_thuebao,base.group_user,1,1,1,1
-access_dai_tgg_importcvi,dai_tgg.importcvi,model_dai_tgg_importcvi,base.group_user,1,1,1,1

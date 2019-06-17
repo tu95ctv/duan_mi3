@@ -500,7 +500,7 @@ def create_instance (self, MODEL_DICT,
                            setting)
         if code =='break_because_required':
             break_condition = True# moi them
-            if field_attr.get('raise_if_False'):
+            if field_attr.get('raise_if_False') and not check_file:
                 raise UserError('raise_if_False field: %s'%field_name)
             if main_call_create_instance_model :#or MODEL_DICT.get('print_write_dict_new',False)
                 print (u'skip việc get or create của dòng này because required but,model %s- field %s'%(model_name,field_name))
@@ -679,31 +679,7 @@ def importthuvien(odoo_or_self_of_wizard,
     if setting2:
         setting.update(setting2)
     setting.setdefault('allow_write',True)
-#     if hasattr(self, 'not_allow_write'):
-#         not_allow_write = getattr(self,'not_allow_write')
-#     else:
-#         not_allow_write = CHOOSED_MODEL_DICT.get('not_allow_write',False)
-#     setting['allow_write'] = not not_allow_write
-#     if hasattr(self, 'write_when_val_exist'):
-#         write_when_val_exist =  self.write_when_val_exist
-#     else:
-#         write_when_val_exist = CHOOSED_MODEL_DICT.get('write_when_val_exist',True)
-#     setting['write_when_val_exist'] = write_when_val_exist
-#     
-#     
-#     if hasattr(self, 'allow_check_excel_obj_is_exist_func'):
-#         allow_check_excel_obj_is_exist_func =  self.allow_check_excel_obj_is_exist_func
-#     else:
-#         allow_check_excel_obj_is_exist_func = CHOOSED_MODEL_DICT.get('allow_check_excel_obj_is_exist_func',True)
-#     
-#     setting['allow_check_excel_obj_is_exist_func'] = allow_check_excel_obj_is_exist_func
-    
-    
-    
-    
-    
-#     print ('**setting**',setting)
-#     raise UserError(u'%s'%setting)
+
     prepare_func = CHOOSED_MODEL_DICT.get('prepare_func')
     if prepare_func:
         prepare_func(needdata,self)

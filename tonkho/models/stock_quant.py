@@ -4,9 +4,9 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.translate import _
 from odoo.tools.float_utils import float_compare
-from  odoo.addons.dai_tgg.mytools import name_compute
+from  odoo.addons.tutool.mytools import name_compute
 from  odoo.addons.tonkho.tonkho_tool import write_to_current_path
-from odoo.addons.dai_tgg.mytools import pn_replace
+from odoo.addons.tutool.mytools import pn_replace
 from lxml import etree
 
 
