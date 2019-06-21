@@ -3,32 +3,27 @@
 from odoo import models, fields, api
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError
-class Statisticslines(models.TransientModel):
-    _name = 'downloadwizard.statisticslinestrans'
-    location_id = fields.Many2one('stock.location')
-    categ_id = fields.Many2one('product.category')
-    name_categ =  fields.Char(string=u'Tiêu chí')
-    quantity = fields.Integer(string=u'Tổng Số lượng vật tư')
-    ket_luan = fields.Char()
-    
-    
-class StatisticslinesI(models.Model):
-    _name = 'downloadwizard.statisticslines'
-    _inherit =  'downloadwizard.statisticslinestrans'
-    statistics_id = fields.Many2one('downloadwizard.statistics')
+# class Statisticslines(models.TransientModel):
+#     _name = 'downloadwizard.statisticslinestrans'
+#     
+#     
+#     location_id = fields.Many2one('stock.location')
+#     categ_id = fields.Many2one('product.category')
+#    
+#     
 #     name_categ =  fields.Char(string=u'Tiêu chí')
 #     quantity = fields.Integer(string=u'Tổng Số lượng vật tư')
-
-
+#     ket_luan = fields.Char()
+#     
+# class StatisticslinesI(models.TransientModel):
+#     _name = 'downloadwizard.statisticslines'
+#     _inherit =  'downloadwizard.statisticslinestrans'
+#     statistics_id = fields.Many2one('downloadwizard.statistics')
+    
+    
 
 class Statistics(models.Model):
-    _name='downloadwizard.statistics'
-    model_name= fields.Char()
-    date_time = fields.Datetime(default=fields.Datetime.now)
-    statistics_ids = fields.One2many('downloadwizard.statisticslines','statistics_id',compute='statistics_ids_',store=True)
-#     statistics_ids = fields.Many2many('downloadwizard.statisticslines','statistics_statisticsline_relate','st_id','stl_id',compute='statistics_ids_')
-    
-    
+    _inherit='setaction.statistics'
     def ket_luan_same_name_diff_pn(self,i):
         product_name = i['name']
         pn_domain = [('name','=',product_name)]
@@ -38,9 +33,8 @@ class Statistics(models.Model):
         if i['__count'] != len(pn_read_group_rs_simple):
             raise UserError("i['__count'] != len(pn_read_group_rs_simple)")
         return ( product_name,i['__count'],pn_read_group_rs_simple_txt)
-    @api.depends('model_name')
-    def statistics_ids_(self):
-      
+    
+    def tonkho_statistics(self):
         statistics_ids = []
         slvt = self.env['product.product'].search_count([])
         statistics_ids.append((0,0,{'name_categ':u'slvt','quantity':slvt}))
@@ -63,11 +57,8 @@ class Statistics(models.Model):
         
         
         read_group_rs = self.env['product.product'].read_group([],['name'],['name'],lazy=False)
-#         statistics_ids.append((0,0,{'name_categ':u'len(read_group_rs)','ket_luan':len(read_group_rs)}))
-#         statistics_ids.append((0,0,{'name_categ':u'read_group_rs','ket_luan':read_group_rs}))
         
         slvt_same_name = slvt - len(read_group_rs)
-#         statistics_ids.append((0,0,{'name_categ':u'Số lượng vật tư cùng tên khác PN','quantity':slvt_same_name}))
         
         ket_luan_same_name_diff_pn =  list(map(self.ket_luan_same_name_diff_pn,filter(lambda i:i['__count']>1,read_group_rs)))
         statistics_ids.append((0,0,{'name_categ':u'vật tư cùng tên khác partnumber','quantity':slvt_same_name,'ket_luan':ket_luan_same_name_diff_pn}))
@@ -112,9 +103,23 @@ class Statistics(models.Model):
         vt_co_trong_kho_tti_va_ltk  = list(filter(lambda i: self.env['stock.quant'].search([('location_id.complete_name','like','LTK'),('quantity','>',0),('product_id','=',i['product_id'][0])]),vt_co_trong_kho_tti))
         statistics_ids.append((0,0,{'name_categ':u'vt_co_trong_kho_tti_va_ltk','ket_luan':vt_co_trong_kho_tti_va_ltk,'quantity':len(vt_co_trong_kho_tti_va_ltk)}))
         
+        return statistics_ids
+    
+    
+    
+    def statistics_ids_collect(self):
+        rs = super(Statistics, self).statistics_ids_collect()
+        rs.update( {'tonkho_statistics': self.tonkho_statistics})
+        return rs
+    
+    
+#     @api.depends('function_key')
+#     def statistics_ids_(self):
+#         picked_function = self.statistics_ids_collect[self.function_key]
+#         statistics_ids = picked_function
+#         self.statistics_ids = statistics_ids
+      
         
-        
-        self.statistics_ids = statistics_ids
 
         
 

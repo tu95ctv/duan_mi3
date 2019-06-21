@@ -19,7 +19,7 @@
     'version': '0.1',
     'application': True,
     # any module necessary for this one to work correctly
-    'depends': ['base','stock','hr','dai_tgg','downloadwizard'],#'dai_tgg',
+    'depends': ['base','stock','hr','dai_tgg','downloadwizard','setaction'],#'dai_tgg',
     #'css': ['static/src/css/style.css'], 
     # always loaded
     'data': [

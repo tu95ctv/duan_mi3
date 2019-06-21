@@ -4,9 +4,9 @@ from openerp.http import request
 import xlwt
 from odoo.exceptions import UserError
 from copy import deepcopy
-from odoo.addons.dai_tgg.mytools import  convert_odoo_datetime_to_vn_str
+from odoo.addons.tutool.mytools import  convert_odoo_datetime_to_vn_str
 from collections import  OrderedDict
-from odoo.addons.dai_tgg.mytools import  Convert_date_orm_to_str
+from odoo.addons.tutool.mytools import  Convert_date_orm_to_str
 from collections import  OrderedDict
 from odoo.addons.downloadwizard.models.dl_models.dl_model import  write_all_row,generate_easyxf
 # from odoo.addons.downloadwizard.models.dl_models.dl_model import  get_width
@@ -14,7 +14,7 @@ from odoo.addons.downloadwizard.models.dl_models.dl_model import  stt_
 from odoo.addons.downloadwizard.models.dl_models.dl_model import  bold_style,normal_style
 from dateutil.relativedelta import relativedelta
 
-from odoo.addons.dai_tgg.mytools import  convert_date_odoo_to_str_vn_date, convert_utc_to_gmt_7
+from odoo.addons.tutool.mytools import  convert_date_odoo_to_str_vn_date, convert_utc_native_dt_to_gmt7
 import datetime
 
 
@@ -25,7 +25,7 @@ def gen_domain_cvi_date(dl_obj,theo_sql = False):
         where_clause_list = []
     if dl_obj.chon_thang ==u'Tháng Này':
         utc_time = datetime.datetime.now()
-        vn_time = convert_utc_to_gmt_7(utc_time)
+        vn_time = convert_utc_native_dt_to_gmt7(utc_time)
         vn_thang_nay_date_begin = vn_time.strftime('%Y-%m-01')
         vn_time_offset_thang_sau =  vn_time + relativedelta(months=1)
         vn_thang_nay_date_end = vn_time_offset_thang_sau.strftime('%Y-%m-01')
@@ -36,7 +36,7 @@ def gen_domain_cvi_date(dl_obj,theo_sql = False):
             where_clause_list.append('cvi.ngay_bat_dau < %s'%vn_thang_nay_date_end)
     elif dl_obj.chon_thang ==u'Tháng Trước':
         utc_time = datetime.datetime.now()
-        vn_time = convert_utc_to_gmt_7(utc_time)
+        vn_time = convert_utc_native_dt_to_gmt7(utc_time)
         thang_truoc_time = vn_time + relativedelta(months=-1)
         thang_truoc_date_begin = thang_truoc_time.strftime('%Y-%m-01')
         thang_truoc_date_end = vn_time.strftime('%Y-%m-01')

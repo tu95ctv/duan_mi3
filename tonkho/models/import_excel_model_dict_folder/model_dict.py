@@ -1,12 +1,7 @@
- # -*- coding: utf-8 -*-
- #Copy tu internal ham import _thu_vien
+# -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 import datetime
-from odoo.addons.importexcel.models.model_dict_folder.model_dict_user_department import gen_user_department_model_dict
-from odoo.addons.importexcel.models.model_dict_folder.model_dict_tvcv import  gen_tvcv_model_dict
-import re
-from odoo.addons.dai_tgg.mytools import pn_replace
- 
+from odoo.addons.tutool.mytools import pn_replace
 all_key_tram = 'all_key_tram'
 key_ltk_dc = 'key_ltk_dc'
 key_ltk_dc2 = 'key_ltk_dc2'
@@ -461,7 +456,7 @@ default_import_xl_setting = {'default_cho_phep_exist_val_before_loop_fields_func
 
 
     
-def gen_model_dict(
+def gen_model_dict_for_stock_move_line(
                 sml_title_row = False,
                 self=None,
                 mode=u'1',
@@ -1426,9 +1421,5 @@ thiết bị'''
                 , 'key':False}),
                                                  ]
                     },#End stock.inventory.line'
-    }                               
-#     ALL_MODELS_DICT.update(gen_product_model_dict())
-    ALL_MODELS_DICT.update(gen_user_department_model_dict())
-    ALL_MODELS_DICT.update(gen_tvcv_model_dict())
-    return ALL_MODELS_DICT
-    
+    }                        
+    return ALL_MODELS_DICT[u'stock.inventory.line.tong.hop.ltk.dp.tti.dp']

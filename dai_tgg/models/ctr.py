@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,exceptions,tools,_
-from odoo.addons.dai_tgg.mytools import  convert_memebers_to_str,convert_utc_to_gmt_7,name_compute,convert_odoo_datetime_to_vn_datetime,convert_odoo_datetime_to_vn_str,convert_vn_datetime_to_utc_datetime,Convert_date_orm_to_str
+from odoo.addons.tutool.mytools import  convert_memebers_to_str,convert_utc_native_dt_to_gmt7,name_compute,convert_odoo_datetime_to_vn_str,convert_vn_datetime_to_utc_datetime,Convert_date_orm_to_str
 import datetime
 from odoo.exceptions import UserError
 from unidecode import unidecode
 class CTR(models.Model):
     _name = 'ctr'
-#     test_id = fields.Many2one('res.partner')
     name = fields.Char(compute = '_name_truc_ca_compute', store=True)
     name_khong_dau = fields.Char(compute = '_name_truc_ca_compute', store=True)
     ca = fields.Selection([(u'Sáng',u'Sáng'), (u'Chiều',u'Chiều'), (u'Đêm',u'Đêm')],string=u'Buổi ca',default = lambda self: self.buoi_ca_now_default_())
-    date = fields.Date(string=u'Ngày',default= convert_utc_to_gmt_7(datetime.datetime.now()).date() )#readonly = True
+    date = fields.Date(string=u'Ngày',default= convert_utc_native_dt_to_gmt7(datetime.datetime.now()).date() )#readonly = True
     gio_bat_dau_ca = fields.Datetime(u'Giờ bắt đầu ca ',default=lambda self: self.gio_bat_dau_defaut_or_ket_thuc_())
     gio_ket_thuc_ca = fields.Datetime(u'Giờ Kết Thúc ca',default=lambda self: self.gio_bat_dau_defaut_or_ket_thuc_(is_tinh_gio_bat_dau_or_ket_thuc = 'gio_ket_thuc'))#
     department_id = fields.Many2one('hr.department',string=u'Đơn vị',default=lambda self:self.env.user.department_id, readonly=True, required=True,ondelete='restrict')
@@ -90,13 +89,9 @@ class CTR(models.Model):
             if ret:
                 r.name_khong_dau = unidecode(ret)
     
-#     @api.depends('gio_bat_dau_ca')
-#     def date_(self):
-#         for r in self:
-#             if r.gio_bat_dau:
-#                 r.date = convert_odoo_datetime_to_vn_datetime(r.gio_bat_dau).date()
+
     def buoi_ca_now_default_(self,gio_bat_dau_vn_return = False):
-        now_vn_datetime = convert_utc_to_gmt_7(datetime.datetime.now())
+        now_vn_datetime = convert_utc_native_dt_to_gmt7(datetime.datetime.now())
         now_hour = now_vn_datetime.hour
         alist = [(u'Sáng',7),(u'Chiều',14),(u'Đêm',22)]
         new_list= list(map(lambda i:abs(now_hour-i[1]),alist))

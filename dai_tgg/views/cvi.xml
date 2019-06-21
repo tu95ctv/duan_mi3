@@ -90,16 +90,7 @@
       
       
       
-      <act_window
-            id="action_account_payment_from_invoices"
-            name="Duyệt điểm"
-            res_model="dai_tgg.duyetdiem"
-            src_model="cvi"
-            view_mode="form"
-            multi="True"
-            target="new"
-            key2="client_action_multi"
-        />
+      
         
         
         
@@ -197,6 +188,7 @@
             <tree ><!-- decoration-danger="not valid_diemtc" -->
                <field name="id" />
                <field name="loai_record" />
+               <field name="ngay_bat_dau" />
                 <field name="tvcv_id" />
                 <field name="department_id" />
                 <field name="state" />

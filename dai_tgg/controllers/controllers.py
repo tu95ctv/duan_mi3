@@ -19,25 +19,14 @@ from dateutil.relativedelta import relativedelta
 
 import pytz
 import string
-from odoo.addons.dai_tgg.mytools import  convert_date_odoo_to_str_vn_date, convert_utc_to_gmt_7
+from odoo.addons.tutool.mytools import  convert_date_odoo_to_str_vn_date, convert_utc_native_dt_to_gmt7
 from unidecode import unidecode
 
-# from odoo.addons.dai_tgg.models.dl_models.dl_tvcv import  download_tvcv
-# from odoo.addons.dai_tgg.models.dl_models.dl_user import  download_user
-# from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_bcn
-# from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_cvi
-# from odoo.addons.dai_tgg.models.dl_models.dl_p3 import  dl_p3
 
 
 from odoo.addons.downloadwizard.download_tool import  download_all_model_by_url
 
-# def FIELDNAME_FIELDATTR_flat(FIELDNAME_FIELDATTR,item_seperate=';',k_v_separate = ':'):
-#     alist = []
-#     for k,v in FIELDNAME_FIELDATTR.iteritems():
-#         if isinstance(v,dict):
-#             v = FIELDNAME_FIELDATTR_flat(v,item_seperate=',',k_v_separate = ' ')
-#         alist.append(k + k_v_separate + v)
-#     return item_seperate.join(alist)     
+
 
 def get_width(num_characters):
     return int((1+num_characters) * 256)
@@ -127,7 +116,7 @@ def generate_domain_date_and_department(dlcv_obj, theo_sql = False):
             raise ValueError(u'Bạn không có quyền xem Báo cáo của những trạm đó')
     if dlcv_obj.chon_thang ==u'Tháng Này':
                 utc_time = datetime.datetime.now()
-                vn_time = convert_utc_to_gmt_7(utc_time)
+                vn_time = convert_utc_native_dt_to_gmt7(utc_time)
                 vn_thang_nay_date_begin = vn_time.strftime('%Y-%m-01')
                 vn_time_offset_thang_sau =  vn_time + relativedelta(months=1)
                 vn_thang_nay_date_end = vn_time_offset_thang_sau.strftime('%Y-%m-01')
@@ -138,7 +127,7 @@ def generate_domain_date_and_department(dlcv_obj, theo_sql = False):
                     where_clause_list.append('cvi.ngay_bat_dau < %s'%vn_thang_nay_date_end)
     elif dlcv_obj.chon_thang ==u'Tháng Trước':
         utc_time = datetime.datetime.now()
-        vn_time = convert_utc_to_gmt_7(utc_time)
+        vn_time = convert_utc_native_dt_to_gmt7(utc_time)
         thang_truoc_time = vn_time + relativedelta(months=-1)
         thang_truoc_date_begin = thang_truoc_time.strftime('%Y-%m-01')
         thang_truoc_date_end = vn_time.strftime('%Y-%m-01')

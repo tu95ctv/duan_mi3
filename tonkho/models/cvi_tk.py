@@ -7,8 +7,8 @@ class Cvi(models.Model):
     _inherit = 'cvi'
     thiet_bi_id = fields.Many2one('tonkho.thietbi', string = u'Thiết bị')
     categ_id = fields.Many2one(
-        'product.category', u'Nhóm',
-        default= lambda self: self.env['product.category'].search([('name','=',u'Khác')])[0].id
+        'product.category', u'Nhóm'
+#         ,default= lambda self: self.env['product.category'].search([('name','=',u'Khác')])[0].id
         )
     
     @api.onchange('thiet_bi_id')

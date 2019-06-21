@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import pytz
 from odoo import models, fields, api,exceptions,tools,_
@@ -8,6 +7,23 @@ import sys
 import datetime
 from odoo.osv import expression
 
+def convert_utc_native_dt_to_gmt7(utc_datetime_inputs):
+    local = pytz.timezone('Etc/GMT-7')
+    utc_tz =pytz.utc
+    gio_bat_dau_utc_native = utc_datetime_inputs#fields.Datetime.from_string(self.gio_bat_dau)
+    gio_bat_dau_utc = utc_tz.localize(gio_bat_dau_utc_native, is_dst=None)
+    gio_bat_dau_vn = gio_bat_dau_utc.astimezone (local)
+    return gio_bat_dau_vn
+def convert_odoo_datetime_to_vn_datetime(odoo_datetime):
+        utc_datetime_inputs = fields.Datetime.from_string(odoo_datetime)
+        vn_time = convert_utc_native_dt_to_gmt7(utc_datetime_inputs)
+        return vn_time
+    
+    
+    
+    
+    
+    
 def pn_replace(pn):
     if pn:
         pn_replace =  re.sub('[- _ \s \\\ \/ |.]','',pn)
@@ -107,17 +123,7 @@ def name_khong_dau_compute(self_):
                     raise ValueError(name)
                 r.name_khong_dau = name_khong_dau
                 r.name_viet_tat = viet_tat(name_khong_dau)
-def convert_utc_to_gmt_7(utc_datetime_inputs):
-    local = pytz.timezone('Etc/GMT-7')
-    utc_tz =pytz.utc
-    gio_bat_dau_utc_native = utc_datetime_inputs#fields.Datetime.from_string(self.gio_bat_dau)
-    gio_bat_dau_utc = utc_tz.localize(gio_bat_dau_utc_native, is_dst=None)
-    gio_bat_dau_vn = gio_bat_dau_utc.astimezone (local)
-    return gio_bat_dau_vn
-def convert_odoo_datetime_to_vn_datetime(odoo_datetime):
-        utc_datetime_inputs = fields.Datetime.from_string(odoo_datetime)
-        vn_time = convert_utc_to_gmt_7(utc_datetime_inputs)
-        return vn_time
+
   
 def convert_vn_datetime_to_utc_datetime(native_ca_gio_in_vn):
             local = pytz.timezone('Etc/GMT-7')
@@ -129,7 +135,7 @@ def convert_vn_datetime_to_utc_datetime(native_ca_gio_in_vn):
 def convert_odoo_datetime_to_vn_str(odoo_datetime, format='%d/%m/%Y %H:%M' ):
     if odoo_datetime:
         utc_datetime_inputs = fields.Datetime.from_string(odoo_datetime)
-        vn_time = convert_utc_to_gmt_7(utc_datetime_inputs)
+        vn_time = convert_utc_native_dt_to_gmt7(utc_datetime_inputs)
         vn_time_str = vn_time.strftime(format)
         return vn_time_str
     else:
@@ -191,93 +197,4 @@ def name_compute(r,adict=None,join_char = u' - ',junc_char=u':'):
 
 
 
-
-
-
-
-# def name_compute_char_join_rieng(r,adict=None,join_char = u' - '):
-#     names = []
-# #     adict = [('cate_cvi',{'pr':''}),('noi_dung',{'pr':'','func':lambda r: r.name }),('id',{'pr':''})]
-#     sum_txt = ''
-#     for c,fname_and_attr_dict in enumerate(adict):
-#         fname,attr_dict = fname_and_attr_dict
-#         val = getattr(r,fname)
-#         func = attr_dict.get('func',None)
-#         pr_more = attr_dict.get('pr_more','')
-#         sf_more = attr_dict.get('sf_more','')
-#         join_char_of_one_field = attr_dict.get('join_char',join_char)
-#         if func:
-#             val = func(val)
-#         if  not val:# Cho có trường hợp New ID
-#             if attr_dict.get('skip_if_False',True) and  (pr_more=='' and sf_more==''):
-#                 continue
-#             if  fname=='id' :
-#                 val ='New'
-#             else:
-#                 val ='_'
-#         if attr_dict.get('pr') != None:
-#             item =  attr_dict['pr'] + u': ' + unicode(val)
-#         else:
-#             item = unicode (val)
-#             
-#         if pr_more:
-#             item =  pr_more +  val
-#         if sf_more:
-#             item =  val + sf_more
-#         if c ==0:
-#             pass
-#         else:
-#             item =join_char_of_one_field + item
-#         sum_txt = sum_txt + item
-# #         names.append(item)
-# #     if names:
-# #         name = join_char.join(names)
-# #     else:
-# #         name = False
-#     if sum_txt:
-#         pass
-#     else:
-#         sum_txt = False
-#     return sum_txt
-
-
-
-    
-# def Convert_datetime_orm_to_str(date_orm_str):
-#     if date_orm_str:
-#         date_obj = fields.Datetime.from_string(date_orm_str)
-#         return date_obj.strftime('%d/%m/%y %H:%M')
-#     else:
-#         return False
-    
-    
-# def convert_utc_to_gmt_7(utc_datetime_inputs):
-#     local = pytz.timezone('Etc/GMT-7')
-#     utc_tz =pytz.utc
-#     gio_bat_dau_utc_native = utc_datetime_inputs#fields.Datetime.from_string(self.gio_bat_dau)
-#     gio_bat_dau_utc = utc_tz.localize(gio_bat_dau_utc_native, is_dst=None)
-#     gio_bat_dau_vn = gio_bat_dau_utc.astimezone (local)
-#     return gio_bat_dau_vn
-# def convert_odoo_datetime_to_vn_datetime(odoo_datetime):
-#         utc_datetime_inputs = fields.Datetime.from_string(odoo_datetime)
-#         vn_time = convert_utc_to_gmt_7(utc_datetime_inputs)
-#         return vn_time
-#   
-# def convert_vn_datetime_to_utc_datetime(native_ca_gio_in_vn):
-#             local = pytz.timezone('Etc/GMT-7')
-#             utc_tz =pytz.utc
-#             gio_bat_dau_in_vn = local.localize(native_ca_gio_in_vn, is_dst=None)
-#             gio_bat_dau_in_utc = gio_bat_dau_in_vn.astimezone (utc_tz)
-#             return gio_bat_dau_in_utc
-#         
-# def convert_odoo_datetime_to_vn_str(odoo_datetime):
-#     if odoo_datetime:
-#         utc_datetime_inputs = fields.Datetime.from_string(odoo_datetime)
-#         vn_time = convert_utc_to_gmt_7(utc_datetime_inputs)
-#         vn_time_str = vn_time.strftime('%d/%m/%Y %H:%M')
-#         return vn_time_str
-#     else:
-#         return False
-#     
-    
     

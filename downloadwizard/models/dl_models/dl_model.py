@@ -333,13 +333,6 @@ def write_all_row(fixups,dl_obj,set_cols_width,wb=None,ws_name=None,font_height=
     if not wb:
         wb = xlwt.Workbook()
     ws = wb.add_sheet(ws_name)#cell_overwrite_ok=True
-#     ws.header_str = 0
-#     ws.footer_str = 0
-#     
-#     ws.__header_str = 'adfdfdf'
-#     ws.__footer_str = 'adfdfdf'
-#     worksheet.PageSetup.CenterHeader = ''
-#     worksheet.PageSetup.CenterFooter = ''
     if set_cols_width:
         for col,width in enumerate(set_cols_width):
             ws.col(col).width =  width
@@ -371,7 +364,7 @@ def write_all_row(fixups,dl_obj,set_cols_width,wb=None,ws_name=None,font_height=
         a_field_dict['begin_row'] = row
         if func:
             kargs = field_attr.get('kargs',{})
-            nrow = func(ws,f_name,fixups,needdata,row,dl_obj, **kargs)
+            nrow = func(ws, f_name, fixups, needdata, row, dl_obj, **kargs)
             if nrow:
                 cr_new = row + nrow  
                 needdata['cr'] = cr_new

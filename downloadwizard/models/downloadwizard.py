@@ -6,7 +6,7 @@ from urllib.parse import quote
 import base64
 import contextlib
 import io
-class DownloadQuants(models.TransientModel):
+class DownloadWizard(models.TransientModel):
     _name = "downloadwizard.download"
     file_name = fields.Char(string=u'File name')
     data = fields.Binary('File', readonly=True)
@@ -14,15 +14,20 @@ class DownloadQuants(models.TransientModel):
     is_not_skip_field_stt = fields.Boolean(string=u'Không xuất trường STT')
     is_cho_phep_dl_right_now = fields.Boolean(default=True,string=u'Cho phép download ngay')
     font_height = fields.Integer(default=12)
-    def model_name_(self):
-        active_model =  self._context.get('transfer_active_model') or self._context.get('active_model')
-        return active_model
-    model_name = fields.Char(default=model_name_)
-    verbal_model_name = fields.Char(compute='verbal_model_name_',store=True,string=u'Tên đối tượng')
-    @api.depends('model_name')
-    def verbal_model_name_(self):
+    def model_(self):
+        model = self._context.get('active_model')
+        return model
+    model = fields.Char(default= model_)
+    def function_key_(self):
+        function_key =  self._context.get('function_key') or self._context.get('active_model')
+        return function_key
+    function_key = fields.Char(default=function_key_)
+    verbal_function_key = fields.Char(compute='verbal_function_key_',store=True,string=u'Tên Hàm')
+    
+    @api.depends('function_key')
+    def verbal_function_key_(self):
         for r in self:
-            r.verbal_model_name = self.gen_model_verbal_dict().get(r.model_name,r.model_name)
+            r.verbal_function_key = self.gen_model_verbal_dict().get(r.function_key,r.function_key)
 
     
     @api.multi
@@ -48,7 +53,7 @@ class DownloadQuants(models.TransientModel):
         else:
             pick_func = self.gen_pick_func()
             dl_obj = self
-            call_func = pick_func[self.model_name]
+            call_func = pick_func[self.function_key]
             workbook,name = call_func(dl_obj,active_domain)
             with contextlib.closing(io.BytesIO()) as buf:
                 workbook.save(buf)
@@ -60,7 +65,7 @@ class DownloadQuants(models.TransientModel):
                 'view_mode': 'form',
                 'view_type': 'form',
                 'res_id': dl_obj.id,
-                'context':{'active_model':self.model_name},
+                'context':{'active_model':self.model, 'function_key': self.function_key},
                 'views': [(False, 'form')],
                 'target': 'new',
             }

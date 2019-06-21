@@ -1,0 +1,36 @@
+<odoo>
+	<data>
+		<record id="setaction_duyet_diem_form" model="ir.ui.view">
+            <field name="name">setaction.duyet.diem.form</field>
+            <field name="model">setaction.setaction</field>
+            <field name="inherit_id" ref="setaction.setaction_form"></field>
+            <field name="arch" type="xml">
+            	<xpath expr="//footer" position="inside">
+            	
+            		<button name="multi_approved" type="object" string="Approved" class="oe_highlight" />
+                  	<button name="multi_confirmed" type="object" string="Confirmed" class="oe_highlight" />
+                  
+                  
+            	</xpath>
+       
+            	
+            </field>
+            </record>   
+            
+            
+            
+        
+        <act_window
+            id="duyet_diem_action_new"
+            name="Duyệt điểm New"
+            res_model="setaction.setaction"
+            src_model="cvi"
+            view_mode="form"
+            multi="True"
+            target="new"
+            key2="client_action_multi"
+        />
+        
+	
+	</data>
+</odoo>

@@ -1,0 +1,19 @@
+<odoo>
+  <data>
+       <record model="ir.ui.view" id="setaction_form">
+         <field name="name">setaction.setaction</field>
+         <field name="model">setaction.setaction</field>
+         <field name="arch" type="xml">
+            <form string=" Form">
+            	<sheet>
+            	<div>abc</div>
+            	<group>
+            	</group>
+            	</sheet>
+            <footer>
+            </footer>
+            </form>
+            </field>
+            </record>
+  </data>
+</odoo>

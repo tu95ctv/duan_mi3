@@ -4,7 +4,7 @@ from odoo.addons.tonkho.models.dl_models.dl_model_quants import  download_quants
 from odoo.addons.tonkho.models.dl_models.dl_model_product import  download_product
 from odoo.addons.tonkho.models.dl_models.xl_tranfer_bb import write_xl_bb
 from odoo.addons.tonkho.models.check_file import check_imported_file_sml
-from odoo.addons.downloadwizard.download_tool import  do_if_model_name_wrapper
+from odoo.addons.downloadwizard.download_tool import  do_if_function_key_wrapper
 
 
 class KhoLine(models.TransientModel):
@@ -36,7 +36,7 @@ class DownloadQuants(models.TransientModel):
 
 
     @api.depends('parent_location_id')
-    @do_if_model_name_wrapper('stock.quant')
+    @do_if_function_key_wrapper('stock.quant')
     def kho_line_ids_(self):
         parent_location_id = self.parent_location_id.id
         domain = [('location_id','child_of',parent_location_id)]

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,exceptions,tools,_
-from odoo.addons.dai_tgg.mytools import  convert_utc_to_gmt_7,name_compute,convert_odoo_datetime_to_vn_datetime,convert_odoo_datetime_to_vn_str,convert_vn_datetime_to_utc_datetime,Convert_date_orm_to_str
+from odoo.addons.tutool.mytools import  convert_utc_native_dt_to_gmt7,name_compute,convert_odoo_datetime_to_vn_datetime,convert_vn_datetime_to_utc_datetime,Convert_date_orm_to_str
 from odoo.exceptions import ValidationError,UserError
 import datetime
 import sys
@@ -118,20 +118,24 @@ class CamSua(models.Model):
                     raise UserError(u'Muốn Xóa thì phải Đánh Dấu Xóa trước đã')
         res = super(CamSua, self).unlink()
         return res 
-class DuyetDiem(models.TransientModel):
-    _name = "dai_tgg.duyetdiem"
-    @api.multi
-    def multi_approved(self):
-        active_ids = self._context.get('active_ids')
-        if active_ids:
-            cac_linh_ids = self.env.user.cac_linh_ids
-            for r in self.env['cvi'].browse(active_ids):
-                if r.is_sep:#or r.is_admin or (cac_linh_ids and (r.create_uid == r.env.user or r.user_id == r.env.user)):
-                    r.state = 'approved'
-                else:
-                    raise UserError (u'Bạn không phải là lãnh đạo của nhân viên tạo record này')
-        else:
-            raise UserError (u'Bạn chưa chọn dòng nào')
+
+# class DuyetDiem(models.TransientModel):
+#     _name = "dai_tgg.duyetdiem"
+#     @api.multi
+#     def multi_approved(self):
+#         active_ids = self._context.get('active_ids')
+#         if active_ids:
+#             cac_linh_ids = self.env.user.cac_linh_ids
+#             for r in self.env['cvi'].browse(active_ids):
+#                 if r.is_sep:#or r.is_admin or (cac_linh_ids and (r.create_uid == r.env.user or r.user_id == r.env.user)):
+#                     r.state = 'approved'
+#                 else:
+#                     raise UserError (u'Bạn không phải là lãnh đạo của nhân viên tạo record này')
+#         else:
+#             raise UserError (u'Bạn chưa chọn dòng nào')
+        
+        
+        
     @api.multi
     def multi_confirmed(self):
         active_ids = self._context.get('active_ids')

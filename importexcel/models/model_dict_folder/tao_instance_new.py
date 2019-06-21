@@ -16,7 +16,7 @@ from copy import deepcopy
 # import sys
 # VERSION_INFO   = sys.version_info[0]
 
-from odoo.addons.importexcel.models.model_dict_folder.model_dict import gen_model_dict
+# from odoo.addons.importexcel.models.model_dict_folder.model_dict import gen_model_dict
 from xlutils.copy import copy
 
 
@@ -559,8 +559,7 @@ def check_notice_dict_co_create_or_get(model_name,noti_dict,check_file,not_get_o
         raise UserError(u'các row bị bỏ qua hết không có dòng nào được tạo hoặc được update')
     
 
-def importthuvien(odoo_or_self_of_wizard,
-                  model_dict = False,
+def importexcel(odoo_or_self_of_wizard,
                   key=False,
                   key_tram=False,
                   check_file = False,
@@ -570,15 +569,12 @@ def importthuvien(odoo_or_self_of_wizard,
     
     
     self_key_tram =  getattr(self,'key_tram',False) or key_tram
-
-    
-    if not model_dict:
-        ALL_MODELS_DICT = gen_model_dict(self=self, 
-                                         key_tram = self_key_tram,mode=mode)
-    else:
-        ALL_MODELS_DICT =  model_dict
-    
-#     for r in self:
+    new_dict = self.gen_model_dict()
+    key = key or self.type_choose
+    CHOOSED_MODEL_DICT = new_dict[key]
+    if callable(CHOOSED_MODEL_DICT):
+        CHOOSED_MODEL_DICT = CHOOSED_MODEL_DICT(self=self, 
+                                             key_tram = self_key_tram,mode=mode)
     if not self.file:
         raise UserError(u'Bạn phải upload file để import')
     file_content = base64.decodestring(self.file)
@@ -588,11 +584,10 @@ def importthuvien(odoo_or_self_of_wizard,
         formatting_info = True
     xl_workbook = xlrd.open_workbook(file_contents = file_content, formatting_info=formatting_info)
     noti_dict = {}
-#     noti_dict['skip because required'] = 0
-    if not key:
-        CHOOSED_MODEL_DICT = ALL_MODELS_DICT[self.type_choose]
-    else:
-        CHOOSED_MODEL_DICT = ALL_MODELS_DICT[key]
+    
+    
+    
+    
     context = {'from_import':True} 
     context_get = CHOOSED_MODEL_DICT.get('context')
     if context_get:

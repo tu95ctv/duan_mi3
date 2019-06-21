@@ -1,22 +1,7 @@
 <odoo>
 <data>
 	<!-- Cong viec Form -->
-         <record model="ir.ui.view" id="duyetdiem_form">
-         <field name="name">dai_tgg.duyetdiem</field>
-         <field name="model">dai_tgg.duyetdiem</field>
-         <field name="arch" type="xml">
-            <form string=" Form">
-            	<sheet>
-            	<group>
-            	</group>
-            	</sheet>
-            <footer>
-                  <button name="multi_approved" type="object" string="Approved" class="oe_highlight" />
-                  <button name="multi_confirmed" type="object" string="Confirmed" class="oe_highlight" />
-            </footer>
-            </form>
-            </field>
-            </record>
+         
       <record model="ir.ui.view" id="cvi_form">
          <field name="name">cv form</field>
          <field name="model">cvi</field>

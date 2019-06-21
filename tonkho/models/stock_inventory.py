@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,_
 from odoo.exceptions import UserError
-from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importthuvien
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel
 from lxml import etree
 
 class Inventory(models.Model):
@@ -177,7 +177,7 @@ class Inventory(models.Model):
     @api.multi
     def import_file(self):
             
-            importthuvien(self,
+            importexcel(self,
                            key=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',
                            key_tram='key_ltk',mode=u'2')
             if self.state not in ('done','cancel'):

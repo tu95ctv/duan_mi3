@@ -2,51 +2,22 @@
     <data>
     
     
-    <record id="statistics_form" model="ir.ui.view">
-            <field name="name">tonkho.statistics.form</field>
-            <field name="model">downloadwizard.statistics</field>
-            <field name="arch" type="xml">
-            <form>
-            <group>
-                <field name="date_time"/>
-                <field name="model_name"></field>
-                <field name="statistics_ids">
-                	<tree name="stats form">
-                			
-                		<field name="name_categ"></field>
-                		<field name="quantity"></field>
-                		<field name="ket_luan"></field>
-                	</tree>
-                </field>
-                	 </group>
-                </form>
-            </field>
-        </record>
-        
-       <record id="statistics_tree" model="ir.ui.view">
-            <field name="name">tonkho.statistics.tree</field>
-            <field name="model">downloadwizard.statistics</field>
-            <field name="arch" type="xml">
-            <tree name="">
-                <field name="date_time"/>
-                </tree>
-            </field>
-        </record>
+    
         
         
         
         
     
     	   <record model="ir.actions.act_window" id="statistics_action">
-            <field name="name">Thống kê </field>
-            <field name="res_model">downloadwizard.statistics</field>
-            <field name="view_mode">tree,form</field>
+            <field name="name">Thống kê  Kho</field>
+            <field name="res_model">setaction.statistics</field>
+            <field name="view_mode">form</field>
             <field name="view_type">form</field>
-            <field name="context">{'default_model_name':'tonkho'}</field>
+            <field name="context">{'function_key':'tonkho_statistics'}</field>
         </record>
         
         
-        <menuitem name="TK" id="statistics_menu" parent="stock.menu_stock_inventory_control" 
+        <menuitem name="Thống kê kho" id="statistics_menu" parent="stock.menu_stock_inventory_control" 
         action="statistics_action" sequence="8" />
     </data>
 </odoo>

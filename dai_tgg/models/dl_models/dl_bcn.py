@@ -5,9 +5,9 @@ import xlwt
 from odoo import fields
 from odoo.exceptions import UserError
 from copy import deepcopy
-from odoo.addons.dai_tgg.mytools import  convert_odoo_datetime_to_vn_str
+from odoo.addons.tutool.mytools import  convert_odoo_datetime_to_vn_str
 from collections import  OrderedDict
-from odoo.addons.dai_tgg.mytools import  Convert_date_orm_to_str
+from odoo.addons.tutool.mytools import  Convert_date_orm_to_str
 from collections import  OrderedDict
 from odoo.addons.downloadwizard.models.dl_models.dl_model import  write_all_row
 from odoo.addons.downloadwizard.models.dl_models.dl_model import  get_width
@@ -36,9 +36,8 @@ def gen_domain_cvi(dl_obj):
     domain = []
     if dl_obj.date:
         domain.append(('ngay_bat_dau','>=',dl_obj.date))
-    if dl_obj.end_date:
-        domain.append(('ngay_bat_dau','<=',dl_obj.end_date))
-        
+#     if dl_obj.end_date:
+#         domain.append(('ngay_bat_dau','<=',dl_obj.end_date))
     return domain
 def generate_Export_Para_cvi(dl_obj):
     font_height =dl_obj.font_height
@@ -108,7 +107,7 @@ def thuebaotable_(worksheet,f_name,fixups,needdata,row_index,dl_obj, **kargs):
                              
                              
 
-def table_bcn_(worksheet,f_name,fixups,needdata,row_index,dl_obj, **kargs):
+def table_bcn_(worksheet, f_name, fixups, needdata,row_index,dl_obj, **kargs):
 #     cates = kargs ['cates'] 
     
     font_height = dl_obj.font_height
@@ -119,7 +118,7 @@ def table_bcn_(worksheet,f_name,fixups,needdata,row_index,dl_obj, **kargs):
     is_show_loai_record = dl_obj.env['ir.config_parameter'].sudo().get_param('dai_tgg.' + 'is_show_loai_record')
     Export_Para_cvi_copy1['FIELDNAME_FIELDATTR']['loai_record']['skip_field'] = not is_show_loai_record
     Export_Para_cvi_copy1['FIELDNAME_FIELDATTR']['categ_id']['skip_field'] = not is_show_loai_record
-    nhoms = request.env['product.category'].search([('stt_for_report','!=',False)],order='stt_for_report asc')
+    cates = request.env['product.category'].search([('stt_for_report','!=',False)],order='stt_for_report asc')
     row_index_begin = row_index
     dl_model_para = {}
     for loai_record,attrs in LOAI_REC_.items():
@@ -138,18 +137,18 @@ def table_bcn_(worksheet,f_name,fixups,needdata,row_index,dl_obj, **kargs):
                 domain_loai_record = [('loai_record','in',[u'Công Việc',u'Sự Vụ']),('loai_cvi','!=',u'Chia Điểm Con')]
             else:
                 domain_loai_record = [('loai_record','=',loai_record)]
-            for cate in nhoms:# categ_id # ghi các đầu nhóm 1. IP , 2TRD
+            for cate in cates:# categ_id # ghi các đầu nhóm 1. IP , 2TRD
                 Export_Para_cvi_copy = deepcopy(Export_Para_cvi_copy1)
-                domain =[('categ_id','=',cate.id),(('is_bc','=',True))] + domain_loai_record
-                n_row = download_model(dl_obj,
-                             Export_Para=Export_Para_cvi_copy,
-                             append_domain=domain,
-                             workbook=None,
-                             worksheet=worksheet,
-                             ROW_TITLE = row_index ,
-                             return_more_thing_for_bcn = True,
+                domain =[('categ_id','=',cate.id),('is_bc','=',True)] + domain_loai_record
+                n_row = download_model(
+                            dl_obj,
+                            Export_Para=Export_Para_cvi_copy,
+                            append_domain = domain,
+                            workbook=None,
+                            worksheet=worksheet,
+                            ROW_TITLE = row_index ,
+                            return_more_thing_for_bcn = True,
                             write_before_title = write_before_title,
-                            
                             kargs_write_before_title = {'worksheet' :worksheet,
                                                                         'row_index_before_title' :row_index ,
                                                                         'col_index_before_title' :0,
@@ -195,7 +194,7 @@ def dl_bcn(dl_obj,append_domain = []):
                  ('ten_pho_dai_vthcm',{'range':['auto', 'auto',1,3],'offset':5,'val':u'Nguyễn Văn Xuân','style':bold_center_style}),
                  ('ten_nguoi_bc',{'range':['auto', 'auto',7,9],'offset':0,'val':dl_obj.env.user.name,'style':bold_center_style}),
                  ]
-    wb = write_all_row(fixups,dl_obj,set_cols_width)
+    wb = write_all_row(fixups, dl_obj, set_cols_width)
         
     return wb,name
         

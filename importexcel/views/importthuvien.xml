@@ -3,13 +3,13 @@
   <data>
   
    <!-- IMPORT THƯ VIỆN -->
-      <record model="ir.ui.view" id="importthuvien_form">
+      <record model="ir.ui.view" id="importexcel_form">
          <field name="name">import thu vien</field>
-         <field name="model">importexcel.importthuvien</field>
+         <field name="model">importexcel.importexcel</field>
          <field name="arch" type="xml">
             <form>
                <header>
-                  <button name="importthuvien" string="import" type="object" class="btn-primary" />
+                  <button name="importexcel" string="import" type="object" class="btn-primary" />
                   <button name="import_all" string="import all" type="object" class="btn-primary" />
                  
                  <!-- 
@@ -80,9 +80,9 @@
             </form>
          </field>
       </record>
-      <record id="importthuvien_list" model="ir.ui.view">
-         <field name="name">importexcel.importthuvien.list</field>
-         <field name="model">importexcel.importthuvien</field>
+      <record id="importexcel_list" model="ir.ui.view">
+         <field name="name">importexcel.importexcel.list</field>
+         <field name="model">importexcel.importexcel</field>
          <field name="arch" type="xml">
             <tree>
                <field name="id" />
@@ -96,9 +96,9 @@
          </field>
       </record>
       
-      <record model="ir.actions.act_window" id="importthuvien_action">
+      <record model="ir.actions.act_window" id="importexcel_action">
          <field name="name">Import thư viện</field>
-         <field name="res_model">importexcel.importthuvien</field>
+         <field name="res_model">importexcel.importexcel</field>
          <field name="view_mode">tree,form</field>
       </record>
       
@@ -110,7 +110,7 @@
          <field name="arch" type="xml">
             <form>
                <header>
-                  <button name="importthuvien" string="import" type="object" class="btn-primary" />
+                  <button name="importexcel" string="import" type="object" class="btn-primary" />
                </header>
                <sheet>
                   <group>
@@ -158,7 +158,7 @@
       
 <!-- import icon -->
       <menuitem name="Import excel" id="import_icon" sequence="1" groups="base.group_erp_manager" />
-      <menuitem id="import_tvcv_menu" parent="import_icon" action="importthuvien_action" sequence="1" />
+      <menuitem id="import_tvcv_menu" parent="import_icon" action="importexcel_action" sequence="1" />
       <!-- Công việc/ Ca Trực 
       <menuitem id="importcvi_menu" parent="else_more_menu"  action="importcvi_action" sequence="1" />-->
   </data>

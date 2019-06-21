@@ -15,7 +15,7 @@
     'category': 'Uncategorized',
     'version': '0.1',
     # any module necessary for this one to work correctly
-    'depends': ['base','base_import','hr','stock','downloadwizard'],
+    'depends': ['base','base_import','hr','stock','downloadwizard','importexcel'],
     # always loaded
     'data': [
         'views/ctr.xml',
@@ -33,8 +33,9 @@
         'views/to_trinh.xml',
         'views/department.xml',
         'views/download.xml',
-                'views/tb.xml',
-
+         'views/tb.xml',
+        'views/setaction_duyet_diem.xml',
+         
         'data/data.xml',
         'security/trucca_security.xml',
         'security/ir.model.access.csv',

@@ -4,15 +4,15 @@ from openerp.http import request
 from odoo import fields
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError
-def do_if_model_name_wrapper(model_name):
-    def do_if_model_name(func):
+def do_if_function_key_wrapper(function_key):
+    def do_if_function_key(func):
         def f_wrapper(self):
-            if self.model_name ==model_name:
+            if self.function_key ==function_key:
                 func(self)
             else:
                 pass
         return f_wrapper
-    return do_if_model_name
+    return do_if_function_key
 
 
 def download_all_model_by_url(kw):
@@ -26,7 +26,7 @@ def download_all_model_by_url(kw):
         active_domain = json.loads(active_domain)
     if downloadwizard_id:
         dj_obj = request.env['downloadwizard.download'].browse(int(downloadwizard_id))
-        download_key =  dj_obj.model_name
+        download_key =  dj_obj.function_key
     else:
         download_model = kw.get('download_model')
         download_model_id = kw.get('download_model_id')

@@ -1,6 +1,6 @@
  # -*- coding: utf-8 -*-
 # from odoo.addons.importexcel.models.get_or_create_func import get_or_create_object_sosanh
-from odoo.addons.dai_tgg.mytools import get_or_create_object_sosanh
+from odoo.addons.tutool.mytools import get_or_create_object_sosanh
 def convert_integer(val,needdata):
     try:
         return int(val)

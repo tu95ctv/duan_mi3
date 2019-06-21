@@ -1,12 +1,11 @@
  # -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 import datetime
-from odoo.addons.dai_tgg.mytools import convert_vn_datetime_to_utc_datetime
+from odoo.addons.tutool.mytools import convert_vn_datetime_to_utc_datetime
 
 def convert_vn_str_datetime_to_utc_str_datetime(v):
     if v:
         dt_v = datetime.datetime.strptime(v,'%d/%m/%Y %H:%M:%S')
-    #     raise UserError(u'%s-%s'%(v,type(v)))
         utc_v =  convert_vn_datetime_to_utc_datetime(dt_v)
         utc_str = utc_v.strftime('%d/%m/%Y %H:%M:%S')
         return utc_str
@@ -52,43 +51,7 @@ def gen_user_department_model_dict():
  
                       ]
                 },            
-        u'location partner': {
-                'title_rows' : [0], 
-                'begin_data_row_offset_with_title_row' :1,
-                'sheet_names': [u'Location Partner'],
-                'model':'stock.location',
-                'fields' : [
-                         ('name',{'func':None,'xl_title':u'Name','key':True,'required':True}),
-                         ('usage',{'set_val':'supplier'}),
-                         ('is_kho_cha',{'set_val':True}),
-                         ('department_id',{'set_val':False}),
-                         ('cho_phep_khac_tram_chon',{'set_val':True}),
-                         ('not_show_in_bb',{'func':lambda v,n: True if v else False,'xl_title':u'not_show_in_bb','for_excel_readonly':True}),
-                         ('partner_id_of_stock_for_report',{
-                             'fields':[('name',{'func': lambda v,n:not n['vof_dict']['not_show_in_bb']['val'] and n['vof_dict']['name']['val'], 'key':True,'required':True}),
-                                                       ]
-                                            }
-                         ),
-                      ]
-                },#location partner
-                       
-        u'categ': {
-                'title_rows' : [0], 
-                'begin_data_row_offset_with_title_row' :1,
-                'sheet_names': [u'categ'],
-                'model':'product.category',
-                'fields' : [
-                         ('name',{'func':None,'xl_title':u'Name','key':True,'required':True}),
-                         ('stt_for_report',{'func':None,'xl_title':u'stt_for_report','required':True,'type_allow':[float]}),
-#                          ('usage',{'set_val':'supplier'}),
-#                          ('is_kho_cha',{'set_val':True}),
-#                          ('cho_phep_khac_tram_chon',{'set_val':True}),
-#                          ('partner_id_of_stock_for_report',{'fields':[('name',{'func': lambda v,n:n['vof_dict']['name']['val'], 'key':True,'required':True}),
-#                                                        ]
-#                                             }
-#                          ),
-                      ]
-                },#location partner
+        
                        
         u'Department': {
         'title_rows' : [1], 
@@ -278,9 +241,6 @@ def gen_user_department_model_dict():
                       ('gio_ket_thuc',{'key':True,'xl_title':u'Giờ Kết Thúc','bypass_check_type':True,'func':convert_vn_str_datetime_to_utc_str_datetime}),
                       ('slncl',{'xl_title':u'Số lượng người chia điểm'}),
                       ('ti_le_chia_diem',{'xl_title':u'Tỉ lệ chia điểm'}),
-#                       ('cd_children_ids',{'fields':[('user_id',{'fields':[
-#                           ('name',{'xl_title':u'Các CV Chia Điểm Con','required':True,'key':True, 'is_x2m_field':True})]})]})
-
                        ('cd_children_ids',{'fields':[
                             ('user_id',{'xl_title':u'Các CV Chia Điểm Con','func':cd_children_ids_,'key':True,'is_x2m_field':True,'required':True }),
                             ('loai_record',{'set_val':u'Công Việc','key':True})     ,
@@ -299,18 +259,12 @@ def gen_user_department_model_dict():
                 'largest_map_row_choosing':True,
                 'sheet_names': [u'BCN'],
                 'dong_test':10,
-                'model':'bds.poster',
+                'model':'dai_tgg.thuebaoline',
                 'fields' : [
-#                       ('stt',{'func':stt_thuebaoline_}),
                       ('thuebao_id',{'fields':[
                           ('date',{'key':True,'required':True,'set_val':datetime.date.today()})
                           ]}),
                       ('msc',{'required':True, 'key':True, 'xl_title':u'MSC-VLR'}),
-             
-#                       ('tb_cap_nhat',{'key':True,'xl_title':u'TB cập nhật'}),
-#                       ('tb_mo_may',{'key':True,'xl_title':u'TB mở máy'}),
-#                       ('tb_tat_may',{'key':True,'xl_title':u'TB tắt máy'}),
-#                       ('tai_cp',{'key':True,'xl_title':u'Tải CP'}),
                       ]
                 },#location partner     
                        
@@ -319,7 +273,6 @@ def gen_user_department_model_dict():
                 'begin_data_row_offset_with_title_row' :1,
                 'largest_map_row_choosing':True,
                 'sheet_names': [u'Sheet 1'],
-#                 'dong_test':10,
                 'model':'bds.poster',
                 'fields' : [
                       ('name',{'key':True,'xl_title':u'Name'}),

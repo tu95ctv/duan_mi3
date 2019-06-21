@@ -5,8 +5,8 @@ from odoo.exceptions import UserError
 from odoo.tools.translate import _
 from odoo.tools.float_utils import float_compare
 from datetime import timedelta
-from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importthuvien
-from odoo.addons.importexcel.models.model_dict_folder.model_dict import  default_import_xl_setting
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel
+from odoo.addons.tonkho.models.import_excel_model_dict_folder.model_dict import  default_import_xl_setting
 from odoo.addons.tonkho.models.dl_models.xl_tranfer_bb import write_xl_bb
 from odoo.addons.tonkho.models.check_file import check_imported_file_sml
 
@@ -497,7 +497,7 @@ class StockPicking(models.Model):
     
     @api.multi
     def import_file(self):
-        importthuvien(self,
+        importexcel(self,
                        key=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',
                        key_tram='sml')
 

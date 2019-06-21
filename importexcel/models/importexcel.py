@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,exceptions,tools,_
 import re
-from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importthuvien
-from odoo.addons.importexcel.models.model_dict_folder.model_dict import default_import_xl_setting
-from odoo.addons.importexcel.models.model_dict_folder.model_dict import gen_model_dict
-# from odoo.addons.importexcel.models.tao_instance import import_strect
-
-# from odoo.addons.importexcel.models.model_dict import gen_model_dict
-
-# ALL_MODELS_DICT = ALL_MODELS_DICT
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel
+from odoo.addons.tonkho.models.import_excel_model_dict_folder.model_dict import default_import_xl_setting
 
 
 
-class ImportThuVien(models.Model):
-    _name = 'importexcel.importthuvien' 
+class Importexcel(models.Model):
+    _name = 'importexcel.importexcel' 
     type_choose = fields.Selection([
 #         (u'stock.inventory.line',u'stock.inventory.line'),
 #         (u'stock.inventory.line.dp_tti',u'stock.inventory.line.dp_tti'),
@@ -97,6 +91,12 @@ class ImportThuVien(models.Model):
     
     is_admin = fields.Boolean(compute='is_admin_')
     mode = fields.Selection([(u'1',u'mode 1 (tim location goc bằng key)'),(u'2',u'mode 2 ( tìm location góc bằng cột trạm)')])
+    
+    def gen_model_dict(self):
+       
+        return {}
+    
+    
     @api.onchange('sheet_name_select')
     def sheet_name_select_oc_(self):
         if self.sheet_name_select:
@@ -106,24 +106,21 @@ class ImportThuVien(models.Model):
         for r in self:
             r.is_admin = self.user_has_groups('base.group_erp_manager')
     
-    def importthuvien(self):
-        importthuvien(self)
+    def importexcel(self):
+        importexcel(self)
         return True
    
     def import_all(self):
-#         importthuvien(self,key=u'User')
-        importthuvien(self,key=u'Department')
-        importthuvien(self,key=u'Partner')
-        importthuvien(self,key=u'location partner')
-        importthuvien(self,key= u'Loại sự cố, sự vụ')
-        importthuvien(self,key= u'thuebaoline')
-        importthuvien(self,key= u'categ')
+        importexcel(self,key=u'Department')
+        importexcel(self,key=u'Partner')
+        importexcel(self,key=u'location partner')
+        importexcel(self,key= u'Loại sự cố, sự vụ')
+        importexcel(self,key= u'thuebaoline')
+        importexcel(self,key= u'categ')
         return True
     
     
-    def gen_model_dict(self):
-        rs = gen_model_dict()
-        return rs
+    
         
     
     @api.onchange('type_choose')
@@ -191,7 +188,7 @@ class ImportThuVien(models.Model):
 
 class ImportCVI(models.Model):
     _name='importexcel.importcvi'
-    _inherit = 'importexcel.importthuvien'
+    _inherit = 'importexcel.importexcel'
     user_id = fields.Many2one('res.users',default= lambda self:self.env.uid)
     
     @api.model

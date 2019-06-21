@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,exceptions,tools,_
-from odoo.addons.dai_tgg.mytools import convert_odoo_datetime_to_vn_str,name_compute,convert_odoo_datetime_to_vn_datetime
+from odoo.addons.dai_tgg.mytools import name_compute,convert_odoo_datetime_to_vn_datetime
 from unidecode import unidecode
 from odoo.exceptions import ValidationError,UserError
 
@@ -68,20 +68,7 @@ class CviSuCo(models.Model):
         for r in self:
             r.loai_record_show = r.loai_record
             
-#     @api.depends('comment_ids')
-#     def comments_show_(self):
-#         for r in self:
-#             comment_ids_text_lists = []
-#             for i in r.comment_ids:
-#                 i_text = name_compute_char_join_rieng(i, [
-#                     ('create_date',{'func':convert_odoo_datetime_to_vn_str}),#,'pr_more':u'('
-#                     ('create_uid',{'func': lambda r: r.name ,'join_char':u'-'}),#'sf_more':u')' 
-#                     ('noi_dung',{'pr':u'',}),
-#                                           ],
-#                                        join_char = ' ')
-#                 comment_ids_text_lists.append(i_text)
-#             r.comments_show = u' | '.join(comment_ids_text_lists)
-                
+
         
 
 

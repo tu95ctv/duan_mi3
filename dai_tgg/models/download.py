@@ -7,7 +7,7 @@ from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_bcn
 from odoo.addons.dai_tgg.models.dl_models.dl_bcn import  dl_cvi
 
 from odoo.addons.dai_tgg.models.dl_models.dl_p3 import  dl_p3,gen_read_group_domain_user_in_department,gen_date_and_department_domain
-from odoo.addons.downloadwizard.download_tool import  do_if_model_name_wrapper
+from odoo.addons.downloadwizard.download_tool import  do_if_function_key_wrapper
 
 
 class ThongkeDiemCVILine(models.TransientModel):
@@ -18,15 +18,7 @@ class ThongkeDiemCVILine(models.TransientModel):
     diemld = fields.Float(digits=(6,2),string=u'Điểm Lãnh Đạo Chấm',store=True)
     download_id = fields.Many2one('downloadwizard.download')
 
-# def do_if_model_name_wrapper(model_name):
-#     def do_if_model_name(func):
-#         def f_wrapper(self):
-#             if self.model_name =='download_bcn':
-#                 func(self)
-#             else:
-#                 pass
-#         return f_wrapper
-#     return do_if_model_name
+
 
 class DownloadCVI(models.TransientModel):
     _inherit = "downloadwizard.download"
@@ -46,13 +38,13 @@ class DownloadCVI(models.TransientModel):
     
     
     @api.depends('date')
-    @do_if_model_name_wrapper('download_bcn')
+    @do_if_function_key_wrapper('download_bcn')
     def bcn_thue_bao_line_ids_(self):
         bcn_thue_bao_line_ids = self.env['dai_tgg.thuebaoline'].search([('date','=',self.date)],order='id asc')
         self.bcn_thue_bao_line_ids = bcn_thue_bao_line_ids
     
     @api.depends('date')
-    @do_if_model_name_wrapper('download_bcn')
+    @do_if_function_key_wrapper('download_bcn')
     def bcn_cvi_ids_(self):
         cvi = self.env['cvi'].search([('is_bc','=',True),('ngay_bat_dau','=',self.date)],order='id asc')
         self.bcn_cvi_ids = cvi
@@ -64,18 +56,11 @@ class DownloadCVI(models.TransientModel):
         return rt
     @api.onchange('date','end_date','chon_thang','department_id')
     def oc_to_diem_line_ids_(self):
-#         read_group_rsul = gen_read_group_domain_user_in_department(self)
-#         rt = map(lambda m:(0,0,{'user_id':m['user_id'][0],'user_id_count':m['user_id_count'],'diemtc':m['diemtc'],'diemld':m['diemld']}),read_group_rsul)
-#         rt = list(rt)
-        
         rt = self.oc_to_diem()
         return {'value':
                 {'diem_line_ids':rt
                  }
                 }
-        
-        
-    
     @api.multi
     def gen_pick_func(self): 
         rs = super(DownloadCVI, self).gen_pick_func()
@@ -95,9 +80,7 @@ class DownloadCVI(models.TransientModel):
         domain = gen_date_and_department_domain(self)
         congviecs = self.env['cvi'].search(domain)
         diff_diem_tvcv_count =0
-        print ('***congviecs',congviecs)
         for cvi in congviecs:
-            print ('****',cvi.tvcv_id.diem,cvi.diem_tvcv)
             if cvi.tvcv_id.diem != cvi.diem_tvcv:
                 diff_diem_tvcv_count +=1
                 if self.is_write_diem:
@@ -106,18 +89,15 @@ class DownloadCVI(models.TransientModel):
         rt = self.oc_to_diem()
         self.diem_line_ids = False
         self.diem_line_ids = rt
-#         self.write({'diem_line_ids':rt
-#                  })
-#         
-        
-        model =self._context.get('transfer_active_model') or self._context['active_model']
+#         model = self._context.get('transfer_active_model') or self._context['active_model']
+#         function_key = self.function_key
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'downloadwizard.download',
             'view_mode': 'form',
             'view_type': 'form',
             'res_id': self.id,
-            'context':{'active_model':model},
+#             'context':{'function_key':function_key},
             'views': [(False, 'form')],
             'target': 'new',
         }
