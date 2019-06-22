@@ -3,7 +3,7 @@ from odoo import models, fields, api,exceptions,tools,_
 from odoo.osv import expression
 from odoo.osv.query import Query
 import datetime
-from odoo.addons.dai_tgg.mytools import  convert_utc_native_dt_to_gmt7
+from odoo.addons.tutool.mytools import  convert_utc_native_dt_to_gmt7
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
 

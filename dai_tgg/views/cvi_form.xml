@@ -7,11 +7,21 @@
          <field name="model">cvi</field>
          <field name="arch" type="xml">
             <form string=" Form">
-             <header>
+             <header attrs="{'invisible':['|',('is_your','=',False),('loai_record','!=','Công Việc')]}">
+                 <!-- 
                   <button name="action_mark_delete" type="object" string="Đánh Dấu Xóa"  class="oe_highlight"  states="confirmed" />
+                  <button name="action_draft" type="object" string="Bản thảo"  class="oe_highlight"   />
                   <button name="action_confirmed" type="object" string="Xác Nhận"  class="oe_highlight"  attrs="{'invisible':['|',('state','=','confirmed'),'&amp;',('is_sep','=',False),('state','=','approved')]}"  />
                   <button name="action_approved" type="object" string="Lãnh Đạo Đồng Ý"  class="oe_highlight"  attrs="{'invisible':['|','|',('state','=','mark_delete'),('state','=','approved'),'&amp;',('state','=','confirmed'),'|',('loai_record','!=','Công Việc'),('is_sep','=',False)]}"   />
-                  
+                   -->
+                   
+                   <button name="action_mark_delete" type="object" string="Đánh Dấu Xóa"  class="oe_highlight"  states="confirmed,draft" />
+                  <!-- <button name="action_draft" type="object" string="Bản thảo"  class="oe_highlight"  states="confirmed, mark_delete" /> -->
+                
+                
+                  <button name="action_draft" type="object" string="Bản thảo"  class="oe_highlight"  attrs="{'invisible':[('state','not in',['mark_delete','confirmed']),'|',('state','!=','approved'),('is_sep','=',False)]}" />
+                  <button name="action_confirmed" type="object" string="Xác Nhận"  class="oe_highlight"  states="draft" />
+                  <button name="action_approved" type="object" string="Lãnh Đạo Đồng Ý"  states="confirmed"  groups="dai_tgg.group_cham_diem_cvi"  />
                   <field name="state" widget="statusbar"  /><!-- attrs="{'invisible':[('loai_record','!=','Công Việc')]}" -->
                </header>
                <sheet>
@@ -19,6 +29,7 @@
                      <group>
                         <field name="id" attrs="{'invisible':[('loai_record','=','Comment')]}"  />
                         <field name="name"  />
+                        <field name="is_your"  />
                        <field name="loai_record" attrs="{'invisible':[('tvcv_id','!=',False)],'required':True}" invisible="context.get('default_loai_record')" /> 
                         <field name="loai_record_show" attrs="{'invisible':[('tvcv_id','=',False)]}" invisible="context.get('default_loai_record')" />
                         <field name="user_id" readonly="1"  attrs="{'invisible':[('loai_record','!=','Công Việc')]}" /> <!-- 'readonly':[('is_admin','=', False),('cam_sua','=', True)], -->
@@ -72,14 +83,9 @@
                      <group name="admin1" string="ADMIN 1">
                         <field name="is_sep" />
                         <field name="is_admin" />
-                        
-                        <!-- <field name="thu_vien_da_chon_list" /> 
-                        <field name="cd_user_id" />-->
                         <field name="valid_diemtc" />
-                        <!-- <field name="diem_remain_gd" /> -->
                         <field name="sum_cd_con" />
                         <field name="valid_cd" />
-                        <!-- <field name="valid_gd" /> -->
                      </group>
                      <group name="admin2" string="ADMIN 2">
                         <!-- <field name="is_has_tvcv_con" /> -->
@@ -95,7 +101,6 @@
                            <tree decoration-danger="not valid_diemtc" editable="bottom">
                               <field name="loai_record"/>
                               <field name="cd_parent_id" invisible="1" />
-                              <!-- có để tránh lỗi   r.diemtt = r.cd_parent_id.diem_goc/r.slnc và để cho @api.constrains('cd_parent_id') có tác dụngl-->
                               <field name="cam_sua" invisible="1" />
                               <field name="is_admin" invisible="1" />
                               <field name="is_sep" invisible="1" />
@@ -111,8 +116,6 @@
                               <field name="diem_goc" invisible="1" />
                               <field name="so_luong" readonly="1" invisible="1" />
                               <field name="so_lan" readonly="1" invisible="1" />
-                              <!--    <field name="diemtt"  /> -->
-                              <!--      <field name="percent_diemtt" attrs="{'readonly':[('cam_sua','=',True)]}" /> -->
                               <field name="diemtc" />
                               <field name="valid_cd" invisible="1" />
                               <field name="percent_diemtc" attrs="{'invisible' : [('is_sep', '=', False),('is_admin', '=', False)]}"   groups="dai_tgg.show_cot_lanh_dao_group" />

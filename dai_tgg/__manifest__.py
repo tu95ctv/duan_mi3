@@ -20,7 +20,7 @@
     'data': [
         'views/ctr.xml',
         'views/cvi_form.xml',
-        'views/cvi.xml',
+        'views/cvi_list_search.xml',
         'views/tvcv.xml',
 #         'views/importthuvien.xml',
         'views/comment.xml',

@@ -6,8 +6,10 @@
          <field name="arch" type="xml">
             <form string=" Form">
             	<sheet>
-            	<div>abc</div>
+            	
             	<group>
+            		<field name="choosed_object_qty"/>
+            		<field name="affected_object_qty"/>
             	</group>
             	</sheet>
             <footer>

@@ -9,7 +9,7 @@ class CTR(models.Model):
     name = fields.Char(compute = '_name_truc_ca_compute', store=True)
     name_khong_dau = fields.Char(compute = '_name_truc_ca_compute', store=True)
     ca = fields.Selection([(u'Sáng',u'Sáng'), (u'Chiều',u'Chiều'), (u'Đêm',u'Đêm')],string=u'Buổi ca',default = lambda self: self.buoi_ca_now_default_())
-    date = fields.Date(string=u'Ngày',default= convert_utc_native_dt_to_gmt7(datetime.datetime.now()).date() )#readonly = True
+    date = fields.Date(string=u'Ngày',default= convert_utc_native_dt_to_gmt7(datetime.datetime.now()).date() )
     gio_bat_dau_ca = fields.Datetime(u'Giờ bắt đầu ca ',default=lambda self: self.gio_bat_dau_defaut_or_ket_thuc_())
     gio_ket_thuc_ca = fields.Datetime(u'Giờ Kết Thúc ca',default=lambda self: self.gio_bat_dau_defaut_or_ket_thuc_(is_tinh_gio_bat_dau_or_ket_thuc = 'gio_ket_thuc'))#
     department_id = fields.Many2one('hr.department',string=u'Đơn vị',default=lambda self:self.env.user.department_id, readonly=True, required=True,ondelete='restrict')
@@ -35,7 +35,6 @@ class CTR(models.Model):
                     a_defaults['tvcv_id']= truc_ca_tvcv_id
                     cvi_id = (0,0,a_defaults)
                     cvi_ids.append(cvi_id)
-#             new_trucca_cvi = list(map(lambda m:(0,0,{'user_id':m,'loai_record':u'Công Việc','tvcv_id':truc_ca_tvcv_id.id,'state':'confirmed'}),self.member_ids))
             return {'value':
                                     {'cvi_ids': cvi_ids}
                     }
@@ -90,7 +89,7 @@ class CTR(models.Model):
                 r.name_khong_dau = unidecode(ret)
     
 
-    def buoi_ca_now_default_(self,gio_bat_dau_vn_return = False):
+    def buoi_ca_now_default_(self, gio_bat_dau_vn_return = False):
         now_vn_datetime = convert_utc_native_dt_to_gmt7(datetime.datetime.now())
         now_hour = now_vn_datetime.hour
         alist = [(u'Sáng',7),(u'Chiều',14),(u'Đêm',22)]
@@ -123,41 +122,16 @@ class CTR(models.Model):
             else:
                 return False
     
-    @api.model
-    def create(self, vals):
-        new_ctx = dict(self._context, **{'write_create_parent_dict':vals})
-        print ('***vals in create of ca truc',vals)
-        cv = super(CTR, self.with_context(new_ctx)).create(vals)
-        return cv
-
-    @api.multi
-    def write(self, vals):
-        print ('vals in write of catruc', vals)
-#         print ('vals in write',vals)
-#         if 'slncl' in vals:
-#             raise UserError(u'kkakaka')
-#         if 'cd_parent_id' in vals:
-#             raise UserError(u'cd_parent_id %s'%vals)
-        new_ctx = dict(self._context, **{'write_create_parent_dict':vals})
-        res = super(CTR, self.with_context(new_ctx)).write(vals)
-        return res    
-    
 #     @api.model
-#     def default_get(self, fields):
-#         res = super(CTR, self).default_get(fields)
-# #         adict = {'cvi_ids':{'model':'cvi','domain':[('gio_ket_thuc','=',False),('ctr_ids','!=',False),('department_ids','=',self.env.user.department_id.id)]},
-#         adict = {'cvi_ids':{'model':'cvi','domain':[('gio_ket_thuc','=',False),('ctr_ids','!=',False),'|',('department_id','=',self.env.user.department_id.id),('department_ids','=',self.env.user.department_id.id)]},
-# #                  'su_co_ids':{'model':'suco','add_domain':[('ctr_ids','!=',False)]},
-# #                  'su_vu_ids':{'model':'suvu','add_domain':[('ctr_ids','!=',False)]}
-#               
-#                  }
-#         #def afunc(atuple):
-#         print ('defaut_get************')
-#         for field,attr_field_dict in adict.items():
-#             model = attr_field_dict['model']
-#             domain=  attr_field_dict['domain']
-#             empty_ket_thuc_comments = self.env[ model].search(domain)
-#             if empty_ket_thuc_comments:
-#                 res[field] = empty_ket_thuc_comments.mapped('id')
-# #         res['member_ids']  = [self.env.user.id]
-#         return res           
+#     def create(self, vals):
+#         new_ctx = dict(self._context, **{'write_create_parent_dict':vals})
+#         cv = super(CTR, self.with_context(new_ctx)).create(vals)
+#         return cv
+# 
+#     @api.multi
+#     def write(self, vals):
+#         new_ctx = dict(self._context, **{'write_create_parent_dict':vals})
+#         res = super(CTR, self.with_context(new_ctx)).write(vals)
+#         return res    
+    
+  

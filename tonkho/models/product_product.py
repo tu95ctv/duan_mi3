@@ -7,7 +7,7 @@ import os,inspect,sys
 import datetime
 from odoo.osv.orm import setup_modifiers
 import re
-from odoo.addons.dai_tgg.mytools import pn_replace
+from odoo.addons.tutool.mytools import pn_replace
 
 
 class TocDoXFP(models.Model):

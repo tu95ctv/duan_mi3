@@ -6,8 +6,6 @@ def convert_integer(val,needdata):
         return int(val)
     except:
         return 0
-    
-
 def gen_tvcv_model_dict():
     tvcv_dict = {
           u'Thư viện công việc': {
@@ -49,11 +47,7 @@ def gen_tvcv_model_dict():
                                                 ('name',{'key':True, 'required':True,'col_index':7}),
                                                 ],'key' : False,'required' : False}),  
                         ('ghi_chu',{'func':None,'xl_title':u'Ghi chú','key':False}),
-#                         ('children_ids',{'key':False,'required':False,
-#                                        'fields':[
-#                                                 ('name',{'xl_title':u'Các công việc con',  'key':True, 'required':True, 'is_x2m_field':True,'skip_field_if_not_found_column_in_some_sheet':True }),
-#                                                 ]
-#                                        }),  
+
                          ('active',{'func':lambda val, needdata: False if val ==u'na' else True,'xl_title':u'active','key':False,'skip_field_if_not_found_column_in_some_sheet':True,}),
                       ]
                 },#End stock.inventory.line'   

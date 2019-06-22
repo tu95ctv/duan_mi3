@@ -21,7 +21,6 @@ def cd_children_ids_(v,n,self):
             else:
                 raise UserError(u'Không có user là %s'%login)
         return v2
-#     v = list( map(lambda i:int(i),v))
     return v
 def gen_user_department_model_dict():
     user_model_dict = {
@@ -51,8 +50,6 @@ def gen_user_department_model_dict():
  
                       ]
                 },            
-        
-                       
         u'Department': {
         'title_rows' : [1], 
         'begin_data_row_offset_with_title_row' :1,
@@ -71,17 +68,7 @@ def gen_user_department_model_dict():
                                                ]
                                     }
                  ),
-#                 ('sequence_id',{'fields':[
-#                     ('name',{'xl_title':None,'func':lambda v,n:n['vof_dict']['name']['val'] ,'key':True,'required':True}),
-#                     ('sequence_id_bbbg',{'model':'ir.sequence', 'for_excel_readonly':True,
-#                                                     'fields':[('name',{'xl_title':None, 'func':lambda v,n:n['vof_dict']['name']['val']+',' +'BBBG','key':True})]
-#                                          }),
-#                     ('sequence_id_ttr',{'model':'ir.sequence', 'for_excel_readonly':True,
-#                                                     'fields':[('name',{'xl_title':None, 'func':lambda v,n:n['vof_dict']['name']['val']+',' +'TTR','key':True})]
-#                                          }),
-#                                                ]
-#                                     }
-#                  ),
+
                 ('partner_id',{'key':False,'required':False,
                                    'fields':[
                                             ('name',{'xl_title':None,  'key':True, 'required': True, 'func':lambda val,needdata: needdata['vof_dict']['name']['val']}),
@@ -94,8 +81,6 @@ def gen_user_department_model_dict():
                                    }),  
                  
                 ]}),
-                    
-                    
                 ('default_location_id',{'fields':[
                     ('name',{'xl_title':u'default_location_id','func':None,'key':True,'required':True}),
                     ('location_id',{'fields':[
@@ -150,7 +135,6 @@ def gen_user_department_model_dict():
                                                  ('name',{'func':lambda v,needdata:needdata['vof_dict']['name']['val'],'key':True,'required':True}),
                                                         ]
                                               }),
-#                         ('location_id',{'model':'stock.location', 'fields':[('name',{'xl_title':u'location_id','key':True,'required':True}),]}), 
                                                                                 ]
                                                                     }),
                     
@@ -177,7 +161,7 @@ def gen_user_department_model_dict():
                                                  ('login',{'xl_title':u'Cấp trên',  'key':True, 'required':True, 'is_x2m_field':True}),
                                                  ]
                 }),  
-                ('groups_id',{'key':False,'required':False,'skip_this_field':lambda self:self.skip_field_cause_first_import,
+                ('groups_id',{'key':False,'required':False ,#,'skip_this_field':lambda self:self.skip_field_cause_first_import,
                                     'fields':[
                                              ('name',{'xl_title':u'groups_id',  'key':True, 'required': True,'is_x2m_field':True,'remove_all_or_just_add_one_x2m':False}),     
                                               ]

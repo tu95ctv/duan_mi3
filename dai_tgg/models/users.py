@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,exceptions,tools,_
-from odoo.addons.dai_tgg.mytools import  name_compute,name_khong_dau_compute
+from odoo.addons.tutool.mytools import  name_compute,name_khong_dau_compute
 
 
 @api.model

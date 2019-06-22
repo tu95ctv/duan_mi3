@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api#,tools
 from odoo.exceptions import UserError#, except_orm
-from odoo.addons.dai_tgg.mytools import name_khong_dau_compute
+from odoo.addons.tutool.mytools import name_khong_dau_compute
 import re
 
 class Categ(models.Model):

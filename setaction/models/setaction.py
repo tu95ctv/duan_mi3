@@ -4,6 +4,14 @@ from odoo import models, fields, api,exceptions,tools,_
 
 class Setaction(models.TransientModel):
     _name = "setaction.setaction"
+    choosed_object_qty = fields.Integer()
+    affected_object_qty = fields.Integer()
+    
+    
+    
+    
+    
+    
 #     @api.multi
 #     def multi_approved(self):
 #         active_ids = self._context.get('active_ids')

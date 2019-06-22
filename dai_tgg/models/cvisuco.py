@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,exceptions,tools,_
-from odoo.addons.dai_tgg.mytools import name_compute,convert_odoo_datetime_to_vn_datetime
+from odoo.addons.tutool.mytools import name_compute,convert_odoo_datetime_to_vn_datetime
 from unidecode import unidecode
 from odoo.exceptions import ValidationError,UserError
 

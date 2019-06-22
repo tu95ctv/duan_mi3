@@ -6,14 +6,11 @@
             <field name="inherit_id" ref="setaction.setaction_form"></field>
             <field name="arch" type="xml">
             	<xpath expr="//footer" position="inside">
-            	
-            		<button name="multi_approved" type="object" string="Approved" class="oe_highlight" />
                   	<button name="multi_confirmed" type="object" string="Confirmed" class="oe_highlight" />
-                  
-                  
+            		<button name="multi_approved" type="object" string="Approved" class="oe_highlight" />
+            		<button name="multi_draft" type="object" string="multi_draft" class="oe_highlight" />
+            		<button name="multi_mark_delete" type="object" string="multi_mark_delete" class="oe_highlight" />
             	</xpath>
-       
-            	
             </field>
             </record>   
             

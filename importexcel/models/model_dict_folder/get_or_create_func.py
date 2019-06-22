@@ -59,7 +59,7 @@ def get_or_create_object_has_x2m (self, class_name, search_dict,
         if remove_all_or_just_add_one_x2m == True:
             obj_id =  [(6,False,result)]
         else:
-            obj_id =  [(4,result[0],False)]
+            obj_id  = list(map(lambda x: (4,x,False), result)) # [(4,result[0],False)] 
     else:
         obj, get_or_create =  get_or_create_object_sosanh(self, class_name, search_dict,
                                     write_dict =write_dict, is_must_update=is_must_update, noti_dict=noti_dict,
