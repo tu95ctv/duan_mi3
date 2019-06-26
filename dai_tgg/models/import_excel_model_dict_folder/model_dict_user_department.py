@@ -154,7 +154,7 @@ def gen_user_department_model_dict():
                 ('name', {'func':None,'xl_title':u'Họ và Tên','key':True,'required':True}),
                 ('login',{'func':None,'xl_title':u'Địa chỉ email','key':True ,'required':True}),
                 ('password',{'func':None,'required':True,'set_val':'123456'}),
-                ('lang',{'set_val':'vi_VN'}),
+#                 ('lang',{'set_val':'vi_VN'}),
                 ('phone',{'func':None,'xl_title':u'Số điện thoại','key':False}),
                 ('cac_sep_ids',{'key':False,'required':False,'only_get':True,
                                         'fields':[
@@ -162,6 +162,7 @@ def gen_user_department_model_dict():
                                                  ]
                 }),  
                 ('groups_id',{'key':False,'required':False ,#,'skip_this_field':lambda self:self.skip_field_cause_first_import,
+                                    'bypass_this_field_if_value_equal_False':True,
                                     'fields':[
                                              ('name',{'xl_title':u'groups_id',  'key':True, 'required': True,'is_x2m_field':True,'remove_all_or_just_add_one_x2m':False}),     
                                               ]

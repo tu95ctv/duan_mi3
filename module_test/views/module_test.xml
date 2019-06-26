@@ -6,7 +6,8 @@
       <field name="model">module_test.test</field>
       <field name="arch" type="xml">
         <tree>
-          <field name="log"/>
+        	<field name="is_raise_when_not_equal"/>
+        	<field name="log"/>
         </tree>
       </field>
     </record>
@@ -21,7 +22,8 @@
         </header>
         <sheet>
         	<group>
-          	<field name="log"/>
+        		<field name="is_raise_when_not_equal"/>
+          		<field name="log"/>
           	</group>
           </sheet>
         </form>

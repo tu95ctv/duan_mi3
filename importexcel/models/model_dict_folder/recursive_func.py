@@ -94,14 +94,10 @@ def rut_gon_key(MD,key_tram,mode_no_create_in_main_instance=None):
 #                 raise UserError(u'**None** attr:%s- attr_val:%s- thiếu attr trong TYPES_ATT_DICT'%(attr,val))
             default = adict.get('default')
             val = get_by_key_tram(MD, attr, key_tram,default)
+            
             if attr =='skip_this_field' and mode_no_create_in_main_instance:
-                skip_this_field_for_mode_no_create = get_by_key_tram(MD, 'skip_this_field_for_mode_no_create', key_tram)
-                if skip_this_field_for_mode_no_create==True:
-                    val = True
-#             elif attr =='skip_this_field_for_mode_no_create':
-#                 MD['skip_this_field'] = val
+                val = get_by_key_tram(MD, 'skip_this_field_for_mode_no_create', key_tram) or val
             MD[attr] = val
-#         elif MD['fields'] :
         else :
             fields = MD['fields']
             if isinstance(fields, dict):

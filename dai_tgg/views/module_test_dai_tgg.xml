@@ -1,0 +1,16 @@
+<odoo>
+	<data>
+	
+		<record model="ir.ui.view" id="test_form">
+		      <field name="name">module_test.test.form</field>
+		      <field name="model">module_test.test</field>
+		      <field name="inherit_id" ref="module_test.test_form"></field>
+		      <field name="arch" type="xml">
+		        <xpath expr="//header" position="inside">
+		        	  <button name="test_dai_tgg" string="test_dai_tgg" type="object" class="btn-primary" />
+		        </xpath>
+		      </field>
+		    </record>
+	
+	</data>
+</odoo>

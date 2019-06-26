@@ -2,7 +2,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo.tools.translate import _
-from odoo.tools.float_utils import float_compare
 from odoo.tools import float_utils
 
 class InventoryLine(models.Model):

@@ -2,7 +2,6 @@
 from odoo import models, fields, api#,tools
 from odoo.exceptions import UserError#, except_orm
 from odoo.tools.translate import _
-from odoo.tools.float_utils import float_compare
 import psycopg2
 from unidecode import unidecode
 from odoo.addons.tutool.mytools import name_khong_dau_compute

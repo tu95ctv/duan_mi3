@@ -8,13 +8,13 @@ class CviSuCo(models.Model):
     
     _name = 'cvisuco'
     _auto = False
+    name = fields.Char(compute='name_',store=True)
     tvcv_id = fields.Many2one('tvcv', string=u'TVCV/ Loại sự cố/ Loại sự vụ',ondelete='restrict')
 
     is_giao_ca = fields.Boolean(u'Giao ca')
     cvi_id = fields.Many2one('cvi',u'Sự cố/công việc liên quan')
     cvi_cm_ids = fields.One2many('cvi','cvi_id',u'Công việc, comment liên quan')
     nguyen_nhan     = fields.Char(string=u'Nguyên nhân')
-    name = fields.Char(compute='name_',store=True)
     noi_dung = fields.Text(string=u'Nội dung')
     noi_dung_khong_dau = fields.Text(string=u'Nội dung không dấu', compute='noi_dung_khong_dau_',)  
 #     cvi_id = fields.Many2one('cvi')
@@ -39,7 +39,7 @@ class CviSuCo(models.Model):
     gio_bat_dau = fields.Datetime(string=u'Giờ bắt đầu', default=fields.Datetime.now)
     gio_ket_thuc = fields.Datetime(string=u'Giờ Kết Thúc',default=fields.Datetime.now)
     duration = fields.Float(digits=(6, 1), help='Duration in Hours',compute = '_get_duration', store = True,string=u'Thời lượng (giờ)')
-    user_id = fields.Many2one('res.users',default =  lambda self: self.env.uid, readonly=True, string=u'Nhân viên tạo',required=True,copy=False)   
+    user_id = fields.Many2one('res.users',default =  lambda self: self.env.uid, readonly=True, string=u'Nhân viên tạo',required=True, copy=False)   
 #     ctr_ids  = fields.Many2many('ctr','ctr_cvi_relate','cvi_id','ctr_id',string=u'Ca Trực')
     
     ctr_id  = fields.Many2one('ctr',string=u'Ca Trực',copy=False)
@@ -148,7 +148,7 @@ class CviSuCo(models.Model):
     def name_get(self):
         return [(r.id, r.get_names()) for r in self]
     
-    @api.depends('tvcv_id','loai_record','noi_dung')
+    @api.depends('tvcv_id','loai_record','noi_dung','user_id')
     def name_(self):
         for r in self:
             name = r.get_names()

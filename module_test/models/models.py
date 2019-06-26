@@ -4,6 +4,7 @@ from odoo import models, fields, api
 
 class ModuleTest(models.Model):
     _name = 'module_test.test'
+    is_raise_when_not_equal = fields.Boolean()
     log = fields.Text()
     @api.multi
     def test(self):

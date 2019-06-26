@@ -138,9 +138,6 @@ def read_val_for_ci(self,model_name, field_name, set_val,col_index,
     ### end  deal skip_field_cause_first_import####
     val = False
     obj = False
-
-
-
     if set_val != None:
         val = set_val
 #         if MODEL_DICT.get('print_write_dict_new',False):
@@ -153,10 +150,8 @@ def read_val_for_ci(self,model_name, field_name, set_val,col_index,
         if val != False and field_attr.get('is_x2m_field'):
             val = val.split(',')
             val = list(map(lambda i: empty_string_to_False(i.strip()),val))
-            for i in val:
-                if i==False:
-                    raise UserError(u'Không được = False')
-                
+            if False in val:
+                    raise UserError(u'Không được có phần tử = False')
         print ('excel read model_name:%s field_name:%s'%(model_name,field_name),'xl_val',xl_val,'val',xl_val)
     
     elif field_attr.get('fields') :
@@ -176,33 +171,11 @@ def read_val_for_ci(self,model_name, field_name, set_val,col_index,
             write_when_val_exist = setting['write_when_val_exist']
             check_excel_obj_is_exist_func = field_attr.get('check_excel_obj_is_exist_func') 
             check_excel_obj_is_exist_func =   setting.get('allow_check_excel_obj_is_exist_func') and check_excel_obj_is_exist_func
-#             if write_when_val_exist:
-#                 exist_val_search_only = False
-# #                 if check_excel_obj_is_exist_func:
-# #                     is_search = True
-# #                 else:
-# #                     is_search = False
-#             else:
-#                 exist_val_search_only = True
-#         else:
-#             exist_val_search_only = False
-
-        
-        
-        
-        
-        
-        
-        
-
         if not exist_val or (exist_val and (check_excel_obj_is_exist_func or write_when_val_exist)) or check_file:
-            
-          
             if check_file:
                 is_search = True
                 is_create = False
                 is_write = False
-                
             else:
                 if exist_val:
                     if write_when_val_exist:
@@ -270,7 +243,9 @@ def read_val_for_ci(self,model_name, field_name, set_val,col_index,
                     else:
                         get_or_create_display = u'empty cell'
                 sheet_of_copy_wb.write(row,sheet.ncols + offset_write_xl , get_or_create_display,wrap_center_vert_border_style)
-    return obj,val,True      
+    code = True
+    
+    return obj,val,code      
 #F1 
 def get_a_field_val(self,field_name,field_attr,key_tram,
                             needdata,row,sheet,

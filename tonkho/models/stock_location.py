@@ -2,7 +2,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo.tools.translate import _
-from odoo.tools.float_utils import float_compare
 from odoo.osv import expression
 from odoo.addons.tonkho.tonkho_tool import  KHO_SELECTION, KHO_SELECTION_DICT
 from unidecode import unidecode
