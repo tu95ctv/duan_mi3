@@ -9,7 +9,7 @@ from odoo import _
 STRING_TYPE_DICT = {str:'str',bool:'bool',list:'list',dict:'dict',int:'int'}                 
 TYPES_ATT_DICT = {
             'begin_data_row_offset_with_title_row' : {'types': ['int']} ,
-            'bypass_this_field_if_value_equal_False' : {'types': ['bool']} ,
+            'bypass_this_field_if_value_equal_False' : {'types': ['bool']} ,#
             'col_index' : {'types': ['int']} ,
             'empty_val' : {'types': ['list']} ,
             'field_type' : {'types': ['str']} ,
@@ -21,7 +21,7 @@ TYPES_ATT_DICT = {
             'key_allow' : {'types': ['bool']} ,
             # 'key_ltk_dc' : {'types': ['list']} ,
             # 'key_tti_dc' : {'types': ['NoneType']} ,
-            'largest_map_row_choosing' : {'types': ['bool']} ,
+            'set_is_largest_map_row_choosing' : {'types': ['bool']} ,
             'last_import_function' : {'types': ['function']} ,
             'last_record_function' : {'types': ['function']} ,
             'model' : {'types': ['str']} ,
@@ -50,8 +50,7 @@ TYPES_ATT_DICT = {
             'only_get':{'types':['bool']},
             'required_not_create':{'types':['bool']},
             'write_func':{'types': ['function']},
-            'mode_no_create_in_main_instance':{'types': ['bool']},
-            'skip_this_field_for_mode_no_create':{'types': ['bool']}, # no create in main instance
+#             'skip_this_field_for_mode_no_create':{'types': ['bool']}, # no create in main instance
             'required_force':{'types': ['bool']},
             'bypass_check_type':{'types':['bool']},
             'dong_test':{'types':['int']},
@@ -84,19 +83,12 @@ def write_get_or_create_title(model_dict,sheet,sheet_of_copy_wb,title_row,key_tr
             sheet_of_copy_wb.write(title_row, col,title ,header_bold_style)
 
 
-def rut_gon_key(MD,key_tram,mode_no_create_in_main_instance=None): 
-#         raise UserError(u'kkakaka 1')
+def rut_gon_key(MD,key_tram): 
     for attr,val in MD.items():
         if attr != 'fields':
-#             if attr !='get_or_create_para':
             adict = TYPES_ATT_DICT.get(attr,{})
-#             if adict == None:
-#                 raise UserError(u'**None** attr:%s- attr_val:%s- thiếu attr trong TYPES_ATT_DICT'%(attr,val))
             default = adict.get('default')
             val = get_by_key_tram(MD, attr, key_tram,default)
-            
-            if attr =='skip_this_field' and mode_no_create_in_main_instance:
-                val = get_by_key_tram(MD, 'skip_this_field_for_mode_no_create', key_tram) or val
             MD[attr] = val
         else :
             fields = MD['fields']
@@ -104,9 +96,8 @@ def rut_gon_key(MD,key_tram,mode_no_create_in_main_instance=None):
                 fields = get_by_key_tram(MD, attr, key_tram,default)
                 MD[attr] = fields
             if fields != None:
-                print ('***fields',fields)
                 for field_name, field_attr_is_MD_child in fields: 
-                    rut_gon_key(field_attr_is_MD_child,key_tram,mode_no_create_in_main_instance=mode_no_create_in_main_instance)
+                    rut_gon_key(field_attr_is_MD_child,key_tram)
 
 #R3
 def recursive_add_model_name_to_field_attr(self,MODEL_DICT,key_tram=False):
@@ -132,10 +123,6 @@ def recursive_add_model_name_to_field_attr(self,MODEL_DICT,key_tram=False):
                 if 'required' not in field_attr:
                     required_from_model = field.required
                     required_force = field_attr.get('required_force',None)
-    #                 bypass_this_field_if_value_equal_False = field_attr.get('bypass_this_field_if_value_equal_False')  # nó tự default là gì đó
-    #                 if bypass_this_field_if_value_equal_False:
-    #                     required = False
-    #                 else:
                     if required_force:
                         required =True
                     else:

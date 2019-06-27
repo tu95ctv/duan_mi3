@@ -25,7 +25,7 @@
     # always loaded
     'data': [
 #         'security/ir.model.access.csv',
-        'views/importthuvien.xml',
+        'views/importexcel.xml',
         'views/templates.xml',
     ],
     # only loaded in demonstration mode

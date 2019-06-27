@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,exceptions,tools,_
 import re
-from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel_func
 from odoo.addons.tonkho.models.import_excel_model_dict_folder.model_dict import default_import_xl_setting
 
 
@@ -9,10 +9,7 @@ from odoo.addons.tonkho.models.import_excel_model_dict_folder.model_dict import 
 class Importexcel(models.Model):
     _name = 'importexcel.importexcel' 
     type_choose = fields.Selection([
-#         (u'stock.inventory.line',u'stock.inventory.line'),
-#         (u'stock.inventory.line.dp_tti',u'stock.inventory.line.dp_tti'),
         (u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',u'stock.inventory.line.tong.hop'),
-#         (u'stock.inventory.line.tkt.vtdc',u'stock.inventory.line.tkt.vtdc'),
         (u'Product',u'Product'),
         (u'Thư viện công việc',u'Thư viện công việc'),
         (u'User',u'User')
@@ -26,10 +23,10 @@ class Importexcel(models.Model):
          (u'Loại sự cố, sự vụ', u'Loại sự cố, sự vụ')
                                     ],required = True,default=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp')
     sheet_name_select = fields.Selection([
-                                    (u'Vô tuyến',u'Vô tuyến'),
-                                  (u'TRUYỀN DẪN',u'TRUYỀN DẪN'),
+                                   (u'Vô tuyến',u'Vô tuyến'),
                                    (u'Chuyển Mạch (IMS, Di Động)',u'Chuyển Mạch (IMS, Di Động)'),
-                                   (u'Truyền dẫn',u'Truyền dẫn'),(u'IP (VN2, VNP)',u'IP (VN2, VNP)'),
+                                   (u'Truyền dẫn',u'Truyền dẫn'),
+                                   (u'IP (VN2, VNP)',u'IP (VN2, VNP)'),
                                    (u'GTGT',u'GTGT'),(u'XFP, SFP các loại',u'XFP, SFP các loại')  ],rejquired=True)
     sheet_name =  fields.Char()
     key_tram =  fields.Selection([('key_ltk','key_ltk'),
@@ -39,7 +36,6 @@ class Importexcel(models.Model):
                                   ('key_ltk_dc','key_ltk_dc'),
                                   ('key_ltk_dc2','key_ltk_dc2'),
                                   ],default='key_ltk')
-    mode_no_create_in_main_instance = fields.Boolean()
     file = fields.Binary()
     filename = fields.Char()
     name_inventory_suffix = fields.Char()
@@ -56,9 +52,7 @@ class Importexcel(models.Model):
                                     ])
     dong_test = fields.Integer(default=0)#0 la initify vô hạn
     log = fields.Text()
-    skip_field_cause_first_import = fields.Boolean(default=True)
     begin_row = fields.Integer(default=0)
-#     location_id = fields.Many2one('stock.location')
     running_or_prepare = fields.Selection([('running',u'Đang chạy'),('prepare',u'Dự phòng')])
     import_location_id = fields.Many2one('stock.location')
     imported_number_of_row = fields.Integer()
@@ -70,27 +64,13 @@ class Importexcel(models.Model):
     only_xuat_thuoc_tinh =  fields.Boolean()
     dac_tinh = fields.Char()
     categ_id = fields.Many2one('product.category')
-    
-    
-    
-#     default_import_xl_setting = {'default_cho_phep_exist_val_before_loop_fields_func':True,
-#              'default_write_when_val_exist':False,
-#              'default_allow_check_excel_obj_is_exist_func':False,
-#              'default_cho_phep_empty_pn_tuong_duong_voi_pn_duy_nhat':False,
-#              'default_cho_phep_co_pn_cap_nhat_empty_pn':False,
-#              }
-
-    
-    cho_phep_exist_val_before_loop_fields_func = fields.Boolean(default = default_import_xl_setting['default_cho_phep_exist_val_before_loop_fields_func'])
-    write_when_val_exist  = fields.Boolean(default = default_import_xl_setting['default_write_when_val_exist'])
-    allow_check_excel_obj_is_exist_func  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_allow_check_excel_obj_is_exist_func'])
-    cho_phep_empty_pn_tuong_duong_voi_pn_duy_nhat  = fields.Boolean(default = default_import_xl_setting['default_cho_phep_empty_pn_tuong_duong_voi_pn_duy_nhat'])
-    cho_phep_co_pn_cap_nhat_empty_pn  = fields.Boolean(default = default_import_xl_setting['default_cho_phep_co_pn_cap_nhat_empty_pn'])
-    
-    
-    
+    st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
+    st_is_allow_write_existence  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_write_existence'])
+    st_allow_check_if_excel_is_same_existence  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_st_allow_check_if_excel_is_same_existence'])
+    st_is_allow_empty_xldata_pn_is_unique_same_name_product  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_empty_xldata_pn_is_unique_same_name_product'])
+    st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'])
     is_admin = fields.Boolean(compute='is_admin_')
-    mode = fields.Selection([(u'1',u'mode 1 (tim location goc bằng key)'),(u'2',u'mode 2 ( tìm location góc bằng cột trạm)')])
+    cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')])
     
     def gen_model_dict(self):
        
@@ -107,16 +87,16 @@ class Importexcel(models.Model):
             r.is_admin = self.user_has_groups('base.group_erp_manager')
     
     def importexcel(self):
-        importexcel(self)
+        importexcel_func(self)
         return True
    
     def import_all(self):
-        importexcel(self,key=u'Department')
-        importexcel(self,key=u'Partner')
-        importexcel(self,key=u'location partner')
-        importexcel(self,key= u'Loại sự cố, sự vụ')
-        importexcel(self,key= u'thuebaoline')
-        importexcel(self,key= u'categ')
+        importexcel_func(self,key=u'Department')
+        importexcel_func(self,key=u'Partner')
+        importexcel_func(self,key=u'location partner')
+        importexcel_func(self,key= u'Loại sự cố, sự vụ')
+        importexcel_func(self,key= u'thuebaoline')
+        importexcel_func(self,key= u'categ')
         return True
     
     

@@ -27,11 +27,10 @@
                			<field name="sheet_name_select" />
                         <field name="type_choose" />
                         <field name="key_tram" />
-                     	<field name="mode"></field>
+                     	<field name="cach_tim_location_goc"></field>
                         <field name="dong_test"></field>
                         <field name="begin_row"></field>
                         <field name="categ_id"></field>
-                        <field name="mode_no_create_in_main_instance"></field>
                         <field name="only_xuat_thuoc_tinh"></field>
                         <field name="dac_tinh"></field>
                      </group>
@@ -48,14 +47,12 @@
                         <field name="name_inventory_suffix"></field>
                         	<!--<field name="allow_product_qty_dieu_chinh" />
                      	     <field name="running_or_prepare"></field>-->
-                        	<field name="skip_field_cause_first_import"></field>
-                        	
-                        	<field name="allow_check_excel_obj_is_exist_func" groups="base.group_erp_manager" />
-                            <field name="write_when_val_exist" groups="base.group_erp_manager" />
-                            <field name="cho_phep_empty_pn_tuong_duong_voi_pn_duy_nhat" groups="base.group_erp_manager" />
-                            <field name="cho_phep_co_pn_cap_nhat_empty_pn" groups="base.group_erp_manager" />
+                        	<field name="st_allow_check_if_excel_is_same_existence" groups="base.group_erp_manager" />
+                            <field name="st_is_allow_write_existence" groups="base.group_erp_manager" />
+                            <field name="st_is_allow_empty_xldata_pn_is_unique_same_name_product" groups="base.group_erp_manager" />
+                            <field name="st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr" groups="base.group_erp_manager" />
                             <!-- <field name="not_update_field_if_instance_exist_default" groups="base.group_erp_manager" /> -->
-                            <field name="cho_phep_exist_val_before_loop_fields_func" groups="base.group_erp_manager" />
+                            <field name="st_allow_func_map_database_existence" groups="base.group_erp_manager" />
                             
                             
                      </group>

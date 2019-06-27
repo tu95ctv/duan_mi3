@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api,_
 from odoo.exceptions import UserError
-from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel_func
 from lxml import etree
 
 class Inventory(models.Model):
@@ -176,10 +176,9 @@ class Inventory(models.Model):
     # Hàm mới
     @api.multi
     def import_file(self):
-            
-            importexcel(self,
+            importexcel_func(self,
                            key=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',
-                           key_tram='key_ltk',mode=u'2')
+                           key_tram='key_ltk', gen_model_dict_kargs={'cach_tim_location_goc':'find_origin_location_by_column_named_tram'})
             if self.state not in ('done','cancel'):
                 vals = {'state': 'confirm', 'date': fields.Datetime.now()}
                 self.write(vals)

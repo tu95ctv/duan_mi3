@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 from odoo.tools.translate import _
 from odoo.tools.float_utils import float_compare
 from datetime import timedelta
-from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel
+from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel_func
 from odoo.addons.tonkho.models.import_excel_model_dict_folder.model_dict import  default_import_xl_setting
 from odoo.addons.tonkho.models.dl_models.xl_tranfer_bb import write_xl_bb
 from odoo.addons.tonkho.models.check_file import check_imported_file_sml
@@ -241,11 +241,11 @@ class StockPicking(models.Model):
     filename = fields.Char()
     
 
-    cho_phep_exist_val_before_loop_fields_func = fields.Boolean(default = default_import_xl_setting['default_cho_phep_exist_val_before_loop_fields_func'])
-    write_when_val_exist  = fields.Boolean(default = default_import_xl_setting['default_write_when_val_exist'])
-    allow_check_excel_obj_is_exist_func  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_allow_check_excel_obj_is_exist_func'])
-    cho_phep_empty_pn_tuong_duong_voi_pn_duy_nhat  = fields.Boolean(default = default_import_xl_setting['default_cho_phep_empty_pn_tuong_duong_voi_pn_duy_nhat'])
-    cho_phep_co_pn_cap_nhat_empty_pn  = fields.Boolean(default = default_import_xl_setting['default_cho_phep_co_pn_cap_nhat_empty_pn'])
+    st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
+    st_is_allow_write_existence  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_write_existence'])
+    st_allow_check_if_excel_is_same_existence  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_st_allow_check_if_excel_is_same_existence'])
+    st_is_allow_empty_xldata_pn_is_unique_same_name_product  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_empty_xldata_pn_is_unique_same_name_product'])
+    st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'])
     
     
     skip_stt = fields.Boolean(u'Skip (bỏ qua) trường STT khi import')
@@ -497,7 +497,7 @@ class StockPicking(models.Model):
     
     @api.multi
     def import_file(self):
-        importexcel(self,
+        importexcel_func(self,
                        key=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',
                        key_tram='sml')
 

@@ -1,8 +1,22 @@
+ # -*- coding: utf-8 -*-
 import sys
 import xlrd
 VERSION_INFO   = sys.version_info[0]
 import xlwt
 import re
+MAP_TYPE = {
+                      'integer':[int,float],
+                      'float':float, 
+                      'many2one':int,
+                      'char':str,
+                      'selection':str,
+                      'text':str, 
+                      'boolean':bool,
+                      'many2many':list,
+                      'one2many':list,
+                      
+                      
+                      }
 
 def get_width(num_characters):
     return int((1+num_characters) * 256)
@@ -74,4 +88,31 @@ def get_by_key_tram(field_attr, attr, key_tram,default_if_not_attr=None):
         value =  value.get(key_tram,default_if_not_attr) if key_tram in value else value.get('all_key_tram',default_if_not_attr)
     return value
 
+def check_type_of_val(field_attr, val, field_name, model_name):        
+    if field_attr.get('bypass_check_type'):
+        return True
+    field_type = field_attr.get('field_type')
+    if field_type:
+        type_allow = field_attr.get('type_allow',[])
+        if val != False and val != None:
+            try:
+                type_tuong_ung_voi_char_field_type = MAP_TYPE[field_type]
+            except:
+                return True
+                raise UserError(u'không có field_type:%s này'%field_type)
+            if field_attr.get('is_x2m_field'):
+                type_tuong_ung_voi_char_field_type = list
+            if isinstance( type_tuong_ung_voi_char_field_type,list):
+                type_allow.extend(type_tuong_ung_voi_char_field_type)
+            else:
+                type_allow.append(type_tuong_ung_voi_char_field_type)
+            pass_type_check = False
+            for a_type_allow in type_allow:
+                if isinstance(val, a_type_allow):
+                    pass_type_check = True
+                    continue
+            if not pass_type_check:
+                raise UserError(u'model: %s- field:%s có giá trị: %s, đáng lẽ là field_type:%s nhưng lại có type %s'%(model_name, field_name,val,field_type,type(val)))
+            
+            
 ############### end small func ##################

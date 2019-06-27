@@ -161,7 +161,7 @@ def gen_user_department_model_dict():
                                                  ('login',{'xl_title':u'Cấp trên',  'key':True, 'required':True, 'is_x2m_field':True}),
                                                  ]
                 }),  
-                ('groups_id',{'key':False,'required':False ,#,'skip_this_field':lambda self:self.skip_field_cause_first_import,
+                ('groups_id',{'key':False,'required':False ,
                                     'bypass_this_field_if_value_equal_False':True,
                                     'fields':[
                                              ('name',{'xl_title':u'groups_id',  'key':True, 'required': True,'is_x2m_field':True,'remove_all_or_just_add_one_x2m':False}),     
@@ -199,7 +199,7 @@ def gen_user_department_model_dict():
     u'cvi': {
                 'title_rows' : [0], 
                 'begin_data_row_offset_with_title_row' :1,
-                'largest_map_row_choosing':True,
+                'set_is_largest_map_row_choosing':True,
                 'sheet_names': lambda self,wb: [wb.sheet_names()[0]],
                 'model':'cvi',
                 'context':{'from_import':True},
@@ -241,7 +241,7 @@ def gen_user_department_model_dict():
         u'thuebaoline': {
                 'title_rows' : [0], 
                 'begin_data_row_offset_with_title_row' :1,
-                'largest_map_row_choosing':True,
+                'set_is_largest_map_row_choosing':True,
                 'sheet_names': [u'BCN'],
                 'dong_test':10,
                 'model':'dai_tgg.thuebaoline',
@@ -256,7 +256,7 @@ def gen_user_department_model_dict():
         u'bds.poster': {
                 'title_rows' : [0], 
                 'begin_data_row_offset_with_title_row' :1,
-                'largest_map_row_choosing':True,
+                'set_is_largest_map_row_choosing':True,
                 'sheet_names': [u'Sheet 1'],
                 'model':'bds.poster',
                 'fields' : [
