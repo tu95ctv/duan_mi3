@@ -1,220 +1,219 @@
  # -*- coding: utf-8 -*-
-from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import get_key,get_width,VERSION_INFO,get_by_key_tram
+from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import get_key,get_width,VERSION_INFO
 from odoo.addons.downloadwizard.models.dl_models.dl_model  import header_bold_style
 from collections import  OrderedDict
 from odoo.exceptions import UserError
 import re
 import operator
 from odoo import _
-STRING_TYPE_DICT = {str:'str',bool:'bool',list:'list',dict:'dict',int:'int'}                 
-TYPES_ATT_DICT = {
-            'begin_data_row_offset_with_title_row' : {'types': ['int']} ,
-            'bypass_this_field_if_value_equal_False' : {'types': ['bool']} ,#
-            'col_index' : {'types': ['int']} ,
-            'empty_val' : {'types': ['list']} ,
-            'field_type' : {'types': ['str']} ,
-            'for_excel_readonly' : {'types': ['bool']} ,
-            'func' : {'types': ['function', 'NoneType']} ,
-#             'get_or_create_para' : {'types': ['NoneType','dict'],'default':{}} ,#not_use_key: chưa xài
-            'karg' : {'types': ['NoneType','dict']} ,#khong_can_khai_bao_key
-            'key' : {'types': ['bool','function','str']} ,
-            'key_allow' : {'types': ['bool']} ,
-            # 'key_ltk_dc' : {'types': ['list']} ,
-            # 'key_tti_dc' : {'types': ['NoneType']} ,
-            'set_is_largest_map_row_choosing' : {'types': ['bool']} ,
-            'last_import_function' : {'types': ['function']} ,
-            'last_record_function' : {'types': ['function']} ,
-            'model' : {'types': ['str']} ,
-#             'not_create' : {'types': ['bool']} ,
-            'offset_write_xl' : {'types': ['NoneType','int']} ,
-            'raise_if_False' : {'types': ['bool']} ,
-            'replace_string' : {'types': ['list']} ,
-            'replace_val' : {'types': ['dict']} ,
-            'required' : {'types': ['bool']} ,
-            'set_val' : {'types': ['NoneType', 'str', 'function'],'no_need_check_type':True} ,
-            'sheet_allow_this_field_not_has_exel_col' : {'types': ['list']} ,
-            'sheet_names' : {'types': ['function','list']} ,
-            'skip_field_if_not_found_column_in_some_sheet' : {'types': ['bool', 'NoneType']} ,
-            'skip_this_field' : {'types': ['NoneType', 'bool','function']} ,
-            'string' : {'types': ['str']} ,
-            'title_rows' : {'types': ['list'],'no_need_check_type':True} ,
-            'title_rows_some_sheets' : {'types': ['dict']} ,
-            'transfer_name' : {'types': ['str']} ,
-            'xl_title' : {'types': ['str', 'list', 'NoneType']} ,
-            'inactive_include_search':{'types':['bool']},
-            'is_x2m_field':{'types':['bool']},
-            'remove_all_or_just_add_one_x2m':{'types':['bool']},
-            'break_condition_func_for_main_instance':{'types': [ 'function']} ,
-            'type_allow':{'types':['list']},
-            'for_create_another':{'types':['bool']},
-            'only_get':{'types':['bool']},
-            'required_not_create':{'types':['bool']},
-            'write_func':{'types': ['function']},
-#             'skip_this_field_for_mode_no_create':{'types': ['bool']}, # no create in main instance
-            'required_force':{'types': ['bool']},
-            'bypass_check_type':{'types':['bool']},
-            'dong_test':{'types':['int']},
-            'set_val_instead_loop_fields':{'types': ['NoneType', 'str', 'function'],'no_need_check_type':True}
-            
-#             'skip_field_default':{'types': ['bool']}
+   
+
+ATT_TYPE_LIST ={
+  'begin_data_row_offset_with_title_row': ['int'],
+  'break_condition_func_for_main_instance': ['NoneType', 'function'],
+  'bypass_this_field_if_value_equal_False': ['bool'],
+  'bypass_this_field_if_value_equal_False_default': ['bool'],
+  'col_index': ['int', 'NoneType'],
+  'empty_val': ['list', 'NoneType'],
+  'for_excel_readonly': ['bool'],
+  'func': ['function', 'NoneType'],
+  'func_check_if_excel_is_same_existence': ['function'],
+  'func_map_database_existence': ['function'],
+  'func_pre_func': ['NoneType'],
+  'karg': ['dict'],
+  'key': ['bool', 'str'],
+  'key_allow': ['bool'],
+  'last_import_function': ['NoneType', 'function'],
+  'last_record_function': ['NoneType', 'function'],
+  'model': ['str'],
+  'offset_write_xl': ['int'],
+  'only_get': ['bool'],
+  'operator_search': ['str'],
+#   'prepare_func': ['function'],
+  'print_if_write': ['bool'],
+  'print_write_dict_new': ['bool'],
+  'raise_if_False': ['bool'],
+  'raise_if_diff': ['bool'],
+  'ready_declare_default': ['bool'],
+  'replace_string': ['list'],
+  'replace_val': ['dict'],
+  'required': ['bool'],
+  'required_force': ['bool'],
+  'required_when_check_file': ['bool'],
+  'requried': ['bool'],
+  'search_func': ['function'],
+  'set_is_largest_map_row_choosing': ['bool'],
+  'set_val': ['str', 'function', 'int', 'NoneType'],
+  'setting': ['dict'],
+  'setting2': ['dict'],
+  'sheet_allow_this_field_not_has_exel_col': ['list'],
+  'sheet_names': ['function'],
+  'skip_field_if_not_found_column_in_some_sheet': ['bool', 'NoneType'],
+  'skip_this_field': ['bool'],
+  'string': ['str'],
+  'title_rows': ['range', 'list'],
+  'title_rows_some_sheets': ['dict'],
+  'transfer_name': ['str'],
+  'type_allow': ['list'],
+  'valid_field_func': ['function', 'NoneType'],
+  'write_field': ['bool', 'NoneType'],
+  'xl_title': ['list', 'NoneType', 'str']
 }
-###R1
-def ordered_a_model_dict(model_dict):
-    fields = model_dict['fields']
-#     print ('fields',fields)
-    for fname,attr in fields:
-        if attr.get('fields'):
-            new_ordered_dict = ordered_a_model_dict(attr)
-    model_dict['fields']=OrderedDict(fields)
-#R5
-def write_get_or_create_title(model_dict,sheet,sheet_of_copy_wb,title_row,key_tram):
-    fields = model_dict['fields']
-#     print ('fields',fields)
-    for fname,attr in fields.items():
-#         childrend_model_dict =  attr
-#         childrend_fields = attr.get('fields')
-        if attr.get('fields'):
-            write_get_or_create_title(attr,sheet,sheet_of_copy_wb,title_row,key_tram)
-        offset_write_xl = get_key(attr, 'offset_write_xl')
-        if offset_write_xl !=None:
-            col =  sheet.ncols + offset_write_xl 
-            title = attr.get('string',fname)  + u' sẵn hay tạo'
-            sheet_of_copy_wb.col(col).width =  get_width(len(title))
-            sheet_of_copy_wb.write(title_row, col,title ,header_bold_style)
+
+#R0  
 
 
-def rut_gon_key(MD,key_tram): 
-    for attr,val in MD.items():
-        if attr != 'fields':
-            adict = TYPES_ATT_DICT.get(attr,{})
-            default = adict.get('default')
-            val = get_by_key_tram(MD, attr, key_tram,default)
-            MD[attr] = val
+
+def export_all_no_pass_dict_para(MD,out_dict={},type_out_dict={}):
+    key_allow = MD.get('key_allow')
+    export_all_keyval_by_key_tram(MD, out_dict = out_dict, type_out_dict = type_out_dict , key_allow= key_allow)
+    type_out_dict = convert_dict_to_order_dict_string(type_out_dict)
+    return out_dict, type_out_dict
+
+  
+def export_all_keyval_by_key_tram(MD, out_dict = {}, type_out_dict = {} , key_allow= False):
+    for key,val in MD.items():
+        if key != 'fields':
+            if isinstance(val,dict) and key_allow:
+                for key_tram,v in val.items():
+                    append_val_type_n_val_of_key (out_dict, type_out_dict,key, v)
+            else:
+                append_val_type_n_val_of_key (out_dict, type_out_dict,key, val)
+        elif val !=None:
+            for fname, field_MD in val:
+                export_all_keyval_by_key_tram(field_MD, out_dict = out_dict, type_out_dict=type_out_dict, key_allow=key_allow)
+def convert_name_class_to_string(val):
+    type_of_val = str(type(val))
+    rs = re.search("<class '(\w*)'>",type_of_val)
+    if rs:
+        type_of_val = rs.group(1)
+    else:
+        print ('type_of_val **', type_of_val)
+        raise UserError(type_of_val)
+    return type_of_val
+def append_val_type_n_val_of_key (out_dict, type_out_dict,key, val):
+    list_of_val = out_dict.setdefault(key,[])
+    list_of_val.append(val)
+    type_of_val = str(type(val))
+    rs = re.search("<class '(\w*)'>",type_of_val)
+    if rs:
+        type_of_val = rs.group(1)
+    else:
+        print ('type_of_val', type_of_val)
+        raise UserError(type_of_val)
+    list_of_type_of_val = type_out_dict.setdefault(key,[])
+    if type_of_val not in list_of_type_of_val:
+        list_of_type_of_val.append(type_of_val)
+def convert_dict_to_order_dict_string(x):
+    sorted_x = sorted(x.items(), key=lambda kv: kv[0])
+    new = map(lambda kv:u"'%s':%s"%(kv[0],kv[1]),sorted_x)
+    new = u', '.join(new)
+    new = '{%s}'%new
+    return new
+
+###########!R0###############
+
+
+
+# R1
+
+
+def rut_gon_key(MD, key_tram): 
+    for key, val in MD.items():
+        if key != 'fields':
+            val = convert_val_depend_key_tram(val, key_tram)
+            MD[key] = val
         else :
             fields = MD['fields']
             if isinstance(fields, dict):
-                fields = get_by_key_tram(MD, attr, key_tram,default)
-                MD[attr] = fields
-            if fields != None:
-                for field_name, field_attr_is_MD_child in fields: 
-                    rut_gon_key(field_attr_is_MD_child,key_tram)
+                fields_depend_tram = convert_val_depend_key_tram(MD, 'fields', key_tram)
+                val =fields_depend_tram
+                MD['fields'] = val
+            field_tuple_lists = val
+            if field_tuple_lists != None: # xem lại có khi nào bằng None không
+                for fname, field_MD in field_tuple_lists: 
+                    rut_gon_key(field_MD, key_tram)
+                    
+def convert_val_depend_key_tram(value, key_tram):
+    if isinstance(value, dict) and key_tram:
+        value =  value.get(key_tram) if key_tram in value else value.get('all_key_tram')
+    return value
 
+                    
+###R2
+def ordereddict_fields(MD):
+    field_tuple_lists = MD['fields']
+    for fname, field_MD in field_tuple_lists:
+        if field_MD.get('fields'):
+            new_ordered_dict = ordereddict_fields (field_MD)
+    MD['fields']=OrderedDict(field_tuple_lists)
+    
+#R2A             
+def check_xem_att_co_nam_ngoai_khong(MD):
+    for attr, val in MD.items():
+        if attr != 'fields':
+            if not check_set_val_is_true_type(attr, val):
+                raise UserError (u'attr %s val %s không thỏa hàm check_set_val_is_true_type'%(attr,val))
+        elif attr =='fields' and val!=None : 
+            for fname, field_MD in val.items():
+                check_xem_att_co_nam_ngoai_khong(field_MD)
+#R2A1
+STRING_TYPE_DICT = {str:'str' ,bool:'bool', list:'list',dict:'dict',int:'int', }       
+def check_set_val_is_true_type(attr, val):
+    allow_type_list = ATT_TYPE_LIST.get(attr)
+    if not allow_type_list:
+        raise UserError(u'attr:%s chưa có liệt kê  trong ATT_TYPE_LIST'%attr)
+    if  callable(val):
+        str_val_type = 'function'
+    elif val == None:
+        return True
+    else:
+        str_val_type =convert_name_class_to_string(val)
+    if str_val_type not in allow_type_list:
+        raise UserError (u'attr %s val %s, type:%s, không đúng dữ liệu %s'%(attr,val, str_val_type, allow_type_list))
+        return False
+    else:
+        return True    
 #R3
-def recursive_add_model_name_to_field_attr(self,MODEL_DICT,key_tram=False):
-    model_name = get_key(MODEL_DICT, 'model')
+def add_model_n_type_n_required_to_fields(self, MD, field_stt = 0):# add x2m_fields
+    model_name = get_key(MD, 'model')
     fields= self.env[model_name]._fields
-    for f_name,field_attr in MODEL_DICT.get('fields').items():
-        f_name = get_key(field_attr, 'transfer_name') or  f_name
-        skip_this_field = get_key(field_attr, 'skip_this_field',False)
-        if callable(skip_this_field):
-            skip_this_field = skip_this_field(self)
+    for f_name, field_MD in MD.get('fields').items():
+        field_stt +=1
+        f_name = get_key(field_MD, 'transfer_name') or  f_name
+        skip_this_field = get_key(field_MD, 'skip_this_field',False)
         if not skip_this_field:
-            if f_name not in fields and not field_attr.get('for_excel_readonly'):
-                raise UserError(u'f_name:"%s" không nằm trong fields, phải thêm thược tính for_excel_readonly-field_attr:%s'%(f_name,field_attr))
-            if not field_attr.get('for_excel_readonly') :# and not skip_this_field
+            if f_name not in fields and not field_MD.get('for_excel_readonly'):
+                raise UserError(u'f_name:"%s" không nằm trong fields, phải thêm thược tính for_excel_readonly-field_attr:%s'%(f_name, field_MD))
+            
+            bypass_this_field_if_value_equal_False = field_MD.get('bypass_this_field_if_value_equal_False',False)
+            key = field_MD.get('key', False)
+            if key and bypass_this_field_if_value_equal_False:
+                raise UserError(u'key and bypass_this_field_if_value_equal_False')
+            field_MD['field_stt'] = field_stt
+            
+            if not field_MD.get('for_excel_readonly') :# and not skip_this_field
                 try:
                     field = fields[f_name]
                 except:
                     raise UserError(u'field %s không có trong  danh sách fields của model %s'%(f_name,model_name))
-                field_attr['field_type'] = field.type
+                field_MD['field_type'] = field.type
                 if field.comodel_name:
-                    field_attr['model'] = field.comodel_name
+                    field_MD['model'] = field.comodel_name
                 
-                if 'required' not in field_attr:
+                if 'required' not in field_MD:
                     required_from_model = field.required
-                    required_force = field_attr.get('required_force',None)
-                    if required_force:
-                        required =True
-                    else:
-                        required = required_from_model
-                    field_attr['required']= required
-            if field_attr.get('fields'):
-                    recursive_add_model_name_to_field_attr(self,field_attr,key_tram=key_tram)
-                    
-                    
-                    
-
-#R3
-def check_set_val_is_true_type(val, attr):
-#     if attr not in TYPES_ATT_DICT:
-#         return False
-#     else:
-#         return True
-    python_type_of_val = type(val)
-    adict = TYPES_ATT_DICT.get(attr)
-    set_types_of_manual_attr = adict.get('types')
-    if  callable(val):
-        string_type_of_val = 'function'
-    elif val == None or adict.get('no_need_check_type'):
-        return True
-    else:
-        string_type_of_val = STRING_TYPE_DICT.get(python_type_of_val,None)   
-     
-    if not adict:
-        raise UserError(u'attr:%s chưa có liệt kê  trong TYPES_ATT_DICT'%attr)
-    
-    if string_type_of_val not in set_types_of_manual_attr:
-        
-        raise UserError (u'attr %s val %s, type:%s, không đúng dữ liệu %s'%(attr,val,string_type_of_val,set_types_of_manual_attr))
-        return False
-    else:
-        return True
-                    
-def check_xem_att_co_nam_ngoai_khong(COPY_MODEL_DICT,key_tram):
-    for attr,valg in COPY_MODEL_DICT.items():
-        if attr != 'fields':
-            val = COPY_MODEL_DICT.get(attr)
-            if not check_set_val_is_true_type(val,attr):
-                raise UserError (u'attr %s val %s không thỏa hàm check_set_val_is_true_type'%(attr,valg))
-        elif attr =='fields' : 
-            for field,field_attr in COPY_MODEL_DICT['fields'].items():
-                for attr,valg in field_attr.items():
-#                     if attr != 'fields' and attr !='get_or_create_para':
-                    if attr != 'fields' and attr !='get_or_create_para':
-                        val = field_attr.get(attr)
-                        if not check_set_val_is_true_type(val,attr):
-                            raise UserError (u'Thuộc tính nằm ngoài danh sách cho phép: attr %s val %s'%(attr,valg))
-                if 'fields' in field_attr:
-                    check_xem_att_co_nam_ngoai_khong(field_attr,key_tram)
-                                    
-    
-        
-        
-
-
-# R4
-def add_col_index(MODEL_DICT, read_excel_value_may_be_title, col,key_tram):
-    
-    is_map_xl_title = False
-    for field,field_attr in MODEL_DICT.get('fields').items():
-        is_real_xl_match_with_xl_excel = False
-        xl_title = get_key(field_attr,'xl_title')
-        if get_key(field_attr,'set_val') != None:
-            continue
-        if xl_title ==None and get_key(field_attr,'col_index') !=None:
-            continue# cos col_index
-        elif field_attr.get('fields'):
-            is_real_xl_match_with_xl_excel = add_col_index(field_attr, read_excel_value_may_be_title, col,key_tram)
-        elif xl_title:
-            if isinstance(xl_title, list):
-                xl_title_s = xl_title
-            else:
-                xl_title_s = [xl_title]
-            for xl_title in xl_title_s:
-                xl_title_partern = u'^%s$'%xl_title
-#                 xl_title_partern = xl_title
-#                 xl_title_partern = xl_title_partern.replace('/','//').replace('(','/(').replace(')','/)')
-                xl_title_partern = xl_title_partern.replace('\\','\\\\').replace('(','\(').replace(')','\)')
-                is_map = re.search(xl_title_partern,read_excel_value_may_be_title,re.IGNORECASE)
-                is_map = is_map or (xl_title==read_excel_value_may_be_title)
-                if is_map:
-                    field_attr['col_index'] = col
-                    is_real_xl_match_with_xl_excel = True        
-        is_map_xl_title = is_map_xl_title or is_real_xl_match_with_xl_excel
-    return is_map_xl_title #or is_map_xl_title_foreinkey
-def define_col_index(title_rows,sheet,COPY_MODEL_DICT,key_tram):
-#     read_excel_value_may_be_titles = []
-#     titles = []
+                    required_force = field_MD.get('required_force',None)
+                    required = required_force or required_from_model
+                    field_MD['required']= required
+            if field_MD.get('fields'):
+                    field_stt = add_model_n_type_n_required_to_fields(self,field_MD, field_stt =  field_stt)
+            if 'is_x2m_field' in MD:
+                x2m_fields = MD.setdefault('x2m_fields',[])
+                x2m_fields.append()
+    return field_stt
+ # R4                
+def define_col_index(title_rows, sheet, COPY_MODEL_DICT):
     row_title_index =None
     number_map_dict = {}
     for row in title_rows:
@@ -225,96 +224,180 @@ def define_col_index(title_rows,sheet,COPY_MODEL_DICT,key_tram):
                 read_excel_value_may_be_title = unicode(sheet.cell_value(row,col))
             else:
                 read_excel_value_may_be_title = str(sheet.cell_value(row,col))
-            is_map_xl_title = add_col_index( COPY_MODEL_DICT, read_excel_value_may_be_title, col,key_tram)
-#             read_excel_value_may_be_titles.append(read_excel_value_may_be_title)
+            is_map_xl_title = add_col_index( COPY_MODEL_DICT, read_excel_value_may_be_title, col)
             if is_map_xl_title:
                 row_title_index = row
-#                 number_map_dict.setdefault(row,0)
                 number_map_dict[row] =number_map_dict.get(row,0) + 1
-#                 titles.append(read_excel_value_may_be_title)
-#     print ('***number_map_dict',number_map_dict)
     if not number_map_dict:
         raise UserError(u'number_map_dict rỗng')
     largest_map_row = max(number_map_dict.items(), key=operator.itemgetter(1))[0]
     return row_title_index,largest_map_row
-
-
-
-#R5
-def check_col_index_match_xl_title_for_a_field(field_attr,xl_title,col_index,set_val,key_tram,needdata,field_name,func):
-#         if field_attr.get('model'):
-#             if (xl_title or col_index):
-#                 raise UserError(u'có model thì không cần xl title')
-
-        if xl_title and col_index==None and set_val==None :
-            sheet_allow_this_field_not_has_exel_col =get_key( field_attr,'sheet_allow_this_field_not_has_exel_col')
-            skip_field_if_not_found_column_in_some_sheet = get_key(field_attr,'skip_field_if_not_found_column_in_some_sheet')
-            skip_if_not_match =  skip_field_if_not_found_column_in_some_sheet or (sheet_allow_this_field_not_has_exel_col and needdata['sheet_name'] in sheet_allow_this_field_not_has_exel_col)
-            if not skip_if_not_match:
-#                 raise UserError(u'có khai báo xl_title nhưng không match với file excel, field: %s, xl_title: %s -- attr%s' %(field_name,xl_title,field_attr))
-                raise UserError(_(u'Excel not has column one in %s of %s, please change column name match with them') %(xl_title,field_name))
-        if xl_title == None and col_index==None and set_val ==None:
-            if  field_attr.get('model'):
-                if not func and not field_attr.get('fields'):
-                    raise UserError(u'model thì phải có ít nhất func và fields')
+# R4-1
+def add_col_index(MD, read_excel_value_may_be_title,col):
+    is_map_xl_title = False
+    for fname, field_MD in MD.get('fields').items():
+        is_real_xl_match_with_xl_excel = False
+        xl_title = get_key(field_MD, 'xl_title')
+        if get_key(field_MD, 'set_val') != None:
+            continue
+        if xl_title ==None and get_key(field_MD, 'col_index') !=None:
+            continue# cos col_index
+        elif field_MD.get('fields'):
+            is_real_xl_match_with_xl_excel = add_col_index(field_MD, read_excel_value_may_be_title, col)
+        elif xl_title:
+            if isinstance(xl_title, list):
+                xl_title_s = xl_title
             else:
-                if not func:
-                    raise UserError (u' sao khong có col_index và  không có func luôn field %s attrs %s'%(field_name,u'%s'%field_attr))
-                
-                
-def check_col_index_match_xl_title(self,COPY_MODEL_DICT,key_tram,needdata):
-    for field_name,field_attr in COPY_MODEL_DICT.get('fields').items():
-        skip_this_field = get_key(field_attr, 'skip_this_field', False)
-        if callable(skip_this_field):
-                skip_this_field = skip_this_field(self)
+                xl_title_s = [xl_title]
+            for xl_title in xl_title_s:
+                xl_title_partern = u'^%s$'%xl_title
+                xl_title_partern = xl_title_partern.replace('\\','\\\\').replace('(','\(').replace(')','\)')
+                is_map = re.search(xl_title_partern,read_excel_value_may_be_title,re.IGNORECASE)
+                is_map = is_map or (xl_title==read_excel_value_may_be_title)
+                if is_map:
+                    field_MD['col_index'] = col
+                    is_real_xl_match_with_xl_excel = True        
+        is_map_xl_title = is_map_xl_title or is_real_xl_match_with_xl_excel
+    return is_map_xl_title #or is_map_xl_title_foreinkey
+#R5           
+def check_col_index_match_xl_title(self, MD, needdata):
+    for fname, field_MD in MD.get('fields').items():
+        skip_this_field = get_key(field_MD, 'skip_this_field', False)
         if not skip_this_field: 
-            col_index = get_key(field_attr, 'col_index', None)
-            xl_title = get_key(field_attr, 'xl_title')#moi them , moi bo field_attr.get('xl_title')
-            ###  deal set_val ########
-            set_val = get_key( field_attr,'set_val')
-            if callable(set_val):
-                    set_val = set_val(self)
-            field_attr['set_val'] =set_val
-            func = get_key( field_attr,'func')
-            check_col_index_match_xl_title_for_a_field(field_attr,xl_title,col_index,set_val,key_tram,needdata,field_name,func)
-            child_fields =  field_attr.get('fields')
-            if child_fields:
-                check_col_index_match_xl_title(self,field_attr,key_tram,needdata)
+            col_index = get_key(field_MD, 'col_index', None)
+            xl_title = get_key(field_MD, 'xl_title')#moi them , moi bo field_attr.get('xl_title')
+            set_val = get_key( field_MD,'set_val')
+            func = field_MD.get('func')
+            check_col_index_match_xl_title_for_a_field( field_MD, xl_title, col_index, set_val, needdata, fname, func)
+            if field_MD.get('fields'):
+                check_col_index_match_xl_title(self, field_MD, needdata)
+#R51
+def check_col_index_match_xl_title_for_a_field(field_attr, xl_title, col_index, set_val, needdata, field_name, func):
+#         if col_index or set_val or func:
+#             pass
+        if xl_title and set_val:
+            raise UserError("xl_title and set_val")
+        if set_val==None:
+            if col_index==None:
+                if xl_title : # không match
+                    sheet_allow_this_field_not_has_exel_col = get_key( field_attr,'sheet_allow_this_field_not_has_exel_col')
+                    skip_field_if_not_found_column_in_some_sheet = get_key(field_attr,'skip_field_if_not_found_column_in_some_sheet')
+                    
+                    skip_if_not_match =  skip_field_if_not_found_column_in_some_sheet or (sheet_allow_this_field_not_has_exel_col and needdata['sheet_name'] in sheet_allow_this_field_not_has_exel_col)
+                    if not skip_if_not_match:
+                        raise UserError(_(u'Excel not has column one in %s of %s, please change column name match with them') %(xl_title,field_name))
+                else:
+                    
+                    if  field_attr.get('model'):
+                        if not func and not field_attr.get('fields'):
+                            raise UserError(u'model thì phải có ít nhất func và fields')
+                    else:
+                        if not func:
+                            raise UserError (u' sao khong có col_index và  không có func luôn field %s attrs %s'%(field_name,u'%s'%field_attr))
+#R5A
+def write_get_or_create_title(MD, sheet, sheet_of_copy_wb, title_row):
+    fields = MD['fields']
+    for fname, field_MD in fields.items():
+        offset_write_xl = get_key(field_MD, 'offset_write_xl')
+        if offset_write_xl !=None:
+            col =  sheet.ncols + offset_write_xl 
+            title = field_MD.get('string', fname)  + u' sẵn hay tạo'
+            sheet_of_copy_wb.col(col).width =  get_width(len(title))
+            sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
+        if field_MD.get('fields'):
+            write_get_or_create_title(field_MD, sheet,sheet_of_copy_wb,title_row)
+        
+
+
+# #R7        
+# def export_some_key_value_cua_fields_MD(MD, attr_muon_xuats = ['field_type'], ghom_dac_tinh = {}):
+#     fields = MD['fields']
+#     output_field_dicts = {}
+#     for field, field_MD in fields.items():
+#         new_field_MD = {}
+#         for exported_key in attr_muon_xuats:
+#             if exported_key in field_MD:
+#                 val = field_MD.get(exported_key)
+#                 new_field_MD[exported_key] = val
+#                 alist = ghom_dac_tinh.setdefault( exported_key, [])
+#                 if val not in alist:
+#                     alist.append(val)
+#         if 'fields' in field_MD:
+#             child_dict = export_some_key_value_cua_fields_MD(field_MD, attr_muon_xuats, ghom_dac_tinh)
+#             new_field_MD['fields'] = child_dict
+#         output_field_dicts[field] = new_field_MD 
+#     return output_field_dicts, ghom_dac_tinh
+# 
+# 
+# 
+# #R8
+# def export_all_key_value_cua_fields_MD(MD, dac_tinhs = {}):
+#     fields = MD['fields']
+#     for fname, field_MD in fields.items():
+#         for key,val in field_MD.items():
+#             a_dt_list = dac_tinhs.setdefault(key,[])
+#             if val not in a_dt_list :
+#                 a_dt_list.append(val)
+#         if 'fields' in field_MD:
+#             export_all_key_value_cua_fields_MD(field_MD, dac_tinhs)
+
+
+
+
+
+
+                   
+                   
+
+
+
+                
+
+            
+            
+            
+
+                
+                        
+            
+            
+
+
+
+
+
+
+
+                    
+                    
+                    
+
+
+
+            
+
+                                    
+    
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+                
+
     
 
                 
                 
-#!5
-#R4             
-def muon_xuat_dac_tinh_gi(COPY_MODEL_DICT, attr_muon_xuats = ['field_type'],ghom_dac_tinh = {}):
-    #ghom_dac_tinh = {'field_type':['char','many2one']}
-    fields = COPY_MODEL_DICT['fields']
-    some_att_fields = {}
-    #some_att_fields = {
-    for field,field_attr in fields.items():
-        one_field_attrs = {}
-        for attr_muon_xuat in attr_muon_xuats:
-            if attr_muon_xuat in field_attr:
-                val = field_attr.get(attr_muon_xuat)
-                one_field_attrs[attr_muon_xuat] = val
-                alist = ghom_dac_tinh.setdefault(attr_muon_xuat,[])
-                if val not in alist:
-                    alist.append(val)
-        if 'fields' in field_attr:
-            child_dict = muon_xuat_dac_tinh_gi(field_attr,attr_muon_xuats,ghom_dac_tinh)
-            one_field_attrs['fields'] = child_dict
-        some_att_fields[field] = one_field_attrs 
-    return some_att_fields
 
-def xuat_het_dac_tinh(COPY_MODEL_DICT,key_tram,dac_tinhs = {}):
-    fields = COPY_MODEL_DICT['fields']
-    for field,field_attr in fields.items():
-        for attr,val in field_attr.items():
-            a_dt_list = dac_tinhs.setdefault(attr,[])
-            val = get_key(field_attr, attr)
-            if val not in a_dt_list :
-                a_dt_list.append(val)
-        if 'fields' in field_attr:
-            xuat_het_dac_tinh(field_attr,key_tram,dac_tinhs)
+
 
 

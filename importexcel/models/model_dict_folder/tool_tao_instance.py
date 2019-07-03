@@ -82,11 +82,7 @@ def get_key(field_attr, attr,default_if_not_attr=None):
 #         value =  value.get(key_tram,default_if_not_attr) if key_tram in value else value.get('all_key_tram',default_if_not_attr)
 #     return value
 
-def get_by_key_tram(field_attr, attr, key_tram,default_if_not_attr=None):
-    value = field_attr.get(attr,default_if_not_attr)
-    if isinstance(value, dict) and key_tram:
-        value =  value.get(key_tram,default_if_not_attr) if key_tram in value else value.get('all_key_tram',default_if_not_attr)
-    return value
+
 
 def check_type_of_val(field_attr, val, field_name, model_name):        
     if field_attr.get('bypass_check_type'):

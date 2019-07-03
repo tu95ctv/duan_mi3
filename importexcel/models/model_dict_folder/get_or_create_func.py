@@ -4,15 +4,14 @@ from odoo.osv import expression
 import datetime
 from odoo import  fields
 from odoo.exceptions import UserError
-def get_or_create_object_has_x2m (self, class_name, search_dict,
+def get_or_create_object_has_x2m (self, class_name, 
+                                search_dict,
                                 write_dict ={},
                                 is_must_update=False, 
                                 noti_dict=None,
                                 inactive_include_search = False,
-                                x2m_field=False,
-                                remove_all_or_just_add_one_x2m = True,
+#                                 x2m_field=False,
                                 model_dict = {},
-                                key_tram =  None,
                                 exist_val=False,
                                 setting= {},
                                 check_file = False,
@@ -20,8 +19,9 @@ def get_or_create_object_has_x2m (self, class_name, search_dict,
                                 is_create = True,
                                 is_write = True,
                                  ):
-    
-    if x2m_field:
+    x2m_fields = model_dict.get('x2m_fields')
+    if x2m_fields:
+        x2m_field = x2m_fields[0]
         x2m_values = search_dict[x2m_field]
         result = []
         get_or_create = False
@@ -31,7 +31,6 @@ def get_or_create_object_has_x2m (self, class_name, search_dict,
                                     write_dict =write_dict, is_must_update=is_must_update, noti_dict=noti_dict,
                                     inactive_include_search = inactive_include_search,
                                     model_dict = model_dict,
-                                    key_tram = key_tram,
                                     exist_val=exist_val,
                                     setting = setting,
                                     check_file = check_file,
@@ -42,7 +41,8 @@ def get_or_create_object_has_x2m (self, class_name, search_dict,
                                     )
             result.append(obj.id)
             get_or_create |=get_or_create_iterator
-        if remove_all_or_just_add_one_x2m == True:
+        remove_all_or_just_add_one_x2m = model_dict.get('remove_all_or_just_add_one_x2m', 'add_one')
+        if remove_all_or_just_add_one_x2m == 'remove_all':
             obj_id =  [(6,False,result)]
         else:
             obj_id  = list(map(lambda x: (4,x,False), result)) # [(4,result[0],False)] 
@@ -51,7 +51,6 @@ def get_or_create_object_has_x2m (self, class_name, search_dict,
                                     write_dict =write_dict, is_must_update=is_must_update, noti_dict=noti_dict,
                                     inactive_include_search = inactive_include_search,
                                     model_dict = model_dict,
-                                    key_tram = key_tram,
                                     exist_val=exist_val,
                                     setting = setting,
                                     check_file = check_file,
@@ -70,11 +69,13 @@ def get_or_create_object_has_x2m (self, class_name, search_dict,
 
         
 
-def get_or_create_object_sosanh(self, class_name, search_dict,
-                                write_dict ={},is_must_update=False, noti_dict=None,
+def get_or_create_object_sosanh(self, class_name,
+                                search_dict,
+                                write_dict ={},
+                                is_must_update=False, 
+                                noti_dict=None,
                                 inactive_include_search = False,
                                 model_dict = {},
-                                key_tram = None,
                                 exist_val=False,
                                 setting = {},
                                 check_file=False,
@@ -99,15 +100,25 @@ def get_or_create_object_sosanh(self, class_name, search_dict,
                     f_name = get_key(field_attr, 'transfer_name') or f_name
                     search_dict_new[f_name] =  val
         else:
+            
+            if search_dict :
+                pass
+            else:
+                raise UserError(u'Không có Key search dict, model_name%s----MD%s'%(class_name, model_dict))
+        
+        
             if inactive_include_search:
                 domain_not_active = ['|',('active','=',True),('active','=',False)]
             else:
                 domain_not_active = []
+                
             domain = []
             break_condition = False
             for f_name in search_dict:
                 field_attr = model_dict['fields'][f_name]
                 val =  search_dict[f_name]
+                
+                
                 if val == None:
                     if check_file:
                         searched_object,get_or_create =  None,False

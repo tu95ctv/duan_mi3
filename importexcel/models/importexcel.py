@@ -3,11 +3,12 @@ from odoo import models, fields, api,exceptions,tools,_
 import re
 from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel_func
 from odoo.addons.tonkho.models.import_excel_model_dict_folder.model_dict import default_import_xl_setting
-
-
+from odoo.exceptions import UserError
+# from odoo.addons.importexcel.models.model_dict_folder.recursive_func import export_all_no_pass_dict_para
 
 class Importexcel(models.Model):
     _name = 'importexcel.importexcel' 
+    setting= fields.Char()
     type_choose = fields.Selection([
         (u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',u'stock.inventory.line.tong.hop'),
         (u'Product',u'Product'),
@@ -61,8 +62,8 @@ class Importexcel(models.Model):
     test_result_2 = fields.Text()
     test_result_3 = fields.Text()
     line_not_has_quant =  fields.Text()
-    only_xuat_thuoc_tinh =  fields.Boolean()
-    dac_tinh = fields.Char()
+#     only_xuat_thuoc_tinh =  fields.Boolean()
+#     dac_tinh = fields.Char()
     categ_id = fields.Many2one('product.category')
     st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
     st_is_allow_write_existence  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_write_existence'])
@@ -138,11 +139,7 @@ class Importexcel(models.Model):
         self.test_result_3= rs3
         
     def test_code(self):
-        fields=self.env['stock.move.line']._fields
-#         print ('fields',fields)
-        self.test_result_1 = dir(fields['product_id'])
-        self.test_result_2 = fields['product_id'].required
-        print ("fields['product_id'].required",fields['product_id'].required)
+        pass
     def test_code1(self):
 #         sql_multi_2 = '''select date_trunc('day',create_date) from stock_quant'''
          
@@ -160,6 +157,7 @@ class Importexcel(models.Model):
 
         else:
             raise UserWarning(u'Bạn phải chọn trigger model')
+  
     
     def import_strect(self):
         pass
