@@ -246,7 +246,7 @@ def importexcel_func(odoo_or_self_of_wizard, key=False, key_tram=False, check_fi
             
 ################# CREATE INSTANCE
 def create_instance (self,
-                    MODEL_DICT,
+                    MD,
                     sheet,
                     row,
                     merge_tuple_list,
@@ -260,14 +260,24 @@ def create_instance (self,
                     is_search = True,
                     is_create = True,
                     is_write = True,
-                     ):
+                    ):
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
         
     key_search_dict = {}
     update_dict = {}
-    model_name = MODEL_DICT.get( 'model')
-#     x2m_fields = []
-    collection_dict = {}#'instance_false':False,''remove_all_or_just_add_one_x2m': True
-    for field_name,field_attr  in MODEL_DICT['fields'].items():
+    model_name = MD.get( 'model')
+    collection_dict = {}
+    for field_name,field_attr  in MD['fields'].items():
         a_field_code = get_a_field_val(self,
                                        field_name,
                                        field_attr,
@@ -281,58 +291,49 @@ def create_instance (self,
                                        noti_dict,
                                        key_search_dict,
                                        update_dict,
-#                                        x2m_fields,
                                        collection_dict,
                                        setting)
         if a_field_code =='break_out_a_row_because_a_required':
-#             break_condition = True# moi them
             if field_attr.get('raise_if_False') and not check_file:
                 raise UserError('raise_if_False field: %s'%field_name)
-            if main_call_create_instance_model :#or MODEL_DICT.get('print_write_dict_new',False)
-                print (u'skip việc get or create của dòng này because required but,model %s- field %s'%(model_name,field_name))
             break
     if a_field_code =='break_out_a_row_because_a_required':
         if main_call_create_instance_model:
-            break_condition_func_for_main_instance  = get_key(MODEL_DICT, 'break_condition_func_for_main_instance')
+            break_condition_func_for_main_instance  = get_key(MD, 'break_condition_func_for_main_instance')
             if break_condition_func_for_main_instance:
                 break_condition_func_for_main_instance(needdata)
         obj_val = False
         get_or_create = False
-        return False, obj_val, get_or_create
-    if collection_dict.get('instance_false'):
-        
-        return None,None,False
+        obj, obj_val, get_or_create =  False, obj_val, get_or_create
     
-    last_record_function = get_key(MODEL_DICT, 'last_record_function')
-    if last_record_function:
-        last_record_function(needdata,self)
+    elif collection_dict.get('instance_false'):# có 1 field = false and required ==> instance đó = False
+        obj, obj_val, get_or_create =  None, None, False
     
-#     if main_call_create_instance_model:
-#         pass
-#         print ('key_search_dict',key_search_dict)
-#         print ('update_dict',update_dict)
-#     
-#     if key_search_dict :
-#         pass
-#     elif is_search:
-#         raise UserError(u'Không có Key search dict, model_name%s----MD%s'%(model_name,MODEL_DICT))
-    
-    obj,obj_val, get_or_create  = get_or_create_instance_from_key_search_and_update_dict(
-                                                   self,
-                                                   model_name,
-                                                   key_search_dict,
-                                                   update_dict,
-                                                   check_file,
-                                                   noti_dict,
-#                                                    x2m_fields,
-                                                   MODEL_DICT,
-                                                   exist_val=exist_val,
+    else:
+        obj,obj_val, get_or_create  = get_or_create_instance_from_key_search_and_update_dict(
+                                                self,
+                                                model_name,
+                                                key_search_dict,
+                                                update_dict,
+                                                check_file,
+                                                noti_dict,
+                                                MD,
+                                                exist_val=exist_val,
                                                 setting=setting,
                                                 is_search = is_search,
                                                 is_create = is_create,
                                                 is_write = is_write,
                                                    )
-    return obj,obj_val, get_or_create 
+    if check_file:
+        if obj_val == False:
+            obj_val = None
+            
+    last_record_function = get_key(MD, 'last_record_function')
+    if last_record_function:
+        last_record_function(needdata,self)
+        
+        
+    return obj, obj_val, get_or_create 
 
 
 
@@ -368,7 +369,6 @@ def get_a_field_val(self,
                     check_file,
                     needdata,
                     noti_dict,
-#                     key_tram,
                     setting,
                     excel_para = {'col_index':col_index,'sheet':sheet, 'row':row,'merge_tuple_list':merge_tuple_list,'sheet_of_copy_wb': sheet_of_copy_wb },
                     for_print_para= {'model_name':model_name, 'field_name':field_name}
@@ -414,14 +414,6 @@ def get_a_field_val(self,
 
    
     key_or_not = field_attr.get('key')
-#     if callable(key_or_not):
-#         key_or_not = key_or_not(needdata)
-    
-    
-#     bypass_this_field_if_value_equal_False = get_key(field_attr, 'bypass_this_field_if_value_equal_False', setting['bypass_this_field_if_value_equal_False_default'])
-#     if bypass_this_field_if_value_equal_False and val==False: 
-#         a_field_code = 'continue'
-#         return a_field_code
     if '2many' in field_attr.get('field_type','' ) and val == False:
         a_field_code = 'continue'
         return a_field_code
@@ -444,11 +436,6 @@ def get_a_field_val(self,
         valid_field_func(val,obj,needdata,self)
     print ("row: ", row,'model_name: ',model_name,'-field: ', field_name, '-val: ', val)
     check_type_of_val(field_attr, val, field_name, model_name)
-    
-#     if field_attr.get('is_x2m_field'):
-#         x2m_fields = collection_dict.setdefault('x2m_fields',[])
-#         x2m_fields.append(field_name)
-#             collection_dict['remove_all_or_just_add_one_x2m'] &= field_attr.get('remove_all_or_just_add_one_x2m',True)
     a_field_code = False
     return False        
 #F2
@@ -457,7 +444,6 @@ def read_val_for_ci(self,
                     check_file,
                     needdata,
                     noti_dict,
-#                     key_tram,
                     setting,
                     excel_para = {},
                     for_print_para= {}
@@ -489,9 +475,11 @@ def read_val_for_ci(self,
         print ('excel read model_name:%s field_name:%s'%(for_print_para['model_name'],for_print_para['field_name']),'xl_val',xl_val,'val',xl_val)
     
     elif field_attr.get('fields') :
+        
+        
         func_map_database_existence = setting.get('st_allow_func_map_database_existence') and field_attr.get('func_map_database_existence')
         if func_map_database_existence:
-            exist_val = func_map_database_existence(needdata,self) #1,True ; F,False
+            exist_val = func_map_database_existence(needdata,self) 
         else:
             exist_val = False
         if exist_val:
@@ -521,7 +509,8 @@ def read_val_for_ci(self,
                     is_write = True
                     is_search =True
             
-            obj,val, get_or_create  = create_instance (self, field_attr,
+            obj,val, get_or_create  = create_instance (self,
+                                                                    field_attr,
                                                                     sheet, 
                                                                     row, 
                                                                     merge_tuple_list,
@@ -539,23 +528,16 @@ def read_val_for_ci(self,
         if exist_val:
             if  func_check_if_excel_is_same_existence:# and not get_or_create:,not st_is_allow_write_existence and
                 func_check_if_excel_is_same_existence(get_or_create, obj, exist_val)
-#                 try:
-#                     func_check_if_excel_is_same_existence(get_or_create, obj, exist_val)
-#                 except UserError as e: 
-#                     if setting ['allow_check_excel_obj_is_exist_raise_or_break'] =='break':
-#                         a_field_code = 'break'
-#                         return False,False, a_field_code
-#                     else:
-#                         raise UserError(e.args)
             val= exist_val.id
             obj = exist_val
             get_or_create = True
             this_model_notice = noti_dict.setdefault(field_attr.get('model'),{})
             this_model_notice['exist_val'] = this_model_notice.get('exist_val',0) + 1
-        field_attr['get_or_create'] = get_or_create
+        field_attr['get_or_create_sign'] = get_or_create
+        
         if check_file:
-            if val ==False or val ==None:# ke qua search la rỗng obj (None,None,False) (obj(),False,False)
-                val = None
+#             if val ==False or val ==None:
+#                 val = None
             offset_write_xl = get_key(field_attr, 'offset_write_xl')
             if offset_write_xl !=None:
                 if get_or_create:
@@ -565,7 +547,7 @@ def read_val_for_ci(self,
                         get_or_create_display = u'Chưa'
                     else:
                         get_or_create_display = u'empty cell'
-                sheet_of_copy_wb.write(row,sheet.ncols + offset_write_xl , get_or_create_display,wrap_center_vert_border_style)
+                sheet_of_copy_wb.write(row,sheet.ncols + offset_write_xl, get_or_create_display, wrap_center_vert_border_style)
     return obj, val      
 
 def get_or_create_instance_from_key_search_and_update_dict(self,

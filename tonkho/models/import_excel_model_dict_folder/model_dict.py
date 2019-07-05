@@ -899,7 +899,7 @@ def lot_name_key_ltk_dc_(val,needdata,self):
 
 
 def last_record_function_ltk_vtdc_(n,self=None):
-    if n['vof_dict']['product_id']['get_or_create']== False:
+    if n['vof_dict']['product_id']['get_or_create_sign']== False:
         raise UserError(u'Product %s  phải được tạo từ trước'%n['vof_dict']['product_id']['fields']['name']['val'])
     gan_inventory_id_vao_needdata(n,self)
 def gan_inventory_id_vao_needdata(n,self):
