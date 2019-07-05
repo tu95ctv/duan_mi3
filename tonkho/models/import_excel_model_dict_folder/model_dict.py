@@ -71,13 +71,15 @@ def gen_model_dict_for_stock_move_line(sml_title_row=False, self=None, key_tram=
                                    } ,#[self.sheet_name],#,#[self.sheet_name],#[u'Chuyển Mạch (IMS, Di Động)'],#xl_workbook.sheet_names(),#[u'Truyền dẫn'],#[u'IP (VN2, VNP)'],[u'Chuyển Mạch (IMS, Di Động)']
                     'model':{all_key_tram: 'stock.inventory.line',sml:'stock.move.line'},## viet lai ben tao_instance_new
                     'bypass_this_field_if_value_equal_False_default':False,
+                    'st_write_false':True,
                     'setting': {all_key_tram: {
 #                                                'allow_write_from_False_to_not_false':True,
                                                'st_is_allow_write_existence':default_import_xl_setting['default_st_is_allow_write_existence'] if use_default else self.st_is_allow_write_existence,
                                                'st_allow_check_if_excel_is_same_existence':default_import_xl_setting['default_st_allow_check_if_excel_is_same_existence'] if use_default else self.st_allow_check_if_excel_is_same_existence,
                                                'st_is_allow_empty_xldata_pn_is_unique_same_name_product':default_import_xl_setting['default_st_is_allow_empty_xldata_pn_is_unique_same_name_product'] if use_default else self.st_is_allow_empty_xldata_pn_is_unique_same_name_product,
                                                'st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr':default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'] if use_default else  self.st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr,
-                                               'st_allow_func_map_database_existence':default_import_xl_setting['default_st_allow_func_map_database_existence'] if use_default else self.st_allow_func_map_database_existence,
+                                                'st_allow_func_map_database_existence':default_import_xl_setting['default_st_allow_func_map_database_existence'] if use_default else self.st_allow_func_map_database_existence,
+#                                                'st_allow_func_map_database_existence':False,
                                                }},
                     'setting2': {sml: {'allow_check_excel_obj_is_exist_raise_or_break':'break', 
                                     'allow_write':True if  is_admin_cal else False},
@@ -138,7 +140,10 @@ chi tiết
 thiết bị
 (card)'''
                                                                  },
-                                             'empty_val':{'key_ltk':[u'TỔNG ĐÀI IMS',u'JUNIPER ERX 1400; T1600 ; T4000'],all_key_tram:None}
+                                             'empty_val':{
+                                                          'key_ltk':[u'TỔNG ĐÀI IMS',u'JUNIPER ERX 1400; T1600 ; T4000',u'HDD 300G 10K SAS'],
+                                                          'sml':[u'TỔNG ĐÀI IMS',u'JUNIPER ERX 1400; T1600 ; T4000',u'HDD 300G 10K SAS'],
+                                                          all_key_tram:None}
 #                                                      'key':True,
 })  ,
                   
@@ -181,11 +186,13 @@ thiết bị
                                             ('pn',{
 #                                                 'key':'Both',
                                                 'type_allow':[int,float],
-                                                'func':lambda val,needdata: str(int(val)) if isinstance(val,float) else val,'empty_val':[u'NA',u'-',u'--'],
+                                                'func':lambda val,needdata: str(int(val)) if isinstance(val,float) else val,
+                                                'empty_val':[u'NA',u'-',u'--'],
                                                 'xl_title':[u'Part-Number',u'Part Number',u'Partnumber',u'Mã card (P/N)',u'Mã vật tư',u'''MÃ 
 VẬT TƯ''',u'''MÃ 
 Article Code'''],
                                                 'bypass_this_field_if_value_equal_False':True,
+                                                'write_false':False,
                                                 'skip_field_if_not_found_column_in_some_sheet':{sml:True,all_key_tram:None},
                                                 'write_field':True,
                                                    }
@@ -207,10 +214,9 @@ Article Code'''],
                                             ('categ_id',{##cua product_id
                                                             'skip_this_field':{all_key_tram:False},
                                                             'bypass_this_field_if_value_equal_False':True,
-                                                            
+                                                            'write_false':False,
                                                             'write_field':{all_key_tram: write_field_categ_id if is_admin_cal else False,
                                                                             sml:False},
-                                                            'ready_declare_default':True,
                                                             'key':False,
                                                             'only_get':{all_key_tram:True if  not is_admin_cal else False},
 
@@ -254,6 +260,7 @@ Article Code'''],
                                              ('toc_do_id',{
                                                         'skip_this_field':{all_key_tram:True,'key_ltk':False},
                                                         'bypass_this_field_if_value_equal_False':True,
+                                                        'write_false':False,
                                                         'fields':[
                                                             ('name',{'skip_field_if_not_found_column_in_some_sheet':True,'key':True,'xl_title':[u'Tốc độ']})
                                                             ]
@@ -262,6 +269,7 @@ Article Code'''],
                                             ('brand_id',{'empty_val':[u'NA'],
                                                                 'skip_this_field':{key_137:True},
                                                                 'bypass_this_field_if_value_equal_False':True,
+                                                                'write_false':False,
                                                                 'fields':[('name',{'func':lambda v,n: v.upper() if isinstance(v,str) else v,
                                                                                                 'skip_field_if_not_found_column_in_some_sheet':{sml:True,all_key_tram:False},
                                                                                                 'xl_title':{
@@ -276,6 +284,7 @@ Article Code'''],
                                             ('thiet_bi_id',{
                                                 'skip_this_field':{key_137:True},
                                                 'bypass_this_field_if_value_equal_False':True,
+                                                'write_false':False,
                                                 'write_field':None if is_admin_cal else False,
                                                 'fields':[('name',{
                                                                 'func':{all_key_tram:lambda v,n: str(int(v)) if isinstance(v,float) else v,
@@ -300,6 +309,7 @@ thiết bị'''
                                                                                 'write_field':write_field_categ_id if is_admin_cal else False,
                                                                                 'raise_if_diff':False,
                                                                                 'bypass_this_field_if_value_equal_False':True,
+                                                                                'write_false':False,
                                                                                 'print_if_write':True,
                                                                                 'key':False,
                                                                                 'func': lambda v,n:n['vof_dict']['product_id']['fields']['categ_id']['val']}
@@ -309,14 +319,17 @@ thiết bị'''
                                                                          'skip_this_field':{key_137:True},
                                                                          'key':False,
                                                                          'bypass_this_field_if_value_equal_False':True,
+                                                                         'write_false':False,
                                                                          'func': lambda v,n:n['vof_dict']['product_id']['fields']['brand_id']['val']}),                                                               
                                                           ]}), 
                                              
                                             
                                             ('uom_id',  {
                                                         'write_field':None if is_admin_cal else False,
-                                                         'ready_declare_default':True,
-                                                        'bypass_this_field_if_value_equal_False':True, 'fields': [ #'func':uom_id_,'default':1,
+                                                        'bypass_this_field_if_value_equal_False':True,
+#                                                         'default_val':u'akakakka',
+                                                        'write_false':False,
+                                                        'fields': [ #'func':uom_id_,'default':1,
                                                         ('name',{'set_val':{
                                                                             all_key_tram:None,
                                                                             key_ltk_dc:u'Cái',
@@ -787,7 +800,9 @@ thiết bị'''
                                 
                                 
                 ('picking_id',{'required':True,
-                                'key':True, 'set_val':{sml:lambda self:self.id},
+                                'key':True,
+#                                 'set_val':{sml:lambda self:self.id},
+                                'func':{sml:lambda v,n:n['self'].id},
                                 'skip_this_field':{sml:False,all_key_tram:True}}),
                
                 ('product_uom_id',{'skip_this_field':{sml:False,all_key_tram:True}, 

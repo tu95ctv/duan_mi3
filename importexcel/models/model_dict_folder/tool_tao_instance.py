@@ -1,22 +1,11 @@
  # -*- coding: utf-8 -*-
+from odoo.exceptions import UserError
 import sys
 import xlrd
 VERSION_INFO   = sys.version_info[0]
 import xlwt
 import re
-MAP_TYPE = {
-                      'integer':[int,float],
-                      'float':float, 
-                      'many2one':int,
-                      'char':str,
-                      'selection':str,
-                      'text':str, 
-                      'boolean':bool,
-                      'many2many':list,
-                      'one2many':list,
-                      
-                      
-                      }
+
 
 def get_width(num_characters):
     return int((1+num_characters) * 256)
@@ -24,6 +13,7 @@ def get_width(num_characters):
 # header_bold_style = xlwt.easyxf("font: bold on, name Times New Roman, height 240 ; align:  vert centre;  pattern: pattern solid, fore_colour gray25;borders: left thin, right thin, top thin, bottom thin")
 
 EMPTY_CHAR = [u'',u' ',u'\xa0',u'#N/A',u'N/A',u'NA']
+pt = '^('+'|'.join(EMPTY_CHAR)+')$'
 def check_is_string_depend_python_version(val):
     if VERSION_INFO==2:
         check_str = isinstance(val,unicode) or isinstance(val,str)
@@ -31,19 +21,37 @@ def check_is_string_depend_python_version(val):
         check_str =  isinstance(val,str)
     return check_str
     
-def empty_string_to_False(readed_value):
+# def empty_string_to_False(readed_value):
+#     if VERSION_INFO==2:
+#         check_str = isinstance(readed_value,unicode) or isinstance(readed_value,str)
+#     else:
+#         check_str =  isinstance(readed_value,str)
+#     
+#     if check_str :
+#         if readed_value  in EMPTY_CHAR:
+#             return False
+#         rs = re.search('\S',readed_value)
+#         if not rs:
+#             return False
+#     return readed_value
+
+
+def empty_string_to_False(readed_value, pt= pt):
     if VERSION_INFO==2:
         check_str = isinstance(readed_value,unicode) or isinstance(readed_value,str)
     else:
         check_str =  isinstance(readed_value,str)
     
     if check_str :
-        if readed_value  in EMPTY_CHAR:
+        rs = re.search(pt, readed_value)
+        if rs:
             return False
         rs = re.search('\S',readed_value)
         if not rs:
             return False
     return readed_value
+
+
 # def active_function(val):
 #     return False if val ==u'na' else True
 def read_merge_cell(sheet,row,col,merge_tuple_list):
@@ -72,7 +80,7 @@ def read_excel_cho_field(sheet, row, col_index,merge_tuple_list):
         check_str =  isinstance(val,str)
     if check_str:
         val = val.strip()
-    val = empty_string_to_False(val)
+#     val = empty_string_to_False(val)
     return val
 ### Xong khai bao
 def get_key(field_attr, attr,default_if_not_attr=None):
@@ -84,31 +92,7 @@ def get_key(field_attr, attr,default_if_not_attr=None):
 
 
 
-def check_type_of_val(field_attr, val, field_name, model_name):        
-    if field_attr.get('bypass_check_type'):
-        return True
-    field_type = field_attr.get('field_type')
-    if field_type:
-        type_allow = field_attr.get('type_allow',[])
-        if val != False and val != None:
-            try:
-                type_tuong_ung_voi_char_field_type = MAP_TYPE[field_type]
-            except:
-                return True
-                raise UserError(u'không có field_type:%s này'%field_type)
-            if field_attr.get('is_x2m_field'):
-                type_tuong_ung_voi_char_field_type = list
-            if isinstance( type_tuong_ung_voi_char_field_type,list):
-                type_allow.extend(type_tuong_ung_voi_char_field_type)
-            else:
-                type_allow.append(type_tuong_ung_voi_char_field_type)
-            pass_type_check = False
-            for a_type_allow in type_allow:
-                if isinstance(val, a_type_allow):
-                    pass_type_check = True
-                    continue
-            if not pass_type_check:
-                raise UserError(u'model: %s- field:%s có giá trị: %s, đáng lẽ là field_type:%s nhưng lại có type %s'%(model_name, field_name,val,field_type,type(val)))
+
             
             
 ############### end small func ##################

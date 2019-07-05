@@ -5,10 +5,10 @@ from odoo.exceptions import UserError
 import base64
 from copy import deepcopy
 from xlutils.copy import copy
-from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import read_excel_cho_field,check_is_string_depend_python_version,empty_string_to_False,get_key, check_type_of_val#,get_width,header_bold_style,VERSION_INFO
+from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import read_excel_cho_field, check_is_string_depend_python_version, empty_string_to_False, get_key#,get_width,header_bold_style,VERSION_INFO
 from odoo.addons.downloadwizard.models.dl_models.dl_model  import wrap_center_vert_border_style
 from odoo.addons.importexcel.models.model_dict_folder.get_or_create_func import get_or_create_object_has_x2m
-from odoo.addons.importexcel.models.model_dict_folder.recursive_func import export_all_no_pass_dict_para,rut_gon_key,ordereddict_fields, check_xem_att_co_nam_ngoai_khong, add_model_n_type_n_required_to_fields,define_col_index,check_col_index_match_xl_title,write_get_or_create_title, convert_dict_to_order_dict_string 
+from odoo.addons.importexcel.models.model_dict_folder.recursive_func import export_all_no_pass_dict_para,rut_gon_key,ordereddict_fields, check_xem_att_co_nam_ngoai_khong, add_model_n_type_n_required_to_fields,define_col_index,check_col_index_match_xl_title,write_get_or_create_title, convert_dict_to_order_dict_string, export_some_key_value_cua_fields_MD 
 
 
 
@@ -72,7 +72,7 @@ def gen_sheet_names(self,MD, xl_workbook, gen_model_dict_kargs):
 def importexcel_func(odoo_or_self_of_wizard, key=False, key_tram=False, check_file = False, gen_model_dict_kargs= {}):
     self = odoo_or_self_of_wizard
     key_tram =  getattr(self,'key_tram',False) or key_tram
-    new_dict = self.gen_model_dict()
+    new_dict = self.env['importexcel.importexcel'].gen_model_dict()
     key = key or self.type_choose
     MD = new_dict[key]
     
@@ -89,8 +89,15 @@ def importexcel_func(odoo_or_self_of_wizard, key=False, key_tram=False, check_fi
         raise UserError(u'ban phai chon key_tram')
     
     
-#R0
-#     out_dict,type_out_dict =  export_all_no_pass_dict_para(MD)
+#     rs = self.env['importexcel.importexcel'].gen_model_dict()
+#     out_dict = {}
+#     type_out_dict = {}
+#     for k,MD_test in rs.items():
+#     #R0
+#         if callable(MD_test):
+#             MD_test = MD_test(self=self, key_tram=key_tram, gen_model_dict_kargs=gen_model_dict_kargs)
+#         key_allow = MD_test.get('key_allow',False)
+#         export_all_no_pass_dict_para(MD_test, out_dict=out_dict, type_out_dict=type_out_dict)
 #     raise UserError(u'%s%s%s'%(str(out_dict), '***'*8, str(type_out_dict)))
 
 
@@ -115,11 +122,37 @@ def importexcel_func(odoo_or_self_of_wizard, key=False, key_tram=False, check_fi
     ordereddict_fields( MD)
     #R2A
     check_xem_att_co_nam_ngoai_khong(MD)
+    
+    setting = MD.get('setting',{})
+    setting.setdefault('allow_write',MD.get('allow_write', True))
+#     setting['bypass_this_field_if_value_equal_False_default'] =  MD.get('bypass_this_field_if_value_equal_False_default',False)
+
+    setting.setdefault('st_write_false', False)
+    setting['st_write_false'] =  MD.get('st_write_false')
+    setting2 = MD.get('setting2',{})
+    if setting2:
+        setting.update(setting2)
+    self.setting = convert_dict_to_order_dict_string(setting)
+    
+    
     #R3
-    add_model_n_type_n_required_to_fields(self, MD)
+    add_model_n_type_n_required_to_fields(self, MD, setting = setting)
+   
+    imported_model = self.env[MD.get('model')]
+    rs = imported_model.default_get([])#imported_model._fields)
+    
+    
+    
+    
+    
+    a,b = export_some_key_value_cua_fields_MD(MD, attr_muon_xuats = ['partern_empty_val'], ghom_dac_tinh = {})
+    
+    
+    
+#     raise UserError(u'%s-%s'%(a,b))
     
     needdata = {}
-
+    needdata['self'] = self
     
     
     sheet_names=gen_sheet_names(self,MD, xl_workbook, gen_model_dict_kargs)
@@ -129,14 +162,7 @@ def importexcel_func(odoo_or_self_of_wizard, key=False, key_tram=False, check_fi
 
 
     
-    setting = MD.get('setting',{})
-#     setting.setdefault('allow_write_from_False_to_not_false',True)
-    setting['bypass_this_field_if_value_equal_False_default'] =  MD.get('bypass_this_field_if_value_equal_False_default',False)
-    setting2 = MD.get('setting2',{})
-    if setting2:
-        setting.update(setting2)
-    setting.setdefault('allow_write',True)
-    self.setting = convert_dict_to_order_dict_string(setting)
+
     
     
     
@@ -238,7 +264,7 @@ def create_instance (self,
         
     key_search_dict = {}
     update_dict = {}
-    model_name = get_key(MODEL_DICT, 'model')
+    model_name = MODEL_DICT.get( 'model')
 #     x2m_fields = []
     collection_dict = {}#'instance_false':False,''remove_all_or_just_add_one_x2m': True
     for field_name,field_attr  in MODEL_DICT['fields'].items():
@@ -272,8 +298,9 @@ def create_instance (self,
                 break_condition_func_for_main_instance(needdata)
         obj_val = False
         get_or_create = False
-        return False, obj_val,get_or_create
+        return False, obj_val, get_or_create
     if collection_dict.get('instance_false'):
+        
         return None,None,False
     
     last_record_function = get_key(MODEL_DICT, 'last_record_function')
@@ -365,7 +392,16 @@ def get_a_field_val(self,
                 val = func(val,**karg)
 #         print ('func read model_name:%s field_name:%s'%(model_name,field_name),'val',val)
     
-    val =replace_val_for_ci (field_attr,val,needdata)
+    val = replace_val_for_ci (field_attr,val,needdata)
+    field_attr['val_goc'] = val
+    if val == False:
+        default_val = field_attr.get('default_val')
+        if  default_val!=None:
+            val = default_val
+            
+        
+        
+    
     field_attr['val'] = val
     field_attr['obj'] = obj
     if check_file:     
@@ -378,13 +414,18 @@ def get_a_field_val(self,
 
    
     key_or_not = field_attr.get('key')
-    if callable(key_or_not):
-        key_or_not = key_or_not(needdata)
-    bypass_this_field_if_value_equal_False = get_key(field_attr, 'bypass_this_field_if_value_equal_False', setting['bypass_this_field_if_value_equal_False_default'])
-    if bypass_this_field_if_value_equal_False and val==False: 
+#     if callable(key_or_not):
+#         key_or_not = key_or_not(needdata)
+    
+    
+#     bypass_this_field_if_value_equal_False = get_key(field_attr, 'bypass_this_field_if_value_equal_False', setting['bypass_this_field_if_value_equal_False_default'])
+#     if bypass_this_field_if_value_equal_False and val==False: 
+#         a_field_code = 'continue'
+#         return a_field_code
+    if '2many' in field_attr.get('field_type','' ) and val == False:
         a_field_code = 'continue'
         return a_field_code
-    elif required and (val==False and isinstance(val, bool)):# val ==False <==> val ==0, val ==0 <==> val =False
+    if required and (val==False and isinstance(val, bool)):# val ==False <==> val ==0, val ==0 <==> val =False
         this_model_notice = noti_dict.setdefault(model_name,{})
         skip_because_required = this_model_notice.setdefault('skip_because_required',0)
         this_model_notice['skip_because_required'] = skip_because_required + 1
@@ -402,7 +443,7 @@ def get_a_field_val(self,
     if valid_field_func:
         valid_field_func(val,obj,needdata,self)
     print ("row: ", row,'model_name: ',model_name,'-field: ', field_name, '-val: ', val)
-    check_type_of_val(field_attr,val,field_name,model_name)
+    check_type_of_val(field_attr, val, field_name, model_name)
     
 #     if field_attr.get('is_x2m_field'):
 #         x2m_fields = collection_dict.setdefault('x2m_fields',[])
@@ -434,8 +475,12 @@ def read_val_for_ci(self,
 
     elif col_index !=None: # đọc file exc
         xl_val = read_excel_cho_field(sheet, row, col_index, merge_tuple_list)
+        xl_val = empty_string_to_False(xl_val)
         field_attr['excel_val'] = xl_val
         val = empty_string_to_False(xl_val)
+        if field_attr.get('partern_empty_val'):
+            val = empty_string_to_False(val, pt = field_attr.get('partern_empty_val'))
+        
         if val != False and field_attr.get('is_x2m_field'):
             val = val.split(',')
             val = list(map(lambda i: empty_string_to_False(i.strip()),val))
@@ -555,7 +600,7 @@ def get_or_create_instance_from_key_search_and_update_dict(self,
     
 
             
-def replace_val_for_ci(field_attr,val,needdata):
+def replace_val_for_ci(field_attr, val, needdata):
     
     #### deal replace string ####
     replace_string = get_key( field_attr,'replace_string')
@@ -569,6 +614,7 @@ def replace_val_for_ci(field_attr,val,needdata):
     
     #### deal empty val ###
     empty_val = get_key( field_attr,'empty_val')
+     
     if empty_val and val in empty_val:
         val = False   
     #### !!!deal empty val ###
@@ -588,10 +634,9 @@ def replace_val_for_ci(field_attr,val,needdata):
     #### !!!deal  replace val#####
                 
     ### deal defautl ###
-    if val == False and  field_attr.get('default') !=None:
-        val = field_attr.get('default')
     
-    ### !!!!deal defautl ###
+    
+    ### !!!!deal defautl ###SS
     return val
 
 
@@ -600,5 +645,43 @@ def check_notice_dict_co_create_or_get(model_name,noti_dict,check_file):
     if not adict.get('create') and not adict.get('update') and not check_file :
         raise UserError(u'các row bị bỏ qua hết không có dòng nào được tạo hoặc được update')
     
-
-
+MAP_TYPE = {
+                      'integer':[int,float],
+                      'float':float, 
+                      'many2one':int,
+                      'char':str,
+                      'selection':str,
+                      'text':str, 
+                      'boolean':bool,
+                      'many2many':list,
+                      'one2many':list,
+                      
+                      
+                      }
+def check_type_of_val(field_attr, val, field_name, model_name):        
+    if field_attr.get('bypass_check_type'):
+        return True
+    field_type = field_attr.get('field_type')
+    if field_type:
+        type_allow = field_attr.get('type_allow',[])
+        if val != False and val != None:
+            try:
+                type_tuong_ung_voi_char_field_type = MAP_TYPE[field_type]
+            except:
+                return True
+                raise UserError(u'không có field_type:%s này'%field_type)
+            if field_attr.get('is_x2m_field'):
+                type_tuong_ung_voi_char_field_type = list
+            if isinstance( type_tuong_ung_voi_char_field_type,list):
+                type_allow.extend(type_tuong_ung_voi_char_field_type)
+            else:
+                type_allow.append(type_tuong_ung_voi_char_field_type)
+            pass_type_check = False
+            for a_type_allow in type_allow:
+                if isinstance(val, a_type_allow):
+                    pass_type_check = True
+                    continue
+            if not pass_type_check:
+                raise UserError(u'model: %s- field:%s có giá trị: %s, đáng lẽ là field_type:%s nhưng lại có type %s'%(model_name, field_name,val,field_type,type(val)))
+            
+            

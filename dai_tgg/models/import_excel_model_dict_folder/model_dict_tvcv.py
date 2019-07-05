@@ -1,6 +1,4 @@
  # -*- coding: utf-8 -*-
-# from odoo.addons.importexcel.models.get_or_create_func import get_or_create_object_sosanh
-from odoo.addons.tutool.mytools import get_or_create_object_sosanh
 def convert_integer(val,needdata):
     try:
         return int(val)
@@ -26,7 +24,6 @@ def gen_tvcv_model_dict():
                         ( 'state',{'set_val':'confirmed'}),
                         ( 'cong_viec_cate_id',
                           {
-#                               'func':lambda val,needdata,self:get_or_create_object_sosanh(self, 'tvcvcate', {'name':needdata['sheet_name']}, {} ).id ,
                             'key':False,
                             'fields':[('name',{
                                  'key':True,

@@ -276,7 +276,7 @@
                             	</div>
                                 <field name="range_1" />
                                 <field name="range_2" />
-                                
+                                <field name="begin_row" />
                                  <field name="sheet_name_select" />
                                  <field name="sheet_name" />
                                 <field name="is_dl_right_now" />

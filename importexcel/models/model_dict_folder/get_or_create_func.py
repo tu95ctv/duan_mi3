@@ -91,22 +91,21 @@ def get_or_create_object_sosanh(self, class_name,
     if is_search:
         this_model_noti_dict['search'] = this_model_noti_dict.get('search',0) + 1
         search_func = model_dict.get('search_func')
+        
         if search_func:
             searched_object = search_func(self, model_dict, setting)
             if not searched_object and is_create:
+                
                 for f_name in search_dict:
                     field_attr = model_dict['fields'][f_name]
                     val =  search_dict[f_name]
                     f_name = get_key(field_attr, 'transfer_name') or f_name
                     search_dict_new[f_name] =  val
         else:
-            
             if search_dict :
                 pass
             else:
                 raise UserError(u'Không có Key search dict, model_name%s----MD%s'%(class_name, model_dict))
-        
-        
             if inactive_include_search:
                 domain_not_active = ['|',('active','=',True),('active','=',False)]
             else:
@@ -114,14 +113,14 @@ def get_or_create_object_sosanh(self, class_name,
                 
             domain = []
             break_condition = False
+           
+            
             for f_name in search_dict:
                 field_attr = model_dict['fields'][f_name]
                 val =  search_dict[f_name]
-                
-                
                 if val == None:
                     if check_file:
-                        searched_object,get_or_create =  None,False
+                        searched_object,get_or_create =  None, False
                         break_condition = True
                         break
                     else:
@@ -168,7 +167,11 @@ def get_or_create_object_sosanh(self, class_name,
             if len(searched_object) > 1:
                 raise UserError (u' exist_val: %s len(searched_object) > 1, searched_object: %s'%(exist_val,searched_object))
             for f_name,val in write_dict.items():
+                
                 field_attr = model_dict['fields'][f_name]
+                if field_attr.get('val_goc') ==False and not field_attr.get('write_false'):
+                    continue
+                    
                 f_name = get_key(field_attr, 'transfer_name') or f_name
 
                 st_write_this_field = field_attr.get('write_field')

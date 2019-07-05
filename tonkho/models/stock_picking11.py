@@ -252,6 +252,7 @@ class StockPicking(models.Model):
     allow_cate_for_ghi_chu =  fields.Boolean(string=u"Lấy Tiêu đề làm ghi chú")
     range_1 = fields.Integer(string=u'stt dòng tiêu đề đầu')
     range_2 = fields.Integer(string=u'stt dòng tiêu đề cuối')
+    begin_row = fields.Integer(default=0)
     log = fields.Text()
     # check file
     is_ghom_tot = fields.Boolean(string=u'Nếu tình trạng vật tư tốt hết thì ko cần ghi trong cột',default = True)

@@ -9,10 +9,15 @@ from odoo import _
    
 
 ATT_TYPE_LIST ={
+  'default_val':[],
   'begin_data_row_offset_with_title_row': ['int'],
   'break_condition_func_for_main_instance': ['NoneType', 'function'],
   'bypass_this_field_if_value_equal_False': ['bool'],
+  'is_x2m_field': ['bool'],
+  'remove_all_or_just_add_one_x2m': ['bool','str'],
   'bypass_this_field_if_value_equal_False_default': ['bool'],
+  'st_write_false':['bool'], 
+  'write_false':['bool'], 
   'col_index': ['int', 'NoneType'],
   'empty_val': ['list', 'NoneType'],
   'for_excel_readonly': ['bool'],
@@ -34,7 +39,6 @@ ATT_TYPE_LIST ={
   'print_write_dict_new': ['bool'],
   'raise_if_False': ['bool'],
   'raise_if_diff': ['bool'],
-  'ready_declare_default': ['bool'],
   'replace_string': ['list'],
   'replace_val': ['dict'],
   'required': ['bool'],
@@ -47,7 +51,7 @@ ATT_TYPE_LIST ={
   'setting': ['dict'],
   'setting2': ['dict'],
   'sheet_allow_this_field_not_has_exel_col': ['list'],
-  'sheet_names': ['function'],
+  'sheet_names': ['function','list'],
   'skip_field_if_not_found_column_in_some_sheet': ['bool', 'NoneType'],
   'skip_this_field': ['bool'],
   'string': ['str'],
@@ -95,12 +99,12 @@ def append_val_type_n_val_of_key (out_dict, type_out_dict,key, val):
     list_of_val = out_dict.setdefault(key,[])
     list_of_val.append(val)
     type_of_val = str(type(val))
-    rs = re.search("<class '(\w*)'>",type_of_val)
+    rs = re.search("<class '(.*)'>",type_of_val)
     if rs:
         type_of_val = rs.group(1)
     else:
         print ('type_of_val', type_of_val)
-        raise UserError(type_of_val)
+        raise UserError('search theo partern khong ra %s'%type_of_val)
     list_of_type_of_val = type_out_dict.setdefault(key,[])
     if type_of_val not in list_of_type_of_val:
         list_of_type_of_val.append(type_of_val)
@@ -161,11 +165,13 @@ def check_xem_att_co_nam_ngoai_khong(MD):
 STRING_TYPE_DICT = {str:'str' ,bool:'bool', list:'list',dict:'dict',int:'int', }       
 def check_set_val_is_true_type(attr, val):
     allow_type_list = ATT_TYPE_LIST.get(attr)
-    if not allow_type_list:
+    if  allow_type_list==None:
         raise UserError(u'attr:%s chưa có liệt kê  trong ATT_TYPE_LIST'%attr)
+    if allow_type_list ==[]:
+        return True
     if  callable(val):
         str_val_type = 'function'
-    elif val == None:
+    elif val == None :
         return True
     else:
         str_val_type =convert_name_class_to_string(val)
@@ -175,9 +181,13 @@ def check_set_val_is_true_type(attr, val):
     else:
         return True    
 #R3
-def add_model_n_type_n_required_to_fields(self, MD, field_stt = 0):# add x2m_fields
+def add_model_n_type_n_required_to_fields(self, MD, field_stt = 0, setting={}):# add x2m_fields
     model_name = get_key(MD, 'model')
-    fields= self.env[model_name]._fields
+    OBJ = self.env[model_name]
+    fields= OBJ._fields
+    default_dict = OBJ.default_get(fields)
+    
+    
     for f_name, field_MD in MD.get('fields').items():
         field_stt +=1
         f_name = get_key(field_MD, 'transfer_name') or  f_name
@@ -186,10 +196,13 @@ def add_model_n_type_n_required_to_fields(self, MD, field_stt = 0):# add x2m_fie
             if f_name not in fields and not field_MD.get('for_excel_readonly'):
                 raise UserError(u'f_name:"%s" không nằm trong fields, phải thêm thược tính for_excel_readonly-field_attr:%s'%(f_name, field_MD))
             
-            bypass_this_field_if_value_equal_False = field_MD.get('bypass_this_field_if_value_equal_False',False)
-            key = field_MD.get('key', False)
-            if key and bypass_this_field_if_value_equal_False:
-                raise UserError(u'key and bypass_this_field_if_value_equal_False')
+#             bypass_this_field_if_value_equal_False = field_MD.get('bypass_this_field_if_value_equal_False',False)
+#             key = field_MD.get('key', False)
+#             if key and bypass_this_field_if_value_equal_False:
+#                 raise UserError(u'key and bypass_this_field_if_value_equal_False')
+            st_write_false = setting['st_write_false']
+            write_false = field_MD['write_false'] if 'write_false' in field_MD else st_write_false
+            field_MD['write_false'] = write_false
             field_MD['field_stt'] = field_stt
             
             if not field_MD.get('for_excel_readonly') :# and not skip_this_field
@@ -206,11 +219,22 @@ def add_model_n_type_n_required_to_fields(self, MD, field_stt = 0):# add x2m_fie
                     required_force = field_MD.get('required_force',None)
                     required = required_force or required_from_model
                     field_MD['required']= required
+            default_val = field_MD.get('default_val')
+            
+            if f_name in default_dict and default_val ==None:
+                default_val = default_dict[f_name]
+                field_MD['default_val']=  default_val
+            if field_MD.get('empty_val'):
+                partern_empty_val =  '^('+  '|'.join(field_MD.get('empty_val')) +')$'
+                field_MD['partern_empty_val'] = partern_empty_val
             if field_MD.get('fields'):
-                    field_stt = add_model_n_type_n_required_to_fields(self,field_MD, field_stt =  field_stt)
-            if 'is_x2m_field' in MD:
+                    field_stt = add_model_n_type_n_required_to_fields(self,field_MD, field_stt =  field_stt, setting=setting)
+            
+            if 'is_x2m_field' in field_MD:
                 x2m_fields = MD.setdefault('x2m_fields',[])
-                x2m_fields.append()
+                x2m_fields.append(f_name)
+            
+            
     return field_stt
  # R4                
 def define_col_index(title_rows, sheet, COPY_MODEL_DICT):
@@ -309,24 +333,24 @@ def write_get_or_create_title(MD, sheet, sheet_of_copy_wb, title_row):
         
 
 
-# #R7        
-# def export_some_key_value_cua_fields_MD(MD, attr_muon_xuats = ['field_type'], ghom_dac_tinh = {}):
-#     fields = MD['fields']
-#     output_field_dicts = {}
-#     for field, field_MD in fields.items():
-#         new_field_MD = {}
-#         for exported_key in attr_muon_xuats:
-#             if exported_key in field_MD:
-#                 val = field_MD.get(exported_key)
-#                 new_field_MD[exported_key] = val
-#                 alist = ghom_dac_tinh.setdefault( exported_key, [])
-#                 if val not in alist:
-#                     alist.append(val)
-#         if 'fields' in field_MD:
-#             child_dict = export_some_key_value_cua_fields_MD(field_MD, attr_muon_xuats, ghom_dac_tinh)
-#             new_field_MD['fields'] = child_dict
-#         output_field_dicts[field] = new_field_MD 
-#     return output_field_dicts, ghom_dac_tinh
+#R7        
+def export_some_key_value_cua_fields_MD(MD, attr_muon_xuats = ['field_type'], ghom_dac_tinh = {}):
+    fields = MD['fields']
+    output_field_dicts = {}
+    for field, field_MD in fields.items():
+        new_field_MD = {}
+        for exported_key in attr_muon_xuats:
+            if exported_key in field_MD:
+                val = field_MD.get(exported_key)
+                new_field_MD[exported_key] = val
+                alist = ghom_dac_tinh.setdefault( exported_key, [])
+                if val not in alist:
+                    alist.append(val)
+        if 'fields' in field_MD and field_MD.get('fields') != None :
+            child_dict,ghom_dac_tinh  = export_some_key_value_cua_fields_MD(field_MD, attr_muon_xuats, ghom_dac_tinh)
+            new_field_MD['fields'] = child_dict
+        output_field_dicts[field] = new_field_MD 
+    return output_field_dicts, ghom_dac_tinh
 # 
 # 
 # 

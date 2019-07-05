@@ -161,7 +161,8 @@ def gen_user_department_model_dict():
                                                  ('login',{'xl_title':u'Cấp trên',  'key':True, 'required':True, 'is_x2m_field':True}),
                                                  ]
                 }),  
-                ('groups_id',{'key':False,'required':False ,
+                ('groups_id',{'key':False,
+                                    'required':False ,
                                     'bypass_this_field_if_value_equal_False':True,
                                     'remove_all_or_just_add_one_x2m': 'add_one',
                                     'fields':[
