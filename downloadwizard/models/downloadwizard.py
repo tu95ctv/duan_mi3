@@ -6,6 +6,10 @@ from urllib.parse import quote
 import base64
 import contextlib
 import io
+
+
+    
+    
 class DownloadWizard(models.TransientModel):
     _name = "downloadwizard.download"
     file_name = fields.Char(string=u'File name')
@@ -42,8 +46,8 @@ class DownloadWizard(models.TransientModel):
         active_domain = self._context.get('active_domain',[])
         self.domain_text = self._context
         if self._context.get('download_right_now') and self.is_cho_phep_dl_right_now:#self.is_dl_right_now:
-            download_from_model = self._context.get('download_from_model') or ''
-            url = '/web/binary/download_model/%s?downloadwizard_id=%s&active_domain=%s'%(download_from_model, self.id,quote(u'%s'%active_domain))
+#             download_from_model = self._context.get('download_from_model') or ''
+            url = '/web/binary/download_model?download_model=downloadwizard.download&download_model_id=%s&active_domain=%s'%( self.id,quote(u'%s'%active_domain))
             print ('url',url)
             return {
                  'type' : 'ir.actions.act_url',

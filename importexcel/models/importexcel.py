@@ -4,12 +4,31 @@ import re
 from odoo.addons.importexcel.models.model_dict_folder.tao_instance_new import importexcel_func
 from odoo.addons.tonkho.models.import_excel_model_dict_folder.model_dict import default_import_xl_setting
 from odoo.exceptions import UserError
+from odoo.tools.float_utils import float_compare, float_round
 # from odoo.addons.importexcel.models.model_dict_folder.recursive_func import export_all_no_pass_dict_para
 
+
+
+class CommonSetting(models.Model):
+    _name = 'importexcel.commonsetting'
+    _auto = False
+    st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
+    st_is_allow_write_existence  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_write_existence'])
+    st_allow_check_if_excel_is_same_existence  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_st_allow_check_if_excel_is_same_existence'])
+    st_is_allow_empty_xldata_pn_is_unique_same_name_product  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_empty_xldata_pn_is_unique_same_name_product'],
+                                                                              string='Cho phép sản phẩm có pn trống ờ file tương ứng với sản phẩm cùng tên và duy nhất')
+    st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'], 
+                                                                                 string='Cho phép sản phẩm ở file excel có pn tương ứng với sản phẩm có cùng tên nhưng pn trống'
+                                                                                 )
+    
+    
+    
 class Importexcel(models.Model):
     _name = 'importexcel.importexcel' 
+    _inherit = 'importexcel.commonsetting'
+    _auto = True
     setting= fields.Char()
-    type_choose = fields.Selection([
+    import_key = fields.Selection([
         (u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',u'stock.inventory.line.tong.hop'),
         (u'Product',u'Product'),
         (u'Thư viện công việc',u'Thư viện công việc'),
@@ -39,12 +58,11 @@ class Importexcel(models.Model):
                                   ],default='key_ltk')
     file = fields.Binary()
     filename = fields.Char()
-    name_inventory_suffix = fields.Char()
-    department_id = fields.Many2one('hr.department')
-    update_number=fields.Integer()
-    create_number=fields.Integer()
-    skipupdate_number=fields.Integer()
-    thong_bao_khac = fields.Char()
+#     department_id = fields.Many2one('hr.department')
+#     update_number=fields.Integer()
+#     create_number=fields.Integer()
+#     skipupdate_number=fields.Integer()
+#     thong_bao_khac = fields.Char()
     trigger_model = fields.Selection([(u'kiemke',u'kiemke'),
                                     (u'vattu',u'vattu'),
                                     (u'kknoc',u'kknoc'),
@@ -54,25 +72,19 @@ class Importexcel(models.Model):
     dong_test = fields.Integer(default=0)#0 la initify vô hạn
     log = fields.Text()
     begin_row = fields.Integer(default=0)
-    running_or_prepare = fields.Selection([('running',u'Đang chạy'),('prepare',u'Dự phòng')])
-    import_location_id = fields.Many2one('stock.location')
     imported_number_of_row = fields.Integer()
-    inventory_id = fields.Many2one('stock.inventory')
-    test_result_1 = fields.Text()
-    test_result_2 = fields.Text()
-    test_result_3 = fields.Text()
+#     inventory_id = fields.Many2one('stock.inventory')
+    
+#     test_result_1 = fields.Text()
+#     test_result_2 = fields.Text()
+#     test_result_3 = fields.Text()
     line_not_has_quant =  fields.Text()
 #     only_xuat_thuoc_tinh =  fields.Boolean()
 #     dac_tinh = fields.Char()
-    categ_id = fields.Many2one('product.category')
-    st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
-    st_is_allow_write_existence  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_write_existence'])
-    st_allow_check_if_excel_is_same_existence  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_st_allow_check_if_excel_is_same_existence'])
-    st_is_allow_empty_xldata_pn_is_unique_same_name_product  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_empty_xldata_pn_is_unique_same_name_product'])
-    st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'])
-    is_admin = fields.Boolean(compute='is_admin_')
-    cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')])
     
+    
+    cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')])
+    all_field_attr_dict = fields.Text()
     def gen_model_dict(self):
        
         return {}
@@ -82,36 +94,28 @@ class Importexcel(models.Model):
     def sheet_name_select_oc_(self):
         if self.sheet_name_select:
             self.sheet_name = self.sheet_name_select
-    @api.depends('type_choose')
-    def is_admin_(self):
-        for r in self:
-            r.is_admin = self.user_has_groups('base.group_erp_manager')
+    
     
     def importexcel(self):
         importexcel_func(self)
         return True
+    
+    def check_file(self):
+        return {
+             'type' : 'ir.actions.act_url',
+             'url': '/web/binary/download_model?download_model=importexcel.importexcel&download_model_id=%s&download_key=%s'%(self.id, 'importexcel.checkfile'),
+             'target': 'new',
+             }
+    
    
     def import_all(self):
-        importexcel_func(self,key=u'Department')
-        importexcel_func(self,key=u'Partner')
-        importexcel_func(self,key=u'location partner')
-        importexcel_func(self,key= u'Loại sự cố, sự vụ')
-        importexcel_func(self,key= u'thuebaoline')
-        importexcel_func(self,key= u'categ')
+        importexcel_func(self, import_key=u'Department')
+        importexcel_func(self, import_key=u'Partner')
+        importexcel_func(self, import_key=u'location partner')
+        importexcel_func(self, import_key=u'Loại sự cố, sự vụ')
+        importexcel_func(self, import_key=u'thuebaoline')
+        importexcel_func(self, import_key=u'categ')
         return True
-    
-    
-    
-        
-    
-    @api.onchange('type_choose')
-    def import_location_id_(self):
-#         adict = {'stock.inventory.line':'prepare','stock.inventory.line.tkt.vtdc':'running'}
-        if self.type_choose == u'stock.inventory.line':
-            self.import_location_id = self.env['stock.location'].search([('name','=',u'LTK Dự Phòng')]).id
-        elif self.type_choose == u'stock.inventory.line.tkt.vtdc':
-            self.import_location_id = self.env['stock.location'].search([('name','=',u'LTK Đang Chạy')]).id
-    
     
     def check_stt_inventory_line_old(self):
         rs = self.env['stock.inventory.line'].search([('inventory_id','=',self.inventory_id.id)], order='stt asc')
@@ -139,7 +143,12 @@ class Importexcel(models.Model):
         self.test_result_3= rs3
         
     def test_code(self):
-        pass
+        fl =  float_compare(1.667, 1.67, precision_rounding=2)
+        fl2 =  float_compare(1.7, 1.67, precision_rounding=2)
+        rs =  float_compare(1.767, 1.67, precision_rounding=0.01)
+        fl3= float_round(1.6667, precision_rounding=0.01)
+        fl4= float_round(1.67, precision_rounding=0.01)
+        raise UserError(u'%s-%s, %s-rs:%s'%(fl4,fl3, fl3==fl4,rs))
     def test_code1(self):
 #         sql_multi_2 = '''select date_trunc('day',create_date) from stock_quant'''
          
@@ -168,7 +177,12 @@ class ImportCVI(models.Model):
     _name='importexcel.importcvi'
     _inherit = 'importexcel.importexcel'
     user_id = fields.Many2one('res.users',default= lambda self:self.env.uid)
+    is_admin = fields.Boolean(compute='is_admin_')
     
+    @api.depends('import_key')
+    def is_admin_(self):
+        for r in self:
+            r.is_admin = self.user_has_groups('base.group_erp_manager')
     @api.model
     def default_get(self, fields):
         rs = super(ImportCVI, self).default_get(fields)

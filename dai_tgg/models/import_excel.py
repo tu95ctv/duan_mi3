@@ -5,7 +5,6 @@ from odoo.addons.dai_tgg.models.import_excel_model_dict_folder.model_dict_user_d
 
 class ImportExcel(models.Model):
     _inherit = 'importexcel.importexcel' 
-#     type_choose = fields.Selection(selection_add = [('test_abc','test abc')])
 
     def set_parameter_tonkho(self):
         self.env['res.config.settings'].create({'group_stock_production_lot':True, 'group_uom':True})

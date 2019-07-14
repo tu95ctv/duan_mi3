@@ -11,15 +11,9 @@
                <header>
                   <button name="importexcel" string="import" type="object" class="btn-primary" />
                   <button name="import_all" string="import all" type="object" class="btn-primary" />
+                  <button name="check_file" string="check_file" type="object" class="btn-primary" />
                   <button name="set_parameter_tonkho" string="set_parameter_tonkho" type="object" class="btn-primary" />
-                                    <button name="test_code" string="test_code" type="object" class="btn-primary" />
-                  
-                 <!-- 
-                  <button name="trigger" string="trigger" type="object" class="btn-primary" />
                   <button name="test_code" string="test_code" type="object" class="btn-primary" />
-                  <button name="check_stt_inventory_line" string="check_stt_inventory_line" type="object" class="btn-primary" />
-                  <button name="check_line_khong_co_quant_va_khong_co_qty" string="check_line_khong_co_quant_va_khong_co_qty" type="object" class="btn-primary" />
-               -->
                </header>
                <sheet>
                   <group>
@@ -27,53 +21,34 @@
                         <field name="file" filename="filename" />
                         <field name="sheet_name" required="0"></field>
                			<field name="sheet_name_select" />
-                        <field name="type_choose" />
+                        <field name="import_key" />
                         <field name="key_tram" />
                      	<field name="cach_tim_location_goc"></field>
                         <field name="dong_test"></field>
                         <field name="begin_row"></field>
-                        <field name="categ_id"></field>
-                        <field name="setting"></field>
-                       <!--  <field name="only_xuat_thuoc_tinh"></field> -->
+                     	<field name="trigger_model" />
                      </group>
                      <group string = "Default">
                          <field name="filename" />
-                        <!-- <field name="department_id" required="0"></field> -->
                      </group>
-                     <group string="Onchange Display">
-                        	<!-- <field name="import_location_id"></field> -->
+                   </group>
+                   <group>
+                  
+             
+                     <group string="Thông Báo">
+                     	<field name="setting"></field>
+                        <field name="all_field_attr_dict"></field>
+                        <field name="log" />
+                        <field name="imported_number_of_row"></field>
                      </group>
                      
-                     <group string="Chưa Xài">
-                     
-                        <field name="name_inventory_suffix"></field>
-                        	<!--<field name="allow_product_qty_dieu_chinh" />
-                     	     <field name="running_or_prepare"></field>-->
+                        <group string="Chưa Xài">
+                            <field name="st_allow_func_map_database_existence" groups="base.group_erp_manager" />
                         	<field name="st_allow_check_if_excel_is_same_existence" groups="base.group_erp_manager" />
                             <field name="st_is_allow_write_existence" groups="base.group_erp_manager" />
                             <field name="st_is_allow_empty_xldata_pn_is_unique_same_name_product" groups="base.group_erp_manager" />
                             <field name="st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr" groups="base.group_erp_manager" />
-                            <!-- <field name="not_update_field_if_instance_exist_default" groups="base.group_erp_manager" /> -->
-                            <field name="st_allow_func_map_database_existence" groups="base.group_erp_manager" />
-                            
-                            
                      </group>
-                     <group string="Test">
-                        <field name="create_number" />
-                        <field name="update_number" />
-                        <field name="skipupdate_number" />
-                        <field name="trigger_model" />
-                        <field name="thong_bao_khac" />
-                        <field name="test_result_1"></field>
-                        <field name="test_result_2"></field>
-                        <field name="test_result_3"></field>
-                     </group>
-                     <group string="Thông Báo">
-                        <field name="log" />
-                        <field name="imported_number_of_row"></field>
-                        <field name="inventory_id"></field>
-                     </group>
-                     
                   </group>
                </sheet>
             </form>
@@ -85,7 +60,7 @@
          <field name="arch" type="xml">
             <tree>
                <field name="id" />
-               <field name="type_choose" />
+               <field name="import_key" />
                <field name="key_tram" />
                <field name="filename" />
                <field name="sheet_name" />
@@ -116,7 +91,7 @@
                      <group string="Nhập">
                      	<field name="filename" invisible ="1" />
                         <field name="file" filename="filename" />
-                        <field name="type_choose" readonly="1"/>
+                        <field name="import_key" readonly="1"/>
                         <field name="user_id"  attrs="{'readonly':[('is_admin','=',False)]}" />
                         <field name ="is_admin" invisible="1"></field>
                      </group>
@@ -133,7 +108,7 @@
          <field name="arch" type="xml">
             <tree>
                <field name="id" />
-               <field name="type_choose" />
+               <field name="import_key" />
                <field name="user_id" />
                
                <field name="filename" />

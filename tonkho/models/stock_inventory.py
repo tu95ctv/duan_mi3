@@ -178,7 +178,7 @@ class Inventory(models.Model):
     def import_file(self):
             importexcel_func(self,
                            key=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',
-                           key_tram='key_ltk', gen_model_dict_kargs={'cach_tim_location_goc':'find_origin_location_by_column_named_tram'})
+                           import_key='key_ltk', gen_model_dict_kargs={'cach_tim_location_goc':'find_origin_location_by_column_named_tram'})
             if self.state not in ('done','cancel'):
                 vals = {'state': 'confirm', 'date': fields.Datetime.now()}
                 self.write(vals)

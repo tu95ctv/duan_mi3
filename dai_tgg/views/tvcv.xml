@@ -133,8 +133,8 @@
                <field name="active" />
                <field name="is_bc" />
                
-               <field name="create_date" string="Ngày giờ tạo"  groups="dai_tgg.show_thong_tin_create_write"/>
-               <field name="write_date" string="Ngày giờ sửa" groups="dai_tgg.show_thong_tin_create_write"/>
+               <field name="create_date" string="Ngày giờ tạo" />
+               <field name="write_date" string="Ngày giờ sửa" />
                <field name="create_uid" string="Người Tạo" groups="dai_tgg.show_thong_tin_create_write"/>
                <field name="write_uid" string="Người Sửa" groups="dai_tgg.show_thong_tin_create_write"/>
                 

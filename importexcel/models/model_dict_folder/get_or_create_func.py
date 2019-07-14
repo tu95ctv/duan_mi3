@@ -4,214 +4,213 @@ from odoo.osv import expression
 import datetime
 from odoo import  fields
 from odoo.exceptions import UserError
-def get_or_create_object_has_x2m (self, class_name, 
+from odoo.addons.downloadwizard.models.dl_models.dl_model  import wrap_center_vert_border_style
+from odoo.tools.float_utils import float_compare, float_round
+
+def get_or_create_object_has_x2m (self,
+                                class_name, 
                                 search_dict,
                                 write_dict ={},
-                                is_must_update=False, 
-                                noti_dict=None,
-                                inactive_include_search = False,
-#                                 x2m_field=False,
-                                model_dict = {},
+                                MD = {},
                                 exist_val=False,
                                 setting= {},
                                 check_file = False,
                                 is_search = True,
                                 is_create = True,
                                 is_write = True,
+                                sheet_of_copy_wb_para = None
                                  ):
-    x2m_fields = model_dict.get('x2m_fields')
+    x2m_fields = MD.get('x2m_fields')
     if x2m_fields:
         x2m_field = x2m_fields[0]
         x2m_values = search_dict[x2m_field]
+        len_x2m = len(x2m_values)
         result = []
-        get_or_create = False
-        for val in x2m_values:
-            search_dict[x2m_field] = val #
-            obj, get_or_create_iterator = get_or_create_object_sosanh(self, class_name, search_dict,
-                                    write_dict =write_dict, is_must_update=is_must_update, noti_dict=noti_dict,
-                                    inactive_include_search = inactive_include_search,
-                                    model_dict = model_dict,
-                                    exist_val=exist_val,
-                                    setting = setting,
-                                    check_file = check_file,
-                                    is_search = is_search,
-                                    is_create = is_create,
-                                    is_write = is_write,
-                                        
-                                    )
+    else:
+        len_x2m = 1
+    instance_build_noti_dict = {}  
+    for i in range(0,len_x2m):
+        if x2m_fields:
+            search_dict[x2m_field] = x2m_values[i] #
+        obj, searched_obj, is_tao_moi, new_noti_dict = get_or_create_object_has_search(self, 
+                                class_name, 
+                                search_dict,
+                                write_dict =write_dict,
+                                MD = MD,
+                                exist_val=exist_val,
+                                setting = setting,
+                                check_file = check_file,
+                                is_search = is_search,
+                                is_create = is_create,
+                                is_write = is_write,
+                                sheet_of_copy_wb_para = sheet_of_copy_wb_para
+                                )
+        for k,v in new_noti_dict.items():
+            instance_build_noti_dict[k] = instance_build_noti_dict.get(k,0) + v
+        if x2m_fields:
             result.append(obj.id)
-            get_or_create |=get_or_create_iterator
-        remove_all_or_just_add_one_x2m = model_dict.get('remove_all_or_just_add_one_x2m', 'add_one')
+            searched_obj |= searched_obj
+    if x2m_fields:
+        remove_all_or_just_add_one_x2m = MD.get('remove_all_or_just_add_one_x2m', 'add_one')
         if remove_all_or_just_add_one_x2m == 'remove_all':
             obj_id =  [(6,False,result)]
         else:
-            obj_id  = list(map(lambda x: (4,x,False), result)) # [(4,result[0],False)] 
+            obj_id  = list(map(lambda x: (4, x, False), result)) 
     else:
-        obj, get_or_create =  get_or_create_object_sosanh(self, class_name, search_dict,
-                                    write_dict =write_dict, is_must_update=is_must_update, noti_dict=noti_dict,
-                                    inactive_include_search = inactive_include_search,
-                                    model_dict = model_dict,
-                                    exist_val=exist_val,
-                                    setting = setting,
-                                    check_file = check_file,
-                                    is_search = is_search,
-                                    is_create = is_create,
-                                    is_write = is_write,
-                                    )
-
         if obj != None and  obj != False:
             obj_id = obj.id
         else:
             obj_id = obj
-    return obj, obj_id, get_or_create
+    return obj, obj_id, searched_obj, is_tao_moi, instance_build_noti_dict
 
-
-
-        
-
-def get_or_create_object_sosanh(self, class_name,
+def get_or_create_object_has_search(self, class_name,
                                 search_dict,
                                 write_dict ={},
-                                is_must_update=False, 
-                                noti_dict=None,
-                                inactive_include_search = False,
-                                model_dict = {},
-                                exist_val=False,
+                                MD = {},
+                                exist_val= None,
                                 setting = {},
                                 check_file=False,
                                 is_search = True,
                                 is_create = True,
                                 is_write = True,
+                                sheet_of_copy_wb_para = None
                                 ):
-    search_dict_new = {}
-    write_dict_new = {}
-    if noti_dict !=None:
-        this_model_noti_dict = noti_dict.setdefault(class_name,{})
-   
+    is_tao_moi = False
+    new_noti_dict = {} 
     if is_search:
-        this_model_noti_dict['search'] = this_model_noti_dict.get('search',0) + 1
-        search_func = model_dict.get('search_func')
-        
-        if search_func:
-            searched_object = search_func(self, model_dict, setting)
-            if not searched_object and is_create:
-                
-                for f_name in search_dict:
-                    field_attr = model_dict['fields'][f_name]
-                    val =  search_dict[f_name]
-                    f_name = get_key(field_attr, 'transfer_name') or f_name
-                    search_dict_new[f_name] =  val
-        else:
-            if search_dict :
-                pass
-            else:
-                raise UserError(u'Không có Key search dict, model_name%s----MD%s'%(class_name, model_dict))
-            if inactive_include_search:
-                domain_not_active = ['|',('active','=',True),('active','=',False)]
-            else:
-                domain_not_active = []
-                
-            domain = []
-            break_condition = False
-           
-            
-            for f_name in search_dict:
-                field_attr = model_dict['fields'][f_name]
-                val =  search_dict[f_name]
-                if val == None:
-                    if check_file:
-                        searched_object,get_or_create =  None, False
-                        break_condition = True
-                        break
-                    else:
-                        raise UserError(u'val không thể bằng None')
-                f_name = get_key(field_attr, 'transfer_name') or f_name
-                operator_search = field_attr.get('operator_search','=')
-                tuple_in = (f_name, operator_search, val)
-                domain.append(tuple_in)
-                if is_create:
-                    search_dict_new[f_name] =  val
-            
-            if not break_condition:
-                domain = expression.AND([domain_not_active, domain])
-                searched_object  = self.env[class_name].search(domain)
-            
-        return_obj = searched_object 
-        get_or_create = bool(searched_object)
-        if get_or_create:
-            this_model_noti_dict['search_yes'] = this_model_noti_dict.get('search_yes',0) + 1
-        else:
-            this_model_noti_dict['search_no'] = this_model_noti_dict.get('search_no',0) + 1
+        searched_obj = search_handle(self, MD, search_dict, check_file, class_name, setting)
+        new_noti_dict['search']=1
     else:
-        return_obj = None 
-        get_or_create = None
+        searched_obj = None
+    get_obj = (not exist_val and searched_obj)  or exist_val
+    if get_obj and len(get_obj) > 1:
+        try:
+            mapped_name = get_obj.mapped('name')
+        except:
+            mapped_name = get_obj
+        raise UserError (u'len_return_obj > 1 %s'%(mapped_name))
+    if not searched_obj and is_create:
+        return_obj = create_handle(self, search_dict, write_dict, MD, class_name)
+        new_noti_dict['create'] =1
+        is_tao_moi = True
+    elif get_obj and (( is_write and  setting['allow_write']) or check_file):
+        write_handle(self, get_obj, MD, write_dict, check_file, sheet_of_copy_wb_para, new_noti_dict )
+        return_obj = get_obj
+    else:
+        return_obj = get_obj
     
-    if is_create:
-        if not searched_object  :#create
-            only_get = get_key(model_dict,'only_get')
-            if only_get:
-                raise UserError(u'Model %s này chỉ được get chứ không được tạo'%class_name)
-            for f_name,val in write_dict.items():
-                field_attr = model_dict['fields'][f_name]
-                f_name = get_key(field_attr, 'transfer_name') or f_name
-                search_dict_new[f_name]=val
-            created_object = self.env[class_name].create(search_dict_new)
-            this_model_noti_dict['create'] = this_model_noti_dict.get('create', 0) + 1
-            return_obj =  created_object
-            return return_obj,get_or_create
-    allow_write_all_field = setting['allow_write']
-    if is_write  :  
-        if exist_val:
-            searched_object = exist_val
-        if searched_object :# write
-            if len(searched_object) > 1:
-                raise UserError (u' exist_val: %s len(searched_object) > 1, searched_object: %s'%(exist_val,searched_object))
-            for f_name,val in write_dict.items():
+    return return_obj, searched_obj, is_tao_moi, new_noti_dict# bool(searched_obj)
+
+
+
+def search_handle(self, model_dict, search_dict, check_file, class_name, setting):
+    search_func = model_dict.get('search_func')
+    if search_func:
+        searched_obj = search_func(self, model_dict, setting)
+    else:
+        if search_dict :
+            pass
+        else:
+            raise UserError(u'Không có search dict, model_name: %s-MD: %s'%(class_name, model_dict))
+        if model_dict.get('inactive_include_search'):
+            domain_not_active = ['|',('active','=',True),('active','=',False)]
+        else:
+            domain_not_active = []
+        domain = []
+        has_noneval_search_field = False
+        for f_name in search_dict:
+            field_attr = model_dict['fields'][f_name]
+            val =  search_dict[f_name]
+            if val == None:
+                if check_file:
+                    searched_obj =  None
+                    has_noneval_search_field = True
+                    break
+                else:
+                    raise UserError(u'nếu không phải check_file, val không thể bằng None')
+            f_name = get_key(field_attr, 'transfer_name') or f_name
+            operator_search = field_attr.get('operator_search','=')
+            tuple_in = (f_name, operator_search, val)
+            domain.append(tuple_in)
+        if not has_noneval_search_field:
+            domain = expression.AND([domain_not_active, domain])
+            searched_obj  = self.env[class_name].search(domain)
+    return searched_obj
                 
-                field_attr = model_dict['fields'][f_name]
-                if field_attr.get('val_goc') ==False and not field_attr.get('write_false'):
-                    continue
-                    
-                f_name = get_key(field_attr, 'transfer_name') or f_name
+def create_handle(self, search_dict, write_dict, model_dict, class_name):
+    search_dict_new ={}
+    only_get = get_key(model_dict,'only_get')
+    if only_get:
+        raise UserError(u'Model %s này chỉ được get chứ không được tạo'%class_name)
+    search_dict.update(write_dict)
+    for f_name,val in search_dict.items():
+        field_attr = model_dict['fields'][f_name]
+        f_name = get_key(field_attr, 'transfer_name') or f_name
+        search_dict_new[f_name]=val
+    created_object = self.env[class_name].create(search_dict_new)
+    return_obj = created_object
+    return return_obj
 
-                st_write_this_field = field_attr.get('write_field')
-                st_write_this_field = allow_write_all_field if st_write_this_field == None else st_write_this_field
-                raise_if_diff = field_attr.get('raise_if_diff')
-                if not (st_write_this_field or raise_if_diff) :
-                    print ('field_name',f_name,'continue')
-                    continue
-                if not is_must_update or raise_if_diff :
-                    orm_field_val = getattr(searched_object, f_name)
-                    diff = check_diff_write_val_with_exist_obj(orm_field_val,val)
-                    if diff:
-                        if raise_if_diff:
-                            raise UserError(u'raise_if_diff model:%s-f_name:%s - orm_field_val: %s -  val:%s '%(class_name,f_name,orm_field_val,val))
-                        if st_write_this_field:
-                            write_dict_new[f_name] = val
-                else:# is_must_update and not raise_if_diff
-                    write_dict_new[f_name] = val
-            if write_dict_new:
-                if model_dict.get('print_write_dict_new',False):
-                    print ('***write_dict_new***',write_dict_new)
-                searched_object.write(write_dict_new)
-                this_model_noti_dict['update'] = this_model_noti_dict.get('update',0) + 1
-            else:#'not update'
-                this_model_noti_dict['skipupdate'] = this_model_noti_dict.get('skipupdate',0) + 1
+def write_handle(self, return_obj, model_dict, write_dict, check_file, sheet_of_copy_wb_para, new_noti_dict ):
+    write_dict_new = {}
+    writed_object = return_obj
+    for key_f_name, val in write_dict.items():
+        field_MD= model_dict['fields'][key_f_name]
+        offset_write_xl_diff = field_MD.get('offset_write_xl_diff')
         
-    return return_obj, get_or_create# bool(searched_object)
+        
+        if check_file and   offset_write_xl_diff ==None:
+            continue
+        if not check_file and (field_MD.get('val_goc') ==False and not field_MD.get('write_false')):
+            continue
+        f_name = get_key(field_MD, 'transfer_name') or key_f_name
+        if check_file:
+            is_write_this_field = False
+        else:
+            is_write_this_field = field_MD.get('write_field', True)
+        if not check_file and not is_write_this_field :
+            continue
+        orm_field_val = getattr(writed_object, f_name)
+        diff = check_diff_write_val_with_exist_obj(orm_field_val, val, field_MD)
+        if diff:
+            if is_write_this_field:
+                write_dict_new[f_name] = val
+            if check_file:
+                diff_show = u'Khác, db:%s- xl:%s'%(orm_field_val, val)
+        else:
+            if check_file:
+                diff_show = u'Giống'
+        if check_file:
+            sheet_of_copy_wb = sheet_of_copy_wb_para['sheet_of_copy_wb']
+            sheet_of_copy_wb.write(sheet_of_copy_wb_para['row'], sheet_of_copy_wb_para['sheet'].ncols + offset_write_xl_diff, diff_show, wrap_center_vert_border_style)
+    
+    if not check_file:
+        if write_dict_new:
+            writed_object.write(write_dict_new)
+            new_noti_dict['update'] = 1
+        else:#'not update'
+            new_noti_dict['skipupdate'] = 1
+        
+        
 
-def check_diff_write_val_with_exist_obj(orm_field_val,field_dict_val):
+
+def check_diff_write_val_with_exist_obj(orm_field_val, field_dict_val, field_attr):
     is_write = False
-    try:
-        converted_orm_val_to_dict_val = getattr(orm_field_val, 'id', orm_field_val)
-        if converted_orm_val_to_dict_val == None: #recorderset.id ==None when recorder set = ()
-            converted_orm_val_to_dict_val = False
-    except:
-        converted_orm_val_to_dict_val = orm_field_val
     if isinstance(orm_field_val, datetime.date):
         converted_orm_val_to_dict_val = fields.Date.from_string(orm_field_val)
-    if converted_orm_val_to_dict_val != field_dict_val:
-        is_write = True
+    elif isinstance(orm_field_val, datetime.datetime):
+        converted_orm_val_to_dict_val = fields.Datetime.from_string(orm_field_val)
+    else:
+        try:
+            converted_orm_val_to_dict_val = getattr(orm_field_val, 'id', orm_field_val)
+            if converted_orm_val_to_dict_val == None: #recorderset.id ==None when recorder set = ()
+                converted_orm_val_to_dict_val = False
+        except:
+            converted_orm_val_to_dict_val = orm_field_val
+    if field_attr.get('field_type')=='float':
+        is_write = float_compare(orm_field_val, field_dict_val, precision_rounding=0.01)# 1 la khac, 0 la giong
+    else:
+        is_write =  converted_orm_val_to_dict_val != field_dict_val
     return is_write
     
                 

@@ -15,25 +15,29 @@ def do_if_function_key_wrapper(function_key):
     return do_if_function_key
 
 
-def download_all_model_by_url(kw):
+def download_all_model_by_url(download_model=None,download_model_id = None, active_domain=None, download_key= None):
 #     active_domain = kw['active_domain']
-    downloadwizard_id = kw.get('downloadwizard_id')
-    active_domain = kw.get('active_domain')
-    download_key = kw.get('download_key')
+#     downloadwizard_id = kw.get('downloadwizard_id')
+#     active_domain = kw.get('active_domain')
+#     download_key = kw.get('download_key')
     
     if active_domain:
         active_domain = active_domain.replace("'",'"')
         active_domain = json.loads(active_domain)
-    if downloadwizard_id:
-        dj_obj = request.env['downloadwizard.download'].browse(int(downloadwizard_id))
-        download_key =  dj_obj.function_key
-    else:
-        download_model = kw.get('download_model')
-        download_model_id = kw.get('download_model_id')
-        dj_obj = request.env[download_model].browse(int(download_model_id))
+#     if downloadwizard_id:
+#         dj_obj = request.env['downloadwizard.download'].browse(int(downloadwizard_id))
+#         download_key =  dj_obj.function_key
+#     else:
     
+#     download_model = kw.get('download_model')
+#     download_model_id = kw.get('download_model_id')
+    dj_obj = request.env[download_model].browse(int(download_model_id))
+    download_key = download_key or dj_obj.function_key
     pick_func = request.env['downloadwizard.download'].gen_pick_func()
-    call_func = pick_func[download_key]
+    try:
+        call_func = pick_func[download_key]
+    except KeyError:
+        raise UserError(u'download_key khong co:%s'%download_key)
     if active_domain:
         workbook,name = call_func(dj_obj,active_domain)
     else:

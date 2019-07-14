@@ -43,8 +43,12 @@ def _select_nextval(cr, seq_name):
 class ToTrinh(models.Model):
     _name = 'tonkho.title_cac_ben'
     name = fields.Char(u'Title',required=True)
+    
+
 class StockPicking(models.Model):
-    _inherit = "stock.picking"
+    _inherit = ['importexcel.commonsetting','stock.picking']
+    _name = 'stock.picking'
+    _auto = True
 #     cancel_mode = fields.Boolean(compute='action_cancel_show_')
     _sql_constraints = [
         ('name_uniq', 'unique(name, company_id)', 'Reference must be unique per company!'),
@@ -241,11 +245,11 @@ class StockPicking(models.Model):
     filename = fields.Char()
     
 
-    st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
-    st_is_allow_write_existence  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_write_existence'])
-    st_allow_check_if_excel_is_same_existence  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_st_allow_check_if_excel_is_same_existence'])
-    st_is_allow_empty_xldata_pn_is_unique_same_name_product  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_empty_xldata_pn_is_unique_same_name_product'])
-    st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'])
+#     st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
+#     st_is_allow_write_existence  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_write_existence'])
+#     st_allow_check_if_excel_is_same_existence  = fields.Boolean(string=u'Cho phép đối chiếu product excel obj với product exist object',default = default_import_xl_setting['default_st_allow_check_if_excel_is_same_existence'])
+#     st_is_allow_empty_xldata_pn_is_unique_same_name_product  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_empty_xldata_pn_is_unique_same_name_product'])
+#     st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'])
     
     
     skip_stt = fields.Boolean(u'Skip (bỏ qua) trường STT khi import')
@@ -485,7 +489,7 @@ class StockPicking(models.Model):
             return {
              'type' : 'ir.actions.act_url',
 #              'url': '/web/binary/download_xl_bbbg?model=stock.picking&id=%s'%(self.id),
-             'url': '/web/binary/download_model/tonkho?download_model=stock.picking&download_model_id=%s&download_key=%s'%(self.id,'write_xl_bb'),
+             'url': '/web/binary/download_model?download_model=stock.picking&download_model_id=%s&download_key=%s'%(self.id,'write_xl_bb'),
              'target': 'new',
              }
         dl_obj = self
@@ -499,7 +503,7 @@ class StockPicking(models.Model):
     @api.multi
     def import_file(self):
         importexcel_func(self,
-                       key=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',
+                       import_key=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',
                        key_tram='sml')
 
 
@@ -509,7 +513,7 @@ class StockPicking(models.Model):
             return {
              'type' : 'ir.actions.act_url',
 #              'url': '/web/binary/download_checked_import_sml_file?model=stock.picking&id=%s'%(self.id),
-             'url': '/web/binary/download_model/tonkho?download_model=stock.picking&download_model_id=%s&download_key=%s'%(self.id,'check_imported_file_sml'),
+             'url': '/web/binary/download_model?download_model=stock.picking&download_model_id=%s&download_key=%s'%(self.id,'check_imported_file_sml'),
              'target': 'new',
              }
         dl_obj = self
