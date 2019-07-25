@@ -34,7 +34,10 @@ ATT_TYPE_LIST ={
   'last_record_function': ['NoneType', 'function'],
   'model': ['str'],
   'offset_write_xl': ['int'],
+  'offset_write_xl_2': ['int'],
   'offset_write_xl_diff': ['int'],
+  'check_file_write_more': ['list'],
+
   'only_get': ['bool'],
   'operator_search': ['str'],
 #   'prepare_func': ['function'],
@@ -378,6 +381,7 @@ def check_compatible_col_index_and_xl_title_for_a_field(field_attr, xl_title, co
 def write_get_or_create_title(MD, sheet, sheet_of_copy_wb, title_row, fname=None):
     offset_write_xl = get_key(MD, 'offset_write_xl')
     offset_write_xl_diff = get_key(MD, 'offset_write_xl_diff')
+    check_file_write_more = get_key(MD, 'check_file_write_more')
     fname = fname or MD.get('model')
     if offset_write_xl !=None:
         col =  sheet.ncols + offset_write_xl 
@@ -389,7 +393,15 @@ def write_get_or_create_title(MD, sheet, sheet_of_copy_wb, title_row, fname=None
         title = MD.get('string', fname)  + u' Diff'
         sheet_of_copy_wb.col(col).width =  get_width(len(title))
         sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
-
+    
+    if check_file_write_more:
+        for more_offset,func, more_title in check_file_write_more:
+            col =  sheet.ncols + more_offset 
+            title = more_title
+            sheet_of_copy_wb.col(col).width =  get_width(len(title))
+            sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
+            
+        
     if MD.get('fields'):
         for fname, field_MD in MD.get('fields').items():
             write_get_or_create_title(field_MD, sheet, sheet_of_copy_wb, title_row, fname)

@@ -155,7 +155,7 @@ def gen_user_department_model_dict():
                 ('login',{'func':None,'xl_title':u'Địa chỉ email','key':True ,'required':True}),
                 ('password',{'func':None,'required':True,'set_val':'123456'}),
 #                 ('lang',{'set_val':'vi_VN'}),
-                ('phone',{'func':None,'xl_title':u'Số điện thoại','key':False}),
+                ('phone',{'func':None,'xl_title':u'Số điện thoại','key':False, 'offset_write_xl_diff':1}),
                 ('cac_sep_ids',{'key':False,'required':False,'only_get':True,
                                         'fields':[
                                                  ('login',{'xl_title':u'Cấp trên',  'key':True, 'required':True, 'st_is_x2m_field':True}),

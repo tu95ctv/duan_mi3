@@ -137,6 +137,7 @@
                 <field name="name" position="after">
                    <field name="id" /> 
                     <field name="pn"></field>
+                    <field name="pn_replace"></field>
                     <field name="categ_id" />
                     <field name="thiet_bi_id" />
                     <field name="brand_id" />

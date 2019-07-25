@@ -23,6 +23,11 @@ class CommonSetting(models.Model):
     
     
     
+    dong_test = fields.Integer(default=0)#0 la initify vô hạn
+    begin_row = fields.Integer(default=0)
+    file = fields.Binary()
+    filename = fields.Char()
+    
 class Importexcel(models.Model):
     _name = 'importexcel.importexcel' 
     _inherit = 'importexcel.commonsetting'
@@ -56,8 +61,7 @@ class Importexcel(models.Model):
                                   ('key_ltk_dc','key_ltk_dc'),
                                   ('key_ltk_dc2','key_ltk_dc2'),
                                   ],default='key_ltk')
-    file = fields.Binary()
-    filename = fields.Char()
+
 #     department_id = fields.Many2one('hr.department')
 #     update_number=fields.Integer()
 #     create_number=fields.Integer()
@@ -69,19 +73,12 @@ class Importexcel(models.Model):
                                     (u'cvi',u'cvi'),
                                     (u'stock.production.lot',u'stock.production.lot')
                                     ])
-    dong_test = fields.Integer(default=0)#0 la initify vô hạn
     log = fields.Text()
-    begin_row = fields.Integer(default=0)
+
     imported_number_of_row = fields.Integer()
-#     inventory_id = fields.Many2one('stock.inventory')
-    
-#     test_result_1 = fields.Text()
-#     test_result_2 = fields.Text()
-#     test_result_3 = fields.Text()
-    line_not_has_quant =  fields.Text()
-#     only_xuat_thuoc_tinh =  fields.Boolean()
-#     dac_tinh = fields.Char()
-    
+
+#     line_not_has_quant =  fields.Text()
+
     
     cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')])
     all_field_attr_dict = fields.Text()
@@ -143,12 +140,18 @@ class Importexcel(models.Model):
         self.test_result_3= rs3
         
     def test_code(self):
-        fl =  float_compare(1.667, 1.67, precision_rounding=2)
-        fl2 =  float_compare(1.7, 1.67, precision_rounding=2)
-        rs =  float_compare(1.767, 1.67, precision_rounding=0.01)
-        fl3= float_round(1.6667, precision_rounding=0.01)
-        fl4= float_round(1.67, precision_rounding=0.01)
-        raise UserError(u'%s-%s, %s-rs:%s'%(fl4,fl3, fl3==fl4,rs))
+#         t = self.env['tvcv'].create({'name':'aa','diem':None,'code':None})
+#         print (t.name, t.diem, t.code)
+            t = self.env['tvcv']
+            print ('t.department_id, t.diem, t.name,t.id',t.department_id, t.diem, t.name, t.id)
+#         fl =  float_compare(1.667, 1.67, precision_rounding=2)
+#         fl2 =  float_compare(1.7, 1.67, precision_rounding=2)
+#         rs =  float_compare(1.767, 1.67, precision_rounding=0.01)
+#         fl3= float_round(1.6667, precision_rounding=0.01)
+#         fl4= float_round(1.67, precision_rounding=0.01)
+#         raise UserError(u'%s-%s, %s-rs:%s'%(fl4,fl3, fl3==fl4,rs))
+
+
     def test_code1(self):
 #         sql_multi_2 = '''select date_trunc('day',create_date) from stock_quant'''
          

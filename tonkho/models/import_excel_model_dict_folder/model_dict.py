@@ -14,7 +14,8 @@ def gen_model_dict_for_stock_move_line(self=None, key_tram=None, gen_model_dict_
         mode = u'2'
     write_field_categ_id = self.env['ir.config_parameter'].sudo().get_param('tonkho.' + 'write_field_categ_id')
     not_use_default_excel_import_setting = self.env['ir.config_parameter'].sudo().get_param('tonkho.' + 'not_use_default_excel_import_setting')
-    use_default = not not_use_default_excel_import_setting
+#     use_default = not not_use_default_excel_import_setting
+    use_default = False
     admin_to_user = False
     user_to_admin = self.user_has_groups('tonkho.group_write_field_when_import_excel')
     is_admin = self.user_has_groups('base.group_erp_manager')
@@ -133,6 +134,11 @@ S/N'''],
     ('product_id',{'string':u'Tên Vật tư',
                        'search_func':search_func_for_product_id_,
                        'offset_write_xl':{all_key_tram:2}, 
+#                        'offset_write_xl_2':{sml:4}, 
+                       'check_file_write_more':{sml:[(4, check_file_write_more_check_searched_obj_product_, u'Searched OBJ'),\
+                                                     (5, check_file_write_more_check_name_product_, u'Name of Product'),
+                                                     (6,check_file_write_more_check_PN_product_, 'PN of Product'),
+                                                     (7, check_file_write_more_check_name_and_PN_product_, 'Name and PN of Product')]},
                        'key':'Both',
                        'required':{all_key_tram:True},
                        'required_when_check_file':False,
@@ -142,9 +148,9 @@ S/N'''],
                        'func_map_database_existence':func_map_database_existence_for_product_,
                        'func_check_if_excel_is_same_existence':{all_key_tram: func_check_if_excel_is_same_existence_for_product_id_},#,sml:None
                        'fields':[('pn',{'type_allow':[int,float],
-                                            'func':lambda val,needdata: str(int(val)) if isinstance(val,float) else val,
+                                            'func':def_pn_,
                                             'empty_val':[u'NA',u'-',u'--'],
-                                            'xl_title':[u'Part-Number',u'Part Number',u'Partnumber',u'Mã card (P/N)'],
+                                            'xl_title':[u'Part-Number',u'Part Number',u'Partnumber',u'Mã card (P/N)', u'mã vật tư'],
                                             'write_false':False,
                                             'allow_not_match_xl_title':{sml:True,all_key_tram:None},
                                             'write_field':True}),
@@ -213,13 +219,16 @@ S/N'''],
                                                                          'func': lambda v,n:n['vof_dict']['product_id']['fields']['brand_id']['val']}),                                                               
                                                           ]}
                                 ), 
-                                ('uom_id',{'write_field':None if is_admin_cal else False,
+                                ('uom_id',{'write_field':None if is_admin_cal else False, # required = True
                                                 'write_false':False,
+#                                                 'default_val':1,
+                                                'offset_write_xl_diff':12, 
                                                 'fields': [('name',{'set_val':{all_key_tram:None, key_ltk_dc:u'Cái',  key_ltk_dc2:u'Cái',  key_tti_dc:u'Cái' },
                                                                         'func':{all_key_tram:name_of_uom_id_,},
                                                                         'operator_search':'=ilike',
-                                                                        'xl_title':{all_key_tram:[u'Đơn vị tính',u'ĐVT',u'Đơn vị'],key_ltk_dc2:None },
-                                                                        'key':True,'required':True,
+                                                                        'xl_title':{all_key_tram:[u'Đơn vị tính',u'ĐVT',u'Đơn vị'], key_ltk_dc2:None },
+                                                                        'key':True,
+                                                                        'required':True,
                                                                         'replace_string':{'key_ltk':[('Modunle','module'),('CARD','Card'),('module','Module')],
                                                                                                 'key_tti':[('CARD','Card'),('module','Module'),(u'bộ',u'Bộ')]},
                                                                         'sheet_allow_this_field_not_has_exel_col':{'key_ltk':[u'XFP, SFP các loại']}}
@@ -413,7 +422,9 @@ S/N'''],
                                  'func':None,
                                  'only_get':True,
                                  'valid_field_func':{sml:check_location_id_is_same_in_bb_dc_},
-                                 'fields':[('name',{'xl_title':u'Trạm điều chuyển','key':True,'required':True,
+                                 'fields':[('name',{'xl_title':u'Trạm điều chuyển',
+                                                        'key':True,
+                                                        'required':True,
                                                         'allow_not_match_xl_title':True}),
                                            ], 
                                  'skip_this_field':{sml:False, all_key_tram:True},
@@ -562,7 +573,8 @@ S/N'''],
                                                                 needdata['vof_dict']['location_id1_dc']['val'] or \
                                                                 needdata['vof_dict']['location_id_goc_dc']['val'] or \
                                                                 self.location_dest_id.id }),
-    ('picking_id',{'skip_this_field':{sml:True if check_file else False,
+    ('picking_id',{'skip_this_field':{sml: False,
+#                                             sml:True if check_file else False,
                                             all_key_tram:True},
                         'key':True,'required':True,
                         'func':lambda v,n:n['self'].id,
@@ -753,8 +765,14 @@ def convert_integer(val,needdata):
         return 0
 def qty_(val,n):
     if val:
-        val = float(int(val))
-        val=  1.0 if  (n['vof_dict']['prod_lot_id_excel_readonly']['val'] and val > 1) else val
+        try:
+            val = float(int(val))
+            val=  1.0 if  (n['vof_dict']['prod_lot_id_excel_readonly']['val'] and val > 1) else val
+        except ValueError as e:
+            if n['check_file']:
+                return 0
+            else:
+                raise ValueError(e)
     return val
 
 def qty_137_(val,n):
@@ -795,13 +813,16 @@ def ghi_chu_cho_sml_(v,n,self):
 #     else:
 #         return False
     
-    
+def def_pn_(val,n,self):
+    print ('****************val of pn', val)
+    dk = ( isinstance(val,float) or isinstance(val,int))
+    if val and dk:
+        val = str(int(val)) 
+    return val
 def pn_replace_(v,n,self):
     v = n['vof_dict']['product_id']['fields']['pn']['val'] 
     if isinstance(v,str):
         v = pn_replace(v)
-#         v = re.sub('[-_ \s]','',v)
-    
     return v
 def product_id_(v,n,self):
     if v==False:
@@ -814,26 +835,52 @@ def tracking_write_func_(**kargs):
     val =  kargs['val']
     if val =='none':
         return 'continue'
+# def prod_lot_id_excel_readonly_for_search_(v,n,self):
+#     prod_lot_id_excel_readonly_name = n['vof_dict']['prod_lot_id_excel_readonly']['val']
+#     if prod_lot_id_excel_readonly_name:
+#         prod_lot_id_excel_readonly_for_search = self.env['stock.production.lot'].search([('name','=',prod_lot_id_excel_readonly_name)])
+#         return prod_lot_id_excel_readonly_for_search
+#     else:
+#         return False
+# 
+# def func_map_database_existence_for_product_(n,self): 
+#     prod_lot_id_excel_readonly_for_search = n['vof_dict']['prod_lot_id_excel_readonly_for_search']['val']
+#     if prod_lot_id_excel_readonly_for_search:
+#         return prod_lot_id_excel_readonly_for_search.product_id
+#     else:
+#         return False
+# def func_map_database_existence_for_lot_id_(n,self): 
+#     prod_lot_id_excel_readonly_for_search = n['vof_dict']['prod_lot_id_excel_readonly_for_search']['val']
+#     if prod_lot_id_excel_readonly_for_search:
+#         return prod_lot_id_excel_readonly_for_search
+#     else:
+#         return False
+
+
 def prod_lot_id_excel_readonly_for_search_(v,n,self):
     prod_lot_id_excel_readonly_name = n['vof_dict']['prod_lot_id_excel_readonly']['val']
+    lot_obj = self.env['stock.production.lot']
     if prod_lot_id_excel_readonly_name:
-        prod_lot_id_excel_readonly_for_search = self.env['stock.production.lot'].search([('name','=',prod_lot_id_excel_readonly_name)])
-        return prod_lot_id_excel_readonly_for_search
+        prod_lot_id_excel_readonly_for_search = lot_obj.search([('name', '=', prod_lot_id_excel_readonly_name)])
     else:
-        return False
+        prod_lot_id_excel_readonly_for_search = lot_obj
+    return prod_lot_id_excel_readonly_for_search
+ 
 
 def func_map_database_existence_for_product_(n,self): 
     prod_lot_id_excel_readonly_for_search = n['vof_dict']['prod_lot_id_excel_readonly_for_search']['val']
     if prod_lot_id_excel_readonly_for_search:
-        return prod_lot_id_excel_readonly_for_search.product_id
+        exist_product =  prod_lot_id_excel_readonly_for_search.product_id
     else:
-        return False
+        exist_product =  None
+    return exist_product
+
 def func_map_database_existence_for_lot_id_(n,self): 
     prod_lot_id_excel_readonly_for_search = n['vof_dict']['prod_lot_id_excel_readonly_for_search']['val']
-    if prod_lot_id_excel_readonly_for_search:
-        return prod_lot_id_excel_readonly_for_search
-    else:
-        return False
+    return prod_lot_id_excel_readonly_for_search
+  
+    
+    
     
     
 def func_check_if_excel_is_same_existence_for_product_id_(get_or_create, searched_obj, exist_val):#bool(searched_obj), searched_obj, obj
@@ -845,7 +892,10 @@ def func_check_if_excel_is_same_existence_for_product_id_(get_or_create, searche
     
 def product_uom_id_(v,n,self):
     pr_id = n['vof_dict']['product_id']['val']
-    uom_id = self.env['product.product'].browse(pr_id ).uom_id.id
+    if pr_id != None:
+        uom_id = self.env['product.product'].browse(pr_id ).uom_id.id
+    else:
+        uom_id =None
     return uom_id
         
 def product_id_name_(v,n,self):
@@ -859,11 +909,14 @@ def product_id_137_(v,n,self):
 
 
 def search_func_for_product_id_(self, model_dict, setting):
+    PR = self.env['product.product']
     st_is_allow_empty_xldata_pn_is_unique_same_name_product = setting['st_is_allow_empty_xldata_pn_is_unique_same_name_product']
     st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr = setting['st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr']
     product_name =  model_dict['fields']['name']['val']
     pn_replace = model_dict['fields']['pn_replace']['val']
+    print ('hahaaaaaaaaaaaa search func**** product_name:%s - pn_replace :%s- pn:%s'%(product_name, pn_replace, model_dict['fields']['pn']['val']))
     if not pn_replace:
+#         raise UserError('not pn_replace')
         pr = self.env['product.product'].search([('name', '=', product_name),('pn', '=', False)])
         if pr:
             return pr
@@ -871,16 +924,17 @@ def search_func_for_product_id_(self, model_dict, setting):
             pr = self.env['product.product'].search([( 'name', '=', product_name)])
             if len(pr)==1 :
                 return pr
-        return False
+        return PR
     else:
         pr = self.env['product.product'].search([('pn_replace','=',pn_replace)])
+        print ('**** pr :%s'%pr)
         if pr:
             return pr
         if st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr:
             pr = self.env['product.product'].search([('name','=',product_name), ('pn','=',False)])
             if pr:
                 return pr
-        return False
+        return PR
     
         
         
@@ -939,6 +993,68 @@ def if_self_sheet_name(sheet_name,wb):
         return wb.sheet_names()
     return [sheet_name]
 
+def check_file_write_more_check_searched_obj_product_(self,field_MD,searched_obj,*arg,**kargs):
+    collection_dict = arg[0]
+#     break_field = needdata['collection_dict']['break_field']
+    rs = searched_obj
+    
+    print ('***rs', rs)
+    show_val = common_show_write_searched_obj(rs, u'No searched_obj', collection_dict)
+    return show_val
+def common_show_write_searched_obj(rs, no_obj_show, collection_dict):
+    if rs:
+        show_val = str(rs.mapped('id'))
+    elif rs == False:
+        show_val = u'Empty cell'
+    elif rs == None:
+        break_field = collection_dict['break_field']
+#         show_val = u'không thấy obj do có searched field == None'
+        show_val = u'break do cell trống:%s'%break_field
+    else:
+        show_val = no_obj_show
+    return show_val
+
+
+def common_show_write(rs, no_obj_show ):
+    if rs:
+        show_val = str(rs.mapped('id'))
+    elif rs == False:
+        show_val = u'Empty cell'
+    elif rs == None:
+#         show_val = u'không thấy obj do có searched field == None'
+        show_val = u'break do cell trống'
+    else:
+        show_val = no_obj_show
+    return show_val
+    
+def check_file_write_more_check_name_product_(self, field_MD,*arg, **kargs):
+    name = field_MD['fields']['name']['val']
+    if name:
+        rs = self.env['product.product'].search([('name', '=ilike', name)])
+    else:
+        rs = False
+    show_val = common_show_write(rs, u'No pr has name' )
+    return show_val
+
+def check_file_write_more_check_PN_product_(self, field_MD,*args, **kargs):
+    pn_replace = field_MD['fields']['pn_replace']['val']
+    if pn_replace:
+        rs = self.env['product.product'].search([('pn_replace', '=ilike', pn_replace)])
+    else:
+        rs = False
+    show_val = common_show_write(rs, u'No pr has pn' )
+    return show_val
+
+def check_file_write_more_check_name_and_PN_product_(self, field_MD,*arg, **kargs):
+    name = field_MD['fields']['name']['val']
+    pn_replace = field_MD['fields']['pn_replace']['val']
+    rs = self.env['product.product'].search([('name', '=ilike', name), ('pn_replace', '=ilike', pn_replace)])
+    show_val = common_show_write(rs, u'No pr has name and pn')
+    return show_val
+
+
+
+    
 default_import_xl_setting = {
             'default_st_allow_func_map_database_existence':True,
              'default_st_is_allow_write_existence':True,

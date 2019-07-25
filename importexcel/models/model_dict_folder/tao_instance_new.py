@@ -40,9 +40,6 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
 #         export_all_key_list_vals_key_list_type_of_val(MD_test, output_key_list_vals_dict=out_dict, output_key_list_type_of_vals_dict=type_out_dict)
 #     raise UserError(u'%s%s%s'%(str(out_dict), '***'*8, convert_dict_to_order_dict_string(type_out_dict)))
 
-
-
-
     if not self.file:
         raise UserError(u'Bạn phải upload file để import')
     file_content = base64.decodestring(self.file)
@@ -77,6 +74,8 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
     needdata['self'] = self
     needdata['sheet_names'] = sheet_names
     needdata['key_tram'] = key_tram
+    needdata['check_file'] = check_file
+
     sh_names = xl_workbook.sheet_names()
     if check_file:
         workbook_copy = copy(xl_workbook)
@@ -128,6 +127,7 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
     if number_row_count:
         self.imported_number_of_row = number_row_count + 1
     self.log= noti_dict
+    
     return workbook_copy
 ################# CREATE INSTANCE
 def create_instance (self,
@@ -142,14 +142,16 @@ def create_instance (self,
                     setting={},
                     sheet_of_copy_wb_para = None,
                     ):
-        
+    
     search_dict = {}
     update_dict = {}
     model_name = MD.get( 'model')
+    empty_object = self.env[model_name] 
     collection_dict = {}
-    is_create, is_write, is_search, exist_val, is_go_loop_fields = before_ci(self, MD, setting, check_file, needdata)
-    
-    
+    needdata['collection_dict'] = collection_dict
+    is_create, is_write, is_search, exist_val, is_go_loop_fields = \
+    before_ci(self, MD, setting, check_file, needdata)
+#     collection_dict['break_field'] = None
     if is_go_loop_fields:
         for field_name,field_attr  in MD['fields'].items():
             a_field_code = get_a_field_val(self,
@@ -167,7 +169,8 @@ def create_instance (self,
                                            update_dict,
                                            collection_dict,
                                            setting, 
-                                           sheet_of_copy_wb_para )
+                                           sheet_of_copy_wb_para,
+                                           )
             
             if a_field_code =='break_loop_fields_because_one_required_field':
                 if field_attr.get('raise_if_False') and not check_file:
@@ -181,14 +184,18 @@ def create_instance (self,
             break_condition_func_for_main_instance  = MD.get('break_condition_func_for_main_instance')
             if break_condition_func_for_main_instance:
                 break_condition_func_for_main_instance(needdata)
-            obj = False
+            obj = empty_object
             obj_val = False
             is_instance_ton_tai = None
+            is_instance_ton_tai = u'Không tồn tại do required Field  = False'
+            searched_obj= None
         elif collection_dict.get('instance_is_None_in_check_file_mode_becaused_a_required_field_in_imported_mode'):# có 1 field = false and required ==> instance đó = False
-            obj, obj_val, is_instance_ton_tai =  False, False, None
-        
+            obj, obj_val, is_instance_ton_tai =  empty_object, False, u'Không tồn tại do required Field  = False'
+            searched_obj= None
         else:
-            obj, obj_val,searched_obj, is_duoc_tao, a_row_instance_build_noti_dict = get_or_create_object_has_x2m(self, model_name,
+            obj, obj_val, searched_obj, is_duoc_tao, a_row_instance_build_noti_dict =\
+                         get_or_create_object_has_x2m(self,
+                                                                    model_name,
                                                                     search_dict, 
                                                                     update_dict,
                                                                     MD=MD,
@@ -218,11 +225,22 @@ def create_instance (self,
         if offset_write_xl !=None:
             if is_instance_ton_tai:
                 get_or_create_display = u'Đã Có' 
-            elif is_instance_ton_tai == None:
-                get_or_create_display = u'Empty'
+            elif is_instance_ton_tai == u'Không tồn tại do required Field  = False':
+                get_or_create_display = u'Break do field(cell) trống:%s'%collection_dict['break_field']
             elif is_instance_ton_tai == False:# searched_obj is null obj
                 get_or_create_display = u'Chưa'
-            sheet_of_copy_wb.write(row, sheet.ncols + offset_write_xl, get_or_create_display, wrap_center_vert_border_style)
+            sheet_of_copy_wb.write(row, sheet.ncols + offset_write_xl, get_or_create_display )
+            
+#         offset_write_xl_2 = MD.get('offset_write_xl_2')
+#         if offset_write_xl_2 !=None:
+#             searched_obj_show = str(searched_obj)
+#             sheet_of_copy_wb.write(row, sheet.ncols + offset_write_xl_2, searched_obj_show, wrap_center_vert_border_style)
+        
+        check_file_write_more =  MD.get('check_file_write_more')
+        if check_file_write_more:
+            for offset_col, write_more_func, write_more_title in check_file_write_more:
+                write_more_val = write_more_func(self, MD, searched_obj, collection_dict)
+                sheet_of_copy_wb.write(row, sheet.ncols + offset_col, write_more_val, wrap_center_vert_border_style)
 
     return obj, obj_val 
 
@@ -242,14 +260,14 @@ def get_a_field_val(self,
                                    update_dict,
                                    collection_dict,
                                    setting,
-                                   sheet_of_copy_wb_para
+                                   sheet_of_copy_wb_para,
                                    
                            ):
     skip_this_field = field_attr.get('skip_this_field', False)
     if callable(skip_this_field):
             skip_this_field = skip_this_field(self)
     if skip_this_field:
-        return 'continue'
+        return True
     col_index = field_attr.get('col_index')
     func = field_attr.get('func')
     obj = False
@@ -311,10 +329,16 @@ def get_a_field_val(self,
     
     val = replace_val_for_ci (field_attr,val,needdata)
     field_attr['val_goc'] = val
+    
+    
     if val == False:
+        if field_name =='uom_id':
+            print ('kakakaka',val)
         default_val = field_attr.get('default_val')
         if  default_val!=None:
             val = default_val
+            
+            
     if field_attr.get('field_type') =='float':
         try:
             val = float_round(val, precision_rounding=0.01)
@@ -327,9 +351,12 @@ def get_a_field_val(self,
     field_attr['obj'] = obj
     if check_file:     
         required_when_normal  = field_attr.get('required', False)   
-        required = field_attr.get('required_when_check_file', required_when_normal) 
+#         required = field_attr.get('required_when_check_file', required_when_normal) 
+        required = False
         if (required_when_normal and val==False) and required ==False:
             collection_dict['instance_is_None_in_check_file_mode_becaused_a_required_field_in_imported_mode'] = True
+            break_field = collection_dict.setdefault('break_field',[])
+            break_field.append( field_name)
     else:
         required = field_attr.get('required', False)  
 
@@ -338,8 +365,10 @@ def get_a_field_val(self,
     a_field_code = True
     if '2many' in field_attr.get('field_type','' ) and val == False: # khong add field 2many neu field do bang False
         return a_field_code
-    if required and (val==False and isinstance(val, bool)):# val ==False <==> val ==0, val ==0 <==> val =False
+    if required and (val==False ):# val ==False <==> val ==0, val ==0 <==> val =False
         a_field_code = 'break_loop_fields_because_one_required_field' 
+        break_field = collection_dict.setdefault('break_field',[])
+        break_field.append( field_name)        
         return  a_field_code#sua 5
     elif not field_attr.get('for_excel_readonly'):
         if key_or_not==True:
@@ -428,7 +457,7 @@ def check_type_of_val(field_attr, val, field_name, model_name):
             if not is_pass_type_check:
                 raise UserError(u'model: %s- field:%s có giá trị: %s, đáng lẽ là field_type:%s nhưng lại có type %s'%(model_name, field_name,val,char_field_type,type(val)))
             
-def xac_dinh_is_search_is_create_is_write(check_file, exist_val, st_is_allow_write_existence, func_check_if_excel_is_same_existence  ):
+def xac_dinh_is_search_is_create_is_write(field_MD, check_file, exist_val, st_is_allow_write_existence, func_check_if_excel_is_same_existence  ):
     if check_file:
         is_search = True
         is_create = False
@@ -441,7 +470,7 @@ def xac_dinh_is_search_is_create_is_write(check_file, exist_val, st_is_allow_wri
             else:
                 is_create = False
                 is_write = False
-            if func_check_if_excel_is_same_existence:
+            if func_check_if_excel_is_same_existence :
                 is_search = True
             else:
                 is_search = False
@@ -452,21 +481,23 @@ def xac_dinh_is_search_is_create_is_write(check_file, exist_val, st_is_allow_wri
     return is_create, is_write, is_search
                 
     
-def before_ci(self, field_attr, setting, check_file, needdata):
-    func_map_database_existence = setting.get('st_allow_func_map_database_existence') and field_attr.get('func_map_database_existence')
+def before_ci(self, field_MD, setting, check_file, needdata):
+    func_map_database_existence = setting.get('st_allow_func_map_database_existence') and field_MD.get('func_map_database_existence')
     if func_map_database_existence:
         exist_val = func_map_database_existence(needdata,self) 
     else:
-        exist_val = False
+        exist_val = None
+        
+        
     if exist_val:
         st_is_allow_write_existence = setting['st_is_allow_write_existence']
-        func_check_if_excel_is_same_existence =   setting.get('st_allow_check_if_excel_is_same_existence') and  field_attr.get('func_check_if_excel_is_same_existence') 
+        func_check_if_excel_is_same_existence =   setting.get('st_allow_check_if_excel_is_same_existence') and  field_MD.get('func_check_if_excel_is_same_existence') 
     else:
         st_is_allow_write_existence = None
         func_check_if_excel_is_same_existence = None
     is_go_loop_fields = not exist_val or (exist_val and (func_check_if_excel_is_same_existence or st_is_allow_write_existence)) or check_file
     if is_go_loop_fields:
-        is_create, is_write, is_search = xac_dinh_is_search_is_create_is_write(check_file, exist_val, st_is_allow_write_existence, func_check_if_excel_is_same_existence  )
+        is_create, is_write, is_search = xac_dinh_is_search_is_create_is_write(field_MD, check_file, exist_val, st_is_allow_write_existence, func_check_if_excel_is_same_existence  )
         
     return is_create, is_write, is_search, exist_val, is_go_loop_fields
                 

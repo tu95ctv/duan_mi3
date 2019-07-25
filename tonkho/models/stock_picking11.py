@@ -240,9 +240,11 @@ class StockPicking(models.Model):
     so_ban_in = fields.Integer(u'Số bản in',default=4,copy=False)
     ben_giao_giu = fields.Integer(u'Bên giao giữ', default=3,copy=False)
     ben_nhan_giu = fields.Integer(u'Bên nhận giữ',default=1,copy=False)
+    
+    
     # import file
-    file = fields.Binary(string='File Import')
-    filename = fields.Char()
+#     file = fields.Binary(string='File Import')
+#     filename = fields.Char()
     
 
 #     st_allow_func_map_database_existence = fields.Boolean(default = default_import_xl_setting['default_st_allow_func_map_database_existence'])
@@ -256,7 +258,7 @@ class StockPicking(models.Model):
     allow_cate_for_ghi_chu =  fields.Boolean(string=u"Lấy Tiêu đề làm ghi chú")
     range_1 = fields.Integer(string=u'stt dòng tiêu đề đầu')
     range_2 = fields.Integer(string=u'stt dòng tiêu đề cuối')
-    begin_row = fields.Integer(default=0)
+#     begin_row = fields.Integer(default=0)
     log = fields.Text()
     # check file
     is_ghom_tot = fields.Boolean(string=u'Nếu tình trạng vật tư tốt hết thì ko cần ghi trong cột',default = True)
