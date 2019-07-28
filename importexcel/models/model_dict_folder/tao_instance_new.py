@@ -146,12 +146,31 @@ def create_instance (self,
     search_dict = {}
     update_dict = {}
     model_name = MD.get( 'model')
+    instance_not_dict = noti_dict.setdefault(model_name,{})
     empty_object = self.env[model_name] 
     collection_dict = {}
     needdata['collection_dict'] = collection_dict
-    is_create, is_write, is_search, exist_val, is_go_loop_fields = \
-    before_ci(self, MD, setting, check_file, needdata)
-#     collection_dict['break_field'] = None
+#     is_create, is_write, is_search, exist_val, is_go_loop_fields = \
+#     before_ci(self, MD, setting, check_file, needdata)
+#     
+    is_create, is_write, is_search = None, None, None
+    func_map_database_existence = setting.get('st_allow_func_map_database_existence') and MD.get('func_map_database_existence')
+    if func_map_database_existence:
+        exist_val = func_map_database_existence(needdata,self) #exist_val is orm
+    else:
+        exist_val = None
+        
+    searched_obj= None  
+    if exist_val:
+        st_is_allow_write_existence = setting['st_is_allow_write_existence']
+        func_check_if_excel_is_same_existence =   setting.get('st_allow_check_if_excel_is_same_existence') and  MD.get('func_check_if_excel_is_same_existence') 
+    else:
+        st_is_allow_write_existence = None
+        func_check_if_excel_is_same_existence = None
+    is_go_loop_fields = not exist_val or (exist_val and (func_check_if_excel_is_same_existence or st_is_allow_write_existence)) or check_file
+    if is_go_loop_fields:
+        is_create, is_write, is_search = xac_dinh_is_search_is_create_is_write(MD, check_file, exist_val, st_is_allow_write_existence, func_check_if_excel_is_same_existence)
+        
     if is_go_loop_fields:
         for field_name,field_attr  in MD['fields'].items():
             a_field_code = get_a_field_val(self,
@@ -164,7 +183,7 @@ def create_instance (self,
                                            sheet_of_copy_wb,
                                            merge_tuple_list,
                                            model_name,
-                                           noti_dict,
+                                           instance_not_dict,
                                            search_dict,
                                            update_dict,
                                            collection_dict,
@@ -180,20 +199,16 @@ def create_instance (self,
             this_model_notice = noti_dict.setdefault(model_name,{})
             skip_because_required = this_model_notice.setdefault('skip_because_required',0)
             this_model_notice['skip_because_required'] = skip_because_required + 1
-            
             break_condition_func_for_main_instance  = MD.get('break_condition_func_for_main_instance')
             if break_condition_func_for_main_instance:
                 break_condition_func_for_main_instance(needdata)
             obj = empty_object
-            obj_val = False
-            is_instance_ton_tai = None
-            is_instance_ton_tai = u'Không tồn tại do required Field  = False'
-            searched_obj= None
-        elif collection_dict.get('instance_is_None_in_check_file_mode_becaused_a_required_field_in_imported_mode'):# có 1 field = false and required ==> instance đó = False
-            obj, obj_val, is_instance_ton_tai =  empty_object, False, u'Không tồn tại do required Field  = False'
-            searched_obj= None
+#             is_instance_ton_tai = u'Break because required Field = False'
+            
         else:
-            obj, obj_val, searched_obj, is_duoc_tao, a_row_instance_build_noti_dict =\
+            if collection_dict.get('instance_is_None_in_check_file_mode_becaused_a_required_field_in_imported_mode'):# có 1 field = false and required ==> instance đó = False
+                is_search = False
+            obj, obj_val, searched_obj, is_tao_moi, a_row_instance_build_noti_dict =\
                          get_or_create_object_has_x2m(self,
                                                                     model_name,
                                                                     search_dict, 
@@ -207,41 +222,46 @@ def create_instance (self,
                                                                     is_write = is_write,
                                                                     sheet_of_copy_wb_para = sheet_of_copy_wb_para
                                                                     )
-            this_model_not_dict = noti_dict.setdefault(model_name,{})
             for k,v in a_row_instance_build_noti_dict.items():
-                this_model_not_dict[k] = this_model_not_dict.get(k,0) + v
-
-            if exist_val:
+                instance_not_dict[k] = instance_not_dict.get(k,0) + v
+           
+            if collection_dict.get('instance_is_None_in_check_file_mode_becaused_a_required_field_in_imported_mode'):# có 1 field = false and required ==> instance đó = False
+#                 obj, obj_val, is_instance_ton_tai =  empty_object, False, u'Break because required Field = False'
+                obj, obj_val =  empty_object, False
+            if exist_val !=None:
                 func_check_if_excel_is_same_existence =   setting.get('st_allow_check_if_excel_is_same_existence') and  MD.get('func_check_if_excel_is_same_existence')
                 if  func_check_if_excel_is_same_existence:# and not get_or_create:,not st_is_allow_write_existence and
                     func_check_if_excel_is_same_existence(bool(searched_obj), searched_obj, obj)
-                is_instance_ton_tai = True
-                this_model_notice = noti_dict.setdefault(model_name,{})
-                this_model_notice['exist_val'] = this_model_notice.get('exist_val',0) + 1
+    elif exist_val:
+        obj, obj_val = exist_val, exist_val.id
+    if exist_val != None:
+#         is_instance_ton_tai = True
+        this_model_notice = noti_dict.setdefault(model_name,{})
+        this_model_notice['exist_val'] = this_model_notice.get('exist_val', 0) + 1
+        
+    if check_file:
+        if exist_val != None:
+            is_instance_ton_tai = True
+        else:
+            if searched_obj == None:
+                is_instance_ton_tai = u'Break because required Field = False'
             else:
                 is_instance_ton_tai = bool(searched_obj)
-    if check_file:
         offset_write_xl = MD.get('offset_write_xl')
         if offset_write_xl !=None:
-            if is_instance_ton_tai:
+            if is_instance_ton_tai == True:
                 get_or_create_display = u'Đã Có' 
-            elif is_instance_ton_tai == u'Không tồn tại do required Field  = False':
+            elif is_instance_ton_tai == u'Break because required Field = False':
                 get_or_create_display = u'Break do field(cell) trống:%s'%collection_dict['break_field']
             elif is_instance_ton_tai == False:# searched_obj is null obj
                 get_or_create_display = u'Chưa'
             sheet_of_copy_wb.write(row, sheet.ncols + offset_write_xl, get_or_create_display )
-            
-#         offset_write_xl_2 = MD.get('offset_write_xl_2')
-#         if offset_write_xl_2 !=None:
-#             searched_obj_show = str(searched_obj)
-#             sheet_of_copy_wb.write(row, sheet.ncols + offset_write_xl_2, searched_obj_show, wrap_center_vert_border_style)
-        
+  
         check_file_write_more =  MD.get('check_file_write_more')
         if check_file_write_more:
             for offset_col, write_more_func, write_more_title in check_file_write_more:
                 write_more_val = write_more_func(self, MD, searched_obj, collection_dict)
                 sheet_of_copy_wb.write(row, sheet.ncols + offset_col, write_more_val, wrap_center_vert_border_style)
-
     return obj, obj_val 
 
 #F1 
@@ -255,7 +275,7 @@ def get_a_field_val(self,
                                    sheet_of_copy_wb,
                                    merge_tuple_list,
                                    model_name,
-                                   noti_dict,
+                                   instance_not_dict,
                                    search_dict,
                                    update_dict,
                                    collection_dict,
@@ -287,18 +307,21 @@ def get_a_field_val(self,
             if False in val:
                     raise UserError(u'Không được có phần tử = False')
     elif field_attr.get('fields') :
-        obj,val   = create_instance (self,
+        fields_noti_dict = instance_not_dict.setdefault('fields', {})
+        obj, val   = create_instance (self,
                                                 field_attr,
                                                 sheet, 
                                                 row, 
                                                 merge_tuple_list,
                                                 needdata, 
-                                                noti_dict,
+                                                fields_noti_dict,
                                                 check_file = check_file ,
                                                 sheet_of_copy_wb = sheet_of_copy_wb,
                                                 setting=setting,
                                                 sheet_of_copy_wb_para = sheet_of_copy_wb_para
                                                                )
+        
+        
     else:
         val = False
     try:
@@ -332,8 +355,7 @@ def get_a_field_val(self,
     
     
     if val == False:
-        if field_name =='uom_id':
-            print ('kakakaka',val)
+        
         default_val = field_attr.get('default_val')
         if  default_val!=None:
             val = default_val
@@ -482,6 +504,7 @@ def xac_dinh_is_search_is_create_is_write(field_MD, check_file, exist_val, st_is
                 
     
 def before_ci(self, field_MD, setting, check_file, needdata):
+    is_create, is_write, is_search = None, None, None
     func_map_database_existence = setting.get('st_allow_func_map_database_existence') and field_MD.get('func_map_database_existence')
     if func_map_database_existence:
         exist_val = func_map_database_existence(needdata,self) 

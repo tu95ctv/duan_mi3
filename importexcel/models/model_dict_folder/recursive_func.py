@@ -369,7 +369,7 @@ def check_compatible_col_index_and_xl_title_for_a_field(field_attr, xl_title, co
                 allow_not_match_xl_title = get_key(field_attr,'allow_not_match_xl_title')
                 skip_if_not_match =  allow_not_match_xl_title or (sheet_allow_this_field_not_has_exel_col and needdata['sheet_name'] in sheet_allow_this_field_not_has_exel_col)
                 if not skip_if_not_match:
-                    raise UserError(_(u'Excel has not  column one in %s of %s, please change column name match with them') %(xl_title, field_name))
+                    raise UserError(_(u'Excel has not column, which in %s of %s, please change column name match with them') %(xl_title, field_name))
             else:
                 if field_attr.get('model'):
                     if not func and not field_attr.get('fields'):

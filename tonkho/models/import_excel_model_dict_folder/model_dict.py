@@ -8,7 +8,7 @@ def gen_model_dict_for_stock_move_line(self=None, key_tram=None, gen_model_dict_
        
 #     mode =      getattr(self, 'mode',None)     or mode
     check_file = gen_model_dict_kargs.get('check_file')
-    cach_tim_location_goc = gen_model_dict_kargs.get('cach_tim_location_goc', 'find_origin_location_by_key_tram')
+    cach_tim_location_goc = gen_model_dict_kargs.get('cach_tim_location_goc', 'find_origin_location_by_key_tram') or 'find_origin_location_by_key_tram'
     mode = u'1' if cach_tim_location_goc =='find_origin_location_by_key_tram' else u'2'
     if key_tram == sml:
         mode = u'2'
@@ -125,7 +125,7 @@ S/N'''],
                          sml:u'STT',
                          key_137:[u'SỐ'],
                          key_ltk_dc2:u'STT'},
-            'skip_this_field':{key_137:True, all_key_tram:getattr(self,'skip_stt', False)},
+            'skip_this_field':{key_137: True, all_key_tram:getattr(self,'skip_stt', False)},
             'allow_not_match_xl_title':True ,
             'key':{all_key_tram:True},
             'required_force':{all_key_tram:True},
@@ -835,26 +835,6 @@ def tracking_write_func_(**kargs):
     val =  kargs['val']
     if val =='none':
         return 'continue'
-# def prod_lot_id_excel_readonly_for_search_(v,n,self):
-#     prod_lot_id_excel_readonly_name = n['vof_dict']['prod_lot_id_excel_readonly']['val']
-#     if prod_lot_id_excel_readonly_name:
-#         prod_lot_id_excel_readonly_for_search = self.env['stock.production.lot'].search([('name','=',prod_lot_id_excel_readonly_name)])
-#         return prod_lot_id_excel_readonly_for_search
-#     else:
-#         return False
-# 
-# def func_map_database_existence_for_product_(n,self): 
-#     prod_lot_id_excel_readonly_for_search = n['vof_dict']['prod_lot_id_excel_readonly_for_search']['val']
-#     if prod_lot_id_excel_readonly_for_search:
-#         return prod_lot_id_excel_readonly_for_search.product_id
-#     else:
-#         return False
-# def func_map_database_existence_for_lot_id_(n,self): 
-#     prod_lot_id_excel_readonly_for_search = n['vof_dict']['prod_lot_id_excel_readonly_for_search']['val']
-#     if prod_lot_id_excel_readonly_for_search:
-#         return prod_lot_id_excel_readonly_for_search
-#     else:
-#         return False
 
 
 def prod_lot_id_excel_readonly_for_search_(v,n,self):
@@ -862,8 +842,8 @@ def prod_lot_id_excel_readonly_for_search_(v,n,self):
     lot_obj = self.env['stock.production.lot']
     if prod_lot_id_excel_readonly_name:
         prod_lot_id_excel_readonly_for_search = lot_obj.search([('name', '=', prod_lot_id_excel_readonly_name)])
-    else:
-        prod_lot_id_excel_readonly_for_search = lot_obj
+    else:# False
+        prod_lot_id_excel_readonly_for_search = None
     return prod_lot_id_excel_readonly_for_search
  
 
@@ -1004,11 +984,8 @@ def check_file_write_more_check_searched_obj_product_(self,field_MD,searched_obj
 def common_show_write_searched_obj(rs, no_obj_show, collection_dict):
     if rs:
         show_val = str(rs.mapped('id'))
-    elif rs == False:
-        show_val = u'Empty cell'
     elif rs == None:
         break_field = collection_dict['break_field']
-#         show_val = u'không thấy obj do có searched field == None'
         show_val = u'break do cell trống:%s'%break_field
     else:
         show_val = no_obj_show
