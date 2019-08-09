@@ -5,7 +5,7 @@ from odoo.tools.translate import _
 import psycopg2
 from unidecode import unidecode
 from odoo.addons.tutool.mytools import name_khong_dau_compute
-   
+import datetime  
 
 class ProductTemplate(models.Model):
     """ Quants are the smallest unit of stock physical instances """
@@ -19,6 +19,18 @@ class ProductTemplate(models.Model):
     ghi_chu_ngay_xuat = fields.Text(string=u'Ghi chú ngày xuất')
     quant_ids = fields.One2many('stock.quant', 'product_id',domain=[('location_id.usage','=','internal')],string=u'Trong kho')#domain=[('location_id.usage','=','internal')]
     stock_location_id_selection = fields.Selection('get_stock_for_selection_field_', store=False)
+    
+    is_recent_edit = fields.Boolean(compute='is_recent_edit_')
+    @api.depends('write_date')
+    def is_recent_edit_(self):
+        for r in self:
+            write_date = fields.Datetime.from_string(r.write_date)
+            delta = datetime.datetime.now() - write_date
+            seconds = delta.seconds
+            if seconds < 3600:
+                r.is_recent_edit = True
+            
+    
     @api.model
     def default_get(self, fields):
         res = super(ProductTemplate,self).default_get(fields)

@@ -63,6 +63,7 @@
                <field name="phone" />
                <field name="job_id" />
                <field name="department_id" />
+               <field name="birth_day" />
                </field>
          </field>
       </record>

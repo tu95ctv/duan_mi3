@@ -28,6 +28,7 @@ class CommonSetting(models.Model):
     file = fields.Binary()
     filename = fields.Char()
     
+    
 class Importexcel(models.Model):
     _name = 'importexcel.importexcel' 
     _inherit = 'importexcel.commonsetting'
@@ -80,7 +81,7 @@ class Importexcel(models.Model):
 #     line_not_has_quant =  fields.Text()
 
     
-    cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')])
+    cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')], default = 'find_origin_location_by_key_tram')
     all_field_attr_dict = fields.Text()
     def gen_model_dict(self):
        
@@ -143,7 +144,11 @@ class Importexcel(models.Model):
 #         t = self.env['tvcv'].create({'name':'aa','diem':None,'code':None})
 #         print (t.name, t.diem, t.code)
             t = self.env['tvcv']
-            print ('t.department_id, t.diem, t.name,t.id',t.department_id, t.diem, t.name, t.id)
+            t1 = self.env['tvcv'].search([('code','ilike','HCM.QL009')])
+            t2 = t |t1 | t
+            raise UserError(u'%s'%all(t))
+        
+#             print ('t.department_id, t.diem, t.name,t.id',t.department_id, t.diem, t.name, t.id)
 #         fl =  float_compare(1.667, 1.67, precision_rounding=2)
 #         fl2 =  float_compare(1.7, 1.67, precision_rounding=2)
 #         rs =  float_compare(1.767, 1.67, precision_rounding=0.01)

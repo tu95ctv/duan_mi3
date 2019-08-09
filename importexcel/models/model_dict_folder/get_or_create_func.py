@@ -6,9 +6,9 @@ from odoo import  fields
 from odoo.exceptions import UserError
 from odoo.addons.downloadwizard.models.dl_models.dl_model  import wrap_center_vert_border_style
 from odoo.tools.float_utils import float_compare, float_round
+from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import BreakRowException
 
-def get_or_create_object_has_x2m (self,
-                                model_name, 
+def get_create_write_x2m (self,
                                 search_dict,
                                 write_dict ={},
                                 MD = {},
@@ -16,24 +16,26 @@ def get_or_create_object_has_x2m (self,
                                 setting= {},
                                 check_file = False,
                                 is_search = True,
-                                is_create = True,
                                 is_write = True,
-                                sheet_of_copy_wb_para = None
+                                main_call = False,
+                                x2m_fields = False,
+                                needdata = None,
+                                field_name = None
                                  ):
-    x2m_fields = MD.get('x2m_fields')
+#     x2m_fields = MD.get('x2m_fields')
     if x2m_fields:
         x2m_field = x2m_fields[0]
         x2m_values = search_dict[x2m_field]
-        len_x2m = len(x2m_values)
-        result = []
+        len_x2m_vals = len(x2m_values)
     else:
-        len_x2m = 1
+        len_x2m_vals = 1
     instance_build_noti_dict = {}  
-    for i in range(0,len_x2m):
+    for count_i, i in enumerate(range(0, len_x2m_vals)):
         if x2m_fields:
+            x2m_obj = []
+            x2m_searched_obj = []
             search_dict[x2m_field] = x2m_values[i] #
-        obj, searched_obj, is_tao_moi, new_noti_dict = get_or_create_object_has_search(self, 
-                                model_name, 
+        obj, searched_obj, new_noti_dict = get_create_write(self, 
                                 search_dict,
                                 write_dict =write_dict,
                                 MD = MD,
@@ -41,46 +43,29 @@ def get_or_create_object_has_x2m (self,
                                 setting = setting,
                                 check_file = check_file,
                                 is_search = is_search,
-                                is_create = is_create,
                                 is_write = is_write,
-                                sheet_of_copy_wb_para = sheet_of_copy_wb_para
+                                main_call = main_call,
+                                needdata = needdata,
+                                field_name = field_name
                                 )
+       
         for k,v in new_noti_dict.items():
             instance_build_noti_dict[k] = instance_build_noti_dict.get(k,0) + v
         if x2m_fields:
-            result.append(obj.id)
-            searched_obj |= searched_obj
+            x2m_obj.append(obj)
+            x2m_searched_obj.append(searched_obj)
     if x2m_fields:
-        remove_all_or_just_add_one_x2m = MD.get('remove_all_or_just_add_one_x2m', 'add_one')
-        if remove_all_or_just_add_one_x2m == 'remove_all':
-            obj_id =  [(6,False,result)]
-        else:
-            obj_id  = list(map(lambda x: (4, x, False), result)) 
-    else:
-        if not obj:
-            obj_id = None
-        else:
-            obj_id = obj.id
+        obj = x2m_obj
+        searched_obj = x2m_searched_obj
+       
     if not check_file and not obj:
         raise UserError('not check_file and not obj')
         
-            
-   
-#             raise UserError('akakak')
-        
-#         if obj != None :#and  obj != False
-#             obj_id = obj.id
-#             print ('hiccccccccccccccccccc',obj_id )
-#         else:
-#             obj_id = obj
-#         obj_id = obj.id
-#         if check_file and not obj_id:
-# #             obj = None
-#             obj_id = None
-                
-    return obj, obj_id, searched_obj, is_tao_moi, instance_build_noti_dict
+    return obj, searched_obj, instance_build_noti_dict
 
-def get_or_create_object_has_search(self, model_name,
+
+def get_create_write(
+                                self,
                                 search_dict,
                                 write_dict ={},
                                 MD = {},
@@ -88,49 +73,45 @@ def get_or_create_object_has_search(self, model_name,
                                 setting = {},
                                 check_file=False,
                                 is_search = True,
-                                is_create = True,
                                 is_write = True,
-                                sheet_of_copy_wb_para = None
+                                main_call = False,
+                                needdata = None, 
+                                field_name = None
                                 ):
-    is_tao_moi = False
     new_noti_dict = {} 
+    model_name = MD.get('model')
     empty_object  = self.env[model_name]
+    
+# is_search_default_when_not_check_file = False    
+#             is_search= check_file or (exist_val ==None or  func_check_if_excel_is_same_existence)
+#             is_write = not check_file and (exist_val ==None or  st_is_allow_write_existence  )
+    
     if is_search:
-        searched_obj = search_handle(self, MD, search_dict, check_file, model_name, setting, empty_object)
+        searched_obj = search_handle(self, MD, search_dict, model_name, setting, needdata)
         new_noti_dict['search']=1
     else:
-        searched_obj = None
-        
-    if exist_val != None:
-        write_obj = exist_val
-    else:
-        write_obj = searched_obj
-    return_obj = write_obj
-    if write_obj and len(write_obj) > 1:
-        try:
-            mapped_name = write_obj.mapped('name')
-        except:
-            mapped_name = write_obj
-        raise UserError (u'len_return_obj > 1 %s'%(mapped_name))
+        searched_obj = empty_object
     
-    if write_obj == empty_object and is_create:
-        create_obj = create_handle(self, search_dict, write_dict, MD, model_name)
+    return_obj =  exist_val if  exist_val != None else searched_obj
+    if return_obj and len(return_obj) > 1:
+        try:
+            mapped_name = return_obj.mapped('name')
+        except:
+            mapped_name = return_obj
+        raise UserError (u'len_return_obj > 1, mapped_name: %s'%str(mapped_name))
+    
+    if (exist_val ==None and return_obj  == empty_object ) and not check_file:
+        create_obj = create_handle(self, search_dict, write_dict, MD, model_name, field_name)
         return_obj = create_obj
         new_noti_dict['create'] =1
-        is_tao_moi = True
-    elif write_obj and (( is_write and  setting['allow_write']))  :
-        write_handle(self, write_obj, MD, write_dict, new_noti_dict )
-   
-    if check_file:  
-        check_file_handle(self, return_obj, MD, write_dict, check_file, sheet_of_copy_wb_para )
-      
-        
-    return return_obj , searched_obj, is_tao_moi, new_noti_dict
+    elif return_obj and is_write  :
+        write_handle(self, return_obj, MD, write_dict, new_noti_dict, main_call = main_call )
+    return return_obj, searched_obj, new_noti_dict
 
-def search_handle(self, model_dict, search_dict, check_file, model_name, setting, empty_object):
+def search_handle(self, model_dict, search_dict, model_name, setting, needdata):
     search_func = model_dict.get('search_func')
     if search_func:
-        searched_obj = search_func(self, model_dict, setting)
+        searched_obj = search_func(self, model_dict, setting, needdata)
     else:
         if search_dict :
             pass
@@ -145,13 +126,6 @@ def search_handle(self, model_dict, search_dict, check_file, model_name, setting
         for f_name in search_dict:
             field_attr = model_dict['fields'][f_name]
             val =  search_dict[f_name]
-            if val == None:
-                if check_file:
-                    searched_obj = empty_object
-                    has_none_val_search_field = True
-                    break
-                else:
-                    raise UserError(u'nếu không phải check_file, val không thể bằng None')
             f_name = get_key(field_attr, 'transfer_name') or f_name
             operator_search = field_attr.get('operator_search','=')
             tuple_in = (f_name, operator_search, val)
@@ -161,134 +135,61 @@ def search_handle(self, model_dict, search_dict, check_file, model_name, setting
             searched_obj  = self.env[model_name].search(domain)
     return searched_obj
                 
-def create_handle(self, search_dict, write_dict, model_dict, model_name):
+def create_handle(self, search_dict, write_dict, MD, model_name, field_name):
     search_dict_new ={}
-    only_get = get_key(model_dict,'only_get')
+    only_get = get_key(MD,'only_get')
     if only_get:
-        raise UserError(u'Model %s này chỉ được get chứ không được tạo'%model_name)
+        if MD.get('BreakRowException_if_raise_only_get'):
+            raise BreakRowException(u'Model %s này với giá trị field_name:%s, name: "%s" chỉ được get chứ không được tạo, hãy tạo tay hoặc chọn thuộc tính BreakRowException_if_raise_only_get để bỏ qua thông báo này'%(model_name, field_name,  MD['fields']['name']['val']))
+        else:
+            raise UserError(u'Model %s này với giá trị field_name:%s,  name: "%s" chỉ được get chứ không được tạo, hãy tạo tay hoặc chọn thuộc tính BreakRowException_if_raise_only_get để bỏ qua thông báo này'%(model_name, field_name,  MD['fields']['name']['val']))
     search_dict.update(write_dict)
     for f_name,val in search_dict.items():
-        field_attr = model_dict['fields'][f_name]
+        field_attr = MD['fields'][f_name]
         f_name = get_key(field_attr, 'transfer_name') or f_name
         search_dict_new[f_name]=val
     created_object = self.env[model_name].create(search_dict_new)
     return_obj = created_object
     return return_obj
 
-# def write_handle(self, return_obj, model_dict, write_dict, check_file, sheet_of_copy_wb_para, new_noti_dict ):
-#     write_dict_new = {}
-#     writed_object = return_obj
-#     for key_f_name, val in write_dict.items():
-#         field_MD= model_dict['fields'][key_f_name]
-#         offset_write_xl_diff = field_MD.get('offset_write_xl_diff')
-#         if check_file and   offset_write_xl_diff ==None:
-#             continue
-#         if not check_file and (field_MD.get('val_goc') ==False and not field_MD.get('write_false')):
-#             continue
-#         f_name = get_key(field_MD, 'transfer_name') or key_f_name
-#         if check_file:
-#             is_write_this_field = False
-#         else:
-#             is_write_this_field = field_MD.get('write_field', True)
-#         if not check_file and not is_write_this_field :
-#             continue
-#         
-#         if writed_object:
-#             orm_field_val = getattr(writed_object, f_name)
-#             diff = check_diff_write_val_with_exist_obj(orm_field_val, val, field_MD)
-#             if diff:
-#                 if is_write_this_field:
-#                     write_dict_new[f_name] = val
-#                 if check_file:
-#                     if hasattr(orm_field_val,'name'):
-#                         orm_field_val = getattr(orm_field_val,'name')
-#                         if val == None:
-#                             try:
-#                                 val = field_MD['fields']['name']['val']
-#                             except:
-#                                 pass
-#                     diff_show = u'Khác, db:%s- xl:%s'%(orm_field_val, val)
-#             else:
-#                 if check_file:
-#                     diff_show = u'Giống'
-#         else:
-#             if writed_object == None:
-#                 diff_show = u'Bị break'
-#             else:
-#                 diff_show = u'OBJ không được search thấy'
-#             
-#         if check_file:
-#             sheet_of_copy_wb = sheet_of_copy_wb_para['sheet_of_copy_wb']
-#             sheet_of_copy_wb.write(sheet_of_copy_wb_para['row'], sheet_of_copy_wb_para['sheet'].ncols + offset_write_xl_diff, diff_show, wrap_center_vert_border_style)
-#     
-#     if not check_file:
-#         if write_dict_new:
-#             writed_object.write(write_dict_new)
-#             new_noti_dict['update'] = 1
-#         else:#'not update'
-#             new_noti_dict['skipupdate'] = 1
         
-def write_handle(self, return_obj, MD, write_dict, new_noti_dict ):
+def write_handle(self, return_obj, MD, write_dict, new_noti_dict, main_call=False ):
     write_dict_new = {}
     writed_object = return_obj
     for key_f_name, val in write_dict.items():
         field_MD=  MD['fields'][key_f_name]
-#         if check_file and   offset_write_xl_diff ==None:
-#             continue
-        if (field_MD.get('val_goc') ==False and not field_MD.get('write_false')):
-            continue
-        f_name = get_key(field_MD, 'transfer_name') or key_f_name
-
-        is_write_this_field = field_MD.get('write_field', True)
-        if not is_write_this_field :
-            continue
-        
-        orm_field_val = getattr(writed_object, f_name)
-        diff = check_diff_write_val_with_exist_obj(orm_field_val, val, field_MD)
-        if diff:
-            if is_write_this_field:
-                write_dict_new[f_name] = val
-        if write_dict_new:
-            writed_object.write(write_dict_new)
-            new_noti_dict['update'] = 1
-        else:#'not update'
-            new_noti_dict['skipupdate'] = 1
+        if field_MD.get('val_goc') != False or field_MD.get('write_false', False):
+            f_name = get_key(field_MD, 'transfer_name') or key_f_name
+            is_write_this_field = field_MD.get('write_field', True)
+            if  is_write_this_field :
+                orm_field_val = getattr(writed_object, f_name)
+                is_x2m = field_MD.get('x2m_fields', False)
+                diff = check_diff_write_val_with_exist_obj(orm_field_val, val, field_MD, is_x2m)
+                if diff:
+                    if is_write_this_field:
+                        write_dict_new[f_name] = val
+                if write_dict_new:
+                    writed_object.write(write_dict_new)
+                    new_noti_dict['update'] = 1
+                    if main_call:
+                        print ('**write_dict_new', write_dict_new)
+                else:#'not update'
+                    new_noti_dict['skipupdate'] = 1
             
-            
-def check_file_handle(self, return_obj, MD, write_dict, check_file, sheet_of_copy_wb_para ):
-    writed_object = return_obj
-    for key_f_name, val in write_dict.items():
-        field_MD= MD['fields'][key_f_name]
-        f_name = get_key(field_MD, 'transfer_name') or key_f_name
-        offset_write_xl_diff = field_MD.get('offset_write_xl_diff')
-        if offset_write_xl_diff ==None:
-            continue
-        if writed_object:
-            orm_field_val = getattr(writed_object, f_name)
-            diff = check_diff_write_val_with_exist_obj(orm_field_val, val, field_MD)
-            if diff:
-                if hasattr(orm_field_val,'name'):
-                    orm_field_val_name = getattr(orm_field_val,'name')
-                    val_name = field_MD['fields']['name']['val']
-                diff_show = u'Khác, db:%s(%s) - xl: %s(%s)' %(orm_field_val, orm_field_val_name, val, val_name)
-            else:
-                diff_show = u'Giống'
-        else:
-            if writed_object == None:
-                diff_show = u'Bị break'
-            else:
-                diff_show = u'OBJ không được search thấy'
-             
-        if check_file:
-            sheet_of_copy_wb = sheet_of_copy_wb_para['sheet_of_copy_wb']
-            sheet_of_copy_wb.write(sheet_of_copy_wb_para['row'], sheet_of_copy_wb_para['sheet'].ncols + offset_write_xl_diff, diff_show, wrap_center_vert_border_style)
+  
      
-def check_diff_write_val_with_exist_obj(orm_field_val, field_dict_val, field_attr):
+
+  
+  
+def check_diff_write_val_with_exist_obj(orm_field_val, field_dict_val, field_MD, is_x2m):
+    field_type = field_MD.get('field_type')
     is_write = False
-    if isinstance(orm_field_val, datetime.date):
-        converted_orm_val_to_dict_val = fields.Date.from_string(orm_field_val)
-    elif isinstance(orm_field_val, datetime.datetime):
-        converted_orm_val_to_dict_val = fields.Datetime.from_string(orm_field_val)
+    if is_x2m:
+        pass
+#     elif isinstance(orm_field_val, datetime.date):
+#         converted_orm_val_to_dict_val = fields.Date.from_string(orm_field_val)
+#     elif isinstance(orm_field_val, datetime.datetime):
+#         converted_orm_val_to_dict_val = fields.Datetime.from_string(orm_field_val)
     else:
         try:
             converted_orm_val_to_dict_val = getattr(orm_field_val, 'id', orm_field_val)
@@ -296,7 +197,16 @@ def check_diff_write_val_with_exist_obj(orm_field_val, field_dict_val, field_att
                 converted_orm_val_to_dict_val = False
         except:
             converted_orm_val_to_dict_val = orm_field_val
-    if field_attr.get('field_type')=='float':
+    
+    if '2many' in field_type:
+        is_write = False
+        if not all(field_MD['obj']):
+            is_write = True
+        else:
+            for field_dict_val_item in field_MD['obj']:
+                is_write_item = field_dict_val_item not in orm_field_val
+                is_write = is_write or is_write_item
+    elif field_type=='float':
         is_write = float_compare(orm_field_val, field_dict_val, precision_rounding=0.01)# 1 la khac, 0 la giong
     else:
         is_write =  converted_orm_val_to_dict_val != field_dict_val

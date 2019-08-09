@@ -52,7 +52,7 @@ class Product(models.Model):
     
     toc_do_id = fields.Many2one('tonkho.tocdo',string=u'Tốc độ')
     lot_ids = fields.One2many('stock.production.lot','product_id',string=u'Serial numbers')
-    pn = fields.Char(string='Part number')
+    pn = fields.Char(string='Part number',  track_visibility='onchange')
     pn_replace = fields.Char(compute='pn_replace_',store=True)
     qty_available_dai_hcm = fields.Float(
         u'Số lượng dự phòng trong Đài HCM', compute='qty_available_du_phong_',

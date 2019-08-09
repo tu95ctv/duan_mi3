@@ -9,6 +9,8 @@ class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
     stock_quant_id = fields.Many2one('stock.quant', string=u"Lấy vật tư có trong kho")
     tracking = fields.Boolean(string=u'Có SN hay không', store=False,compute='tracking_')
+    id_pr = fields.Integer(related='product_id.id')
+    is_recent_edit = fields.Boolean(related='product_id.is_recent_edit')
     @api.depends('product_id.tracking')
     def tracking_(self):
         for r in self:

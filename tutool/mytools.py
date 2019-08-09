@@ -20,9 +20,11 @@ def convert_odoo_datetime_to_vn_datetime(odoo_datetime):
         return vn_time
     
     
-    
-    
-    
+def convert_str_date_to_str_write_odoo_format_date(v):
+    if v:
+        dt_v = datetime.datetime.strptime(v,'%d/%m/%Y').date()
+        v = dt_v.strftime('%Y-%m-%d')
+    return v
     
 def pn_replace(pn):
     if pn:

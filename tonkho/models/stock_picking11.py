@@ -77,8 +77,12 @@ class StockPicking(models.Model):
     # Công cụ
     categ_id = fields.Many2one('product.category',string=u'Thay đổi nhóm cho các dòng điều chuyển')
     
-    
    
+    write_field_pn = fields.Boolean()
+    allow_create_uom_id = fields.Boolean()
+    BreakRowException_if_raise_only_get = fields.Boolean()
+    cate_from_sheetname = fields.Boolean()
+    location_id_to_location_dest_id = fields.Boolean()
     # Field chính trong biên bản
 
     name = fields.Char(
@@ -254,7 +258,7 @@ class StockPicking(models.Model):
 #     st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr  = fields.Boolean(default = default_import_xl_setting['default_st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr'])
     
     
-    skip_stt = fields.Boolean(u'Skip (bỏ qua) trường STT khi import')
+    skip_stt = fields.Boolean(u'Skip (bỏ qua) trường STT khi import', default=True)
     allow_cate_for_ghi_chu =  fields.Boolean(string=u"Lấy Tiêu đề làm ghi chú")
     range_1 = fields.Integer(string=u'stt dòng tiêu đề đầu')
     range_2 = fields.Integer(string=u'stt dòng tiêu đề cuối')

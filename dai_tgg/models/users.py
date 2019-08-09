@@ -17,7 +17,7 @@ class PartnerABC(models.Model):
     lang = fields.Selection(_lang_get, string='Language', 
                             help="If the selected language is loaded in the system, all documents related to "
                                  "this contact will be printed in this language. If not, it will be English.",default='vi_VN')
-    
+    birth_day = fields.Date()
     @api.depends('name')
     def name_khong_dau_(self):
         name_khong_dau_compute(self)

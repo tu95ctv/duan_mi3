@@ -1,7 +1,7 @@
  # -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 import datetime
-from odoo.addons.tutool.mytools import convert_vn_datetime_to_utc_datetime
+from odoo.addons.tutool.mytools import convert_vn_datetime_to_utc_datetime, convert_str_date_to_str_write_odoo_format_date
 
 def convert_vn_str_datetime_to_utc_str_datetime(v):
     if v:
@@ -9,6 +9,11 @@ def convert_vn_str_datetime_to_utc_str_datetime(v):
         utc_v =  convert_vn_datetime_to_utc_datetime(dt_v)
         utc_str = utc_v.strftime('%d/%m/%Y %H:%M:%S')
         return utc_str
+    return v
+
+
+def birth_day_(v):
+    v = convert_str_date_to_str_write_odoo_format_date(v)
     return v
 def cd_children_ids_(v,n,self):
     print ('val *** in ',v)
@@ -92,7 +97,7 @@ def gen_user_department_model_dict():
                                                ]
                                     }),
                     ('is_kho_cha',{'set_val':True}),
-                    ('usage',{'xl_title':u'usage','func':None,'key':False,'required':False}),
+#                     ('usage',{'xl_title':u'usage',' func':None,'key':False,'required':False}),
                     ('stock_type',{'set_val':'tram'}),
                     ('department_id',
                          {'fields':[
@@ -109,7 +114,7 @@ def gen_user_department_model_dict():
                             ('name',{'key':True,'set_val':u'Đài HCM Đang chạy'}),
                             ('stock_type',{'key':True,'set_val':u'dai'}),
                             ]}),
-                        ('usage',{'xl_title':u'usage','func':None,'key':False,'required':False}),
+#                         ('usage',{'xl_title':u'usage','func':None,'key':False,'required':False}),
                         ('is_kho_cha',{'set_val':True}),
                         ('stock_type',{'set_val':'tram'}),
                         ('partner_id_of_stock_for_report',{'model':'res.partner','fields':[('name',{'func': lambda v,n:n['vof_dict']['name']['val'], 'key':True,'required':True}),
@@ -124,7 +129,7 @@ def gen_user_department_model_dict():
                                                                     }),
                 ('kho_tam_id',{'inactive_include_search':True,'model':'stock.location','fields':[
                         ('name',{'xl_title':u'kho_tam','func':None,'key':True,'required':True}),
-                        ('usage',{'xl_title':u'usage','func':None,'key':False,'required':False}),
+#                         ('usage',{'xl_title':u'usage','func':None,'key':False,'required':False}),
                         ('active',{'set_val':True,'key':False,'required':False}),
                         ('is_kho_cha',{'set_val':True}),
                         ('stock_type',{'set_val':'tram'}),
@@ -153,7 +158,8 @@ def gen_user_department_model_dict():
         'fields' : [
                 ('name', {'func':None,'xl_title':u'Họ và Tên','key':True,'required':True}),
                 ('login',{'func':None,'xl_title':u'Địa chỉ email','key':True ,'required':True}),
-                ('password',{'func':None,'required':True,'set_val':'123456'}),
+                ('birth_day',{'func':birth_day_,'xl_title':u'ngày sinh', 'offset_write_xl_diff':4,}),
+                ('password',{'func':None,'required':True,'set_val':'123456', 'write_field':False}),
 #                 ('lang',{'set_val':'vi_VN'}),
                 ('phone',{'func':None,'xl_title':u'Số điện thoại','key':False, 'offset_write_xl_diff':1}),
                 ('cac_sep_ids',{'key':False,'required':False,'only_get':True,
@@ -162,6 +168,8 @@ def gen_user_department_model_dict():
                                                  ]
                 }),  
                 ('groups_id',{'key':False,
+                                    'offset_write_xl_diff':2,
+                                    'offset_write_xl':3,
                                     'required':False ,
                                     'bypass_this_field_if_value_equal_False':True,
                                     'remove_all_or_just_add_one_x2m': 'add_one',

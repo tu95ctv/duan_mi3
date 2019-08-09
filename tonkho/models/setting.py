@@ -24,6 +24,7 @@ class ResConfigSettings(models.TransientModel):
     
     not_use_default_excel_import_setting = fields.Boolean()
     
+    allow_write = fields.Boolean()
 
 #     font_height = fields.Integer()
     @api.model

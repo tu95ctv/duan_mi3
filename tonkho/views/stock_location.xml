@@ -43,6 +43,7 @@
                     </group>
                 </xpath>
                 <field name="company_id" position="before">
+                    <field name="name_full"></field>
                     <field name="complete_name"></field>
                     <field name="department_id"></field>
                     <field name="partner_id_of_stock_for_report"></field>

@@ -17,6 +17,12 @@ class StockLocation(models.Model):
     stock_type = fields.Selection(KHO_SELECTION,string=u'Loại kho')
                                 
     complete_name_khong_dau = fields.Char(compute='complete_name_khong_dau_',store=True, string=u'Tên đầy đủ không dấu')
+    name_full  = fields.Char(compute='name_full_', store=True)
+    
+    @api.depends('name')
+    def name_full_(self):
+        for r in self:
+            r.name_full = r.name_get_1_record()
 #     not_show_in_bb =  fields.Boolean()
 
     @api.one

@@ -6,7 +6,8 @@ VERSION_INFO   = sys.version_info[0]
 import xlwt
 import re
 
-
+class BreakRowException(Exception):
+    pass
 def get_width(num_characters):
     return int((1+num_characters) * 256)
 # not_horiz_center_border_style = xlwt.easyxf("font:  name Times New Roman, height 240 ;align: wrap on , vert centre; borders: left thin,right thin, top thin, bottom thin")

@@ -36,11 +36,13 @@ ATT_TYPE_LIST ={
   'offset_write_xl': ['int'],
   'offset_write_xl_2': ['int'],
   'offset_write_xl_diff': ['int'],
+  'offset_write_xl_for_searched_obj': ['int'],
   'check_file_write_more': ['list'],
 
   'only_get': ['bool'],
   'operator_search': ['str'],
 #   'prepare_func': ['function'],
+  'required_pre': ['bool'],
   'print_if_write': ['bool'],
   'print_write_dict_new': ['bool'],
   'raise_if_False': ['bool'],
@@ -52,6 +54,7 @@ ATT_TYPE_LIST ={
   'required_when_check_file': ['bool'],
   'requried': ['bool'],
   'search_func': ['function'],
+  'remove_out_item_func': ['function'],
   'set_is_largest_map_row_choosing': ['bool'],
   'set_val': ['str', 'function', 'int', 'NoneType'],
   'setting': ['dict'],
@@ -60,6 +63,7 @@ ATT_TYPE_LIST ={
   'sheet_names': ['function','list'],
   'allow_not_match_xl_title': ['bool', 'NoneType'],
   'skip_this_field': ['bool'],
+  'BreakRowException_if_raise_only_get': ['bool'],
   'string': ['str'],
   'title_rows': ['range', 'list'],
   'title_rows_some_sheets': ['dict'],
@@ -373,29 +377,45 @@ def check_compatible_col_index_and_xl_title_for_a_field(field_attr, xl_title, co
             else:
                 if field_attr.get('model'):
                     if not func and not field_attr.get('fields'):
-                        raise UserError(u'model thì phải có ít nhất func và fields')
+                        raise UserError(u'model thì phải có ít nhất func và fields: %s-%s'%(field_name,field_attr))
                 else:
                     if not func:
                         raise UserError (u'Sao không có col_index và không có func luôn field %s attrs %s'%(field_name,u'%s'%field_attr))
 #R5A
-def write_get_or_create_title(MD, sheet, sheet_of_copy_wb, title_row, fname=None):
-    offset_write_xl = get_key(MD, 'offset_write_xl')
-    offset_write_xl_diff = get_key(MD, 'offset_write_xl_diff')
-    check_file_write_more = get_key(MD, 'check_file_write_more')
-    fname = fname or MD.get('model')
+
+def asmall_func(MD, fname,  sheet_ncols, offset_write_xl, sheet_of_copy_wb, title_row, surfix =u' sẵn hay tạo'):
     if offset_write_xl !=None:
-        col =  sheet.ncols + offset_write_xl 
-        title = MD.get('string', fname)  + u' sẵn hay tạo'
-        sheet_of_copy_wb.col(col).width =  get_width(len(title))
-        sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
-    if offset_write_xl_diff !=None:
-        col =  sheet.ncols + offset_write_xl_diff 
-        title = MD.get('string', fname)  + u' Diff'
+        col =  sheet_ncols + offset_write_xl 
+        title = 'Check ' + MD.get('string', fname)  + surfix
         sheet_of_copy_wb.col(col).width =  get_width(len(title))
         sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
     
+def write_get_or_create_title(MD, sheet, sheet_of_copy_wb, title_row, fname=None):
+    offset_write_xl = get_key(MD, 'offset_write_xl')
+    offset_write_xl_diff = get_key(MD, 'offset_write_xl_diff')
+    offset_write_xl_for_searched_obj = get_key(MD, 'offset_write_xl_for_searched_obj')
+    check_file_write_more = get_key(MD, 'check_file_write_more')
+    fname = fname or MD.get('model')
+    sheet_ncols = sheet.ncols
+    for k,v in [(offset_write_xl, u' có sẵn hay phải tạo'),(offset_write_xl_for_searched_obj, u'theo cách tìm'), (offset_write_xl_diff,  u'ở excel giống hay khác trong database')]:
+        asmall_func(MD, fname,  sheet_ncols, k, sheet_of_copy_wb, title_row, v)
+    
+#     if offset_write_xl !=None:
+#         asmall_func(MD, fname,  sheet_ncols, offset_write_xl, sheet_of_copy_wb, title_row)
+#     if offset_write_xl_for_searched_obj !=None:
+#         col =  sheet.ncols + offset_write_xl_for_searched_obj 
+#         title = MD.get('string', fname)  + u' for searched obj'
+#         sheet_of_copy_wb.col(col).width =  get_width(len(title))
+#         sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
+#     if offset_write_xl_diff != None:
+#         col =  sheet.ncols + offset_write_xl_diff 
+#         title = MD.get('string', fname)  + u' Diff'
+#         sheet_of_copy_wb.col(col).width =  get_width(len(title))
+#         sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
+    
+    
     if check_file_write_more:
-        for more_offset,func, more_title in check_file_write_more:
+        for more_offset, func, more_title in check_file_write_more:
             col =  sheet.ncols + more_offset 
             title = more_title
             sheet_of_copy_wb.col(col).width =  get_width(len(title))

@@ -161,6 +161,8 @@
                     <attribute name="required">0</attribute>
                 </xpath>
                 <xpath expr="//page[1]/field/tree/field[@name='product_uom_id']" position="after">
+                    <field name="id_pr" ></field>
+                    <field name="is_recent_edit" ></field>
                     <field name="categ_id" string="Nhóm"></field>
                     <field name="thiet_bi_id"></field>
                     <field name="tracking"></field>
@@ -266,8 +268,8 @@
                     </page>
                     <page string="Import file">
                         <header>
-                            <button class="btn btn-primary" name="import_file" string="import_file" type="object" />
-                            <button name="check_file" string="check_file" type="object" class="btn" />
+                            <button class="btn btn-primary" name="import_file" string="import_file" type="object" context="{'is_in_transfer':True}" />
+                            <button name="check_file" string="check_file" type="object" class="btn"  context="{'is_in_transfer':True}" />
                         </header>
                         <group>
                             <group>
@@ -290,6 +292,11 @@
                                 <field name="st_is_allow_empty_xldata_pn_is_unique_same_name_product" />
                                 <field name="st_is_allow_nonempty_pn_xldata_pr_is_empty_pn_same_name_pr"/> <!--  groups="tonkho.group_write_field_when_import_excel"  -->
                            
+                           		<field name="write_field_pn"/>
+                           		<field name="allow_create_uom_id"/>
+                           		<field name="BreakRowException_if_raise_only_get"/>
+                           		<field name="cate_from_sheetname"/>
+                           		<field name="location_id_to_location_dest_id"/>
                             </group>
                             <group>
                                 <field name="file" filename="filename" />
