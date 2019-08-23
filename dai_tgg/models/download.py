@@ -89,15 +89,12 @@ class DownloadCVI(models.TransientModel):
         rt = self.oc_to_diem()
         self.diem_line_ids = False
         self.diem_line_ids = rt
-#         model = self._context.get('transfer_active_model') or self._context['active_model']
-#         function_key = self.function_key
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'downloadwizard.download',
             'view_mode': 'form',
             'view_type': 'form',
             'res_id': self.id,
-#             'context':{'function_key':function_key},
             'views': [(False, 'form')],
             'target': 'new',
         }

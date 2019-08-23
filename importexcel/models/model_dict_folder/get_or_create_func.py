@@ -17,10 +17,10 @@ def get_create_write_x2m (self,
                                 check_file = False,
                                 is_search = True,
                                 is_write = True,
-                                main_call = False,
+#                                 main_call = False,
                                 x2m_fields = False,
                                 needdata = None,
-                                field_name = None
+                                f_name_call = None
                                  ):
 #     x2m_fields = MD.get('x2m_fields')
     if x2m_fields:
@@ -44,9 +44,9 @@ def get_create_write_x2m (self,
                                 check_file = check_file,
                                 is_search = is_search,
                                 is_write = is_write,
-                                main_call = main_call,
+#                                 main_call = main_call,
                                 needdata = needdata,
-                                field_name = field_name
+                                f_name_call = f_name_call
                                 )
        
         for k,v in new_noti_dict.items():
@@ -74,9 +74,9 @@ def get_create_write(
                                 check_file=False,
                                 is_search = True,
                                 is_write = True,
-                                main_call = False,
+#                                 main_call = False,
                                 needdata = None, 
-                                field_name = None
+                                f_name_call = None
                                 ):
     new_noti_dict = {} 
     model_name = MD.get('model')
@@ -101,11 +101,11 @@ def get_create_write(
         raise UserError (u'len_return_obj > 1, mapped_name: %s'%str(mapped_name))
     
     if (exist_val ==None and return_obj  == empty_object ) and not check_file:
-        create_obj = create_handle(self, search_dict, write_dict, MD, model_name, field_name)
+        create_obj = create_handle(self, search_dict, write_dict, MD, model_name, f_name_call)
         return_obj = create_obj
         new_noti_dict['create'] =1
     elif return_obj and is_write  :
-        write_handle(self, return_obj, MD, write_dict, new_noti_dict, main_call = main_call )
+        write_handle(self, return_obj, MD, write_dict, new_noti_dict, f_name_call = f_name_call )
     return return_obj, searched_obj, new_noti_dict
 
 def search_handle(self, model_dict, search_dict, model_name, setting, needdata):
@@ -135,14 +135,14 @@ def search_handle(self, model_dict, search_dict, model_name, setting, needdata):
             searched_obj  = self.env[model_name].search(domain)
     return searched_obj
                 
-def create_handle(self, search_dict, write_dict, MD, model_name, field_name):
+def create_handle(self, search_dict, write_dict, MD, model_name, f_name_call):
     search_dict_new ={}
-    only_get = get_key(MD,'only_get')
-    if only_get:
-        if MD.get('BreakRowException_if_raise_only_get'):
-            raise BreakRowException(u'Model %s này với giá trị field_name:%s, name: "%s" chỉ được get chứ không được tạo, hãy tạo tay hoặc chọn thuộc tính BreakRowException_if_raise_only_get để bỏ qua thông báo này'%(model_name, field_name,  MD['fields']['name']['val']))
+    allow_create = MD.get('allow_create', True)
+    if not allow_create:
+        if MD.get('BreakRowException_if_raise_allow_create'):
+            raise BreakRowException(u'Model %s này với giá trị f_name_call:%s, name: "%s" chỉ được get chứ không được tạo, hãy tạo tay hoặc chọn thuộc tính BreakRowException_if_raise_allow_create để bỏ qua thông báo này'%(model_name, f_name_call,  MD['fields']['name']['val']))
         else:
-            raise UserError(u'Model %s này với giá trị field_name:%s,  name: "%s" chỉ được get chứ không được tạo, hãy tạo tay hoặc chọn thuộc tính BreakRowException_if_raise_only_get để bỏ qua thông báo này'%(model_name, field_name,  MD['fields']['name']['val']))
+            raise UserError(u'Model %s này với giá trị f_name_call:%s,  name: "%s" chỉ được get chứ không được tạo, hãy tạo tay hoặc chọn thuộc tính BreakRowException_if_raise_allow_create để bỏ qua thông báo này'%(model_name, f_name_call,  MD['fields']['name']['val']))
     search_dict.update(write_dict)
     for f_name,val in search_dict.items():
         field_attr = MD['fields'][f_name]
@@ -153,16 +153,22 @@ def create_handle(self, search_dict, write_dict, MD, model_name, field_name):
     return return_obj
 
         
-def write_handle(self, return_obj, MD, write_dict, new_noti_dict, main_call=False ):
+def write_handle(self, return_obj, MD, write_dict, new_noti_dict, f_name_call=False ):
     write_dict_new = {}
     writed_object = return_obj
     for key_f_name, val in write_dict.items():
         field_MD=  MD['fields'][key_f_name]
         if field_MD.get('val_goc') != False or field_MD.get('write_false', False):
             f_name = get_key(field_MD, 'transfer_name') or key_f_name
-            is_write_this_field = field_MD.get('write_field', True)
+            
+                
+#             is_write_this_field = field_MD.get('write_field', True)
+            is_write_this_field = field_MD['write_field']
             if  is_write_this_field :
                 orm_field_val = getattr(writed_object, f_name)
+                func_in_write_handle = field_MD.get('func_in_write_handle')
+                if func_in_write_handle:
+                    val = func_in_write_handle(orm_field_val,val)
                 is_x2m = field_MD.get('x2m_fields', False)
                 diff = check_diff_write_val_with_exist_obj(orm_field_val, val, field_MD, is_x2m)
                 if diff:
@@ -171,7 +177,7 @@ def write_handle(self, return_obj, MD, write_dict, new_noti_dict, main_call=Fals
                 if write_dict_new:
                     writed_object.write(write_dict_new)
                     new_noti_dict['update'] = 1
-                    if main_call:
+                    if f_name_call =='main_call':
                         print ('**write_dict_new', write_dict_new)
                 else:#'not update'
                     new_noti_dict['skipupdate'] = 1

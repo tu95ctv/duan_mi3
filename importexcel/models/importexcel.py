@@ -27,7 +27,25 @@ class CommonSetting(models.Model):
     begin_row = fields.Integer(default=0)
     file = fields.Binary()
     filename = fields.Char()
+    key_tram =  fields.Selection([('key_ltk','key_ltk'),
+                                  ('key_tti','key_tti'),
+                                  ('key_137','key_137'),
+                                  ('key_tti_dc','key_tti_dc'),
+                                  ('key_ltk_dc','key_ltk_dc'),
+                                  ('key_ltk_dc2','key_ltk_dc2'),
+                                  ],default='key_ltk')
     
+    sheet_name_select = fields.Selection([
+                                   (u'Vô tuyến',u'Vô tuyến'),
+                                   (u'Chuyển Mạch (IMS, Di Động)',u'Chuyển Mạch (IMS, Di Động)'),
+                                   (u'Truyền dẫn',u'Truyền dẫn'),
+                                   (u'IP (VN2, VNP)',u'IP (VN2, VNP)'),
+                                   (u'GTGT',u'GTGT'),(u'XFP, SFP các loại',u'XFP, SFP các loại')  ],rejquired=True)
+    
+    sheet_name =  fields.Char()
+    log = fields.Text()
+    imported_number_of_row = fields.Integer(readonly=1)
+    all_field_attr_dict = fields.Text()
     
 class Importexcel(models.Model):
     _name = 'importexcel.importexcel' 
@@ -36,6 +54,7 @@ class Importexcel(models.Model):
     setting= fields.Char()
     import_key = fields.Selection([
         (u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',u'stock.inventory.line.tong.hop'),
+        (u'do_cap_quang',u'do_cap_quang'),
         (u'Product',u'Product'),
         (u'Thư viện công việc',u'Thư viện công việc'),
         (u'User',u'User')
@@ -48,20 +67,8 @@ class Importexcel(models.Model):
          ,(u'bds.poster',u'bds.poster'),
          (u'Loại sự cố, sự vụ', u'Loại sự cố, sự vụ')
                                     ],required = True,default=u'stock.inventory.line.tong.hop.ltk.dp.tti.dp')
-    sheet_name_select = fields.Selection([
-                                   (u'Vô tuyến',u'Vô tuyến'),
-                                   (u'Chuyển Mạch (IMS, Di Động)',u'Chuyển Mạch (IMS, Di Động)'),
-                                   (u'Truyền dẫn',u'Truyền dẫn'),
-                                   (u'IP (VN2, VNP)',u'IP (VN2, VNP)'),
-                                   (u'GTGT',u'GTGT'),(u'XFP, SFP các loại',u'XFP, SFP các loại')  ],rejquired=True)
-    sheet_name =  fields.Char()
-    key_tram =  fields.Selection([('key_ltk','key_ltk'),
-                                  ('key_tti','key_tti'),
-                                  ('key_137','key_137'),
-                                  ('key_tti_dc','key_tti_dc'),
-                                  ('key_ltk_dc','key_ltk_dc'),
-                                  ('key_ltk_dc2','key_ltk_dc2'),
-                                  ],default='key_ltk')
+    cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')], default = 'find_origin_location_by_key_tram')
+
 
 #     department_id = fields.Many2one('hr.department')
 #     update_number=fields.Integer()
@@ -75,14 +82,11 @@ class Importexcel(models.Model):
                                     (u'stock.production.lot',u'stock.production.lot')
                                     ])
     log = fields.Text()
-
     imported_number_of_row = fields.Integer()
-
 #     line_not_has_quant =  fields.Text()
 
     
-    cach_tim_location_goc = fields.Selection([(u'find_origin_location_by_key_tram',u'mode 1 (tim location goc bằng key)'),(u'find_origin_location_by_column_named_tram',u'mode 2 ( tìm location góc bằng cột trạm)')], default = 'find_origin_location_by_key_tram')
-    all_field_attr_dict = fields.Text()
+    
     def gen_model_dict(self):
        
         return {}

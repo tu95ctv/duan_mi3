@@ -131,7 +131,7 @@ def dl_p3_per_user(dl_obj,user_id,wb = None,tram=None):
                  ('tram',{'range':[4, 4],'val':tram,'style':bold_style}),
                  ('table',{'range':[9, 0],'val':None,'func':table_detail_p3_ ,'offset':3 ,'kargs':{'append_domain_user_id':[('user_id','=',user_id.id)]}}),
                  ('sum',{'range':[5, 4],'func':sum_ })
-                 ]
+                 ] 
     wb = write_all_row(fixups,dl_obj,None,wb = wb,ws_name=user_id.name,font_height=font_height )
     return wb
 def gen_department_id(dl_obj):

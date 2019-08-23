@@ -131,6 +131,7 @@ def gen_user_department_model_dict():
                         ('name',{'xl_title':u'kho_tam','func':None,'key':True,'required':True}),
 #                         ('usage',{'xl_title':u'usage','func':None,'key':False,'required':False}),
                         ('active',{'set_val':True,'key':False,'required':False}),
+                        
                         ('is_kho_cha',{'set_val':True}),
                         ('stock_type',{'set_val':'tram'}),
                         ('location_id',{'func':lambda v,needdata:needdata['vof_dict']['default_location_id']['val'] }),
@@ -145,6 +146,22 @@ def gen_user_department_model_dict():
                     
                        
                     
+                 ('kho_am_id',{'inactive_include_search':True,'model':'stock.location','fields':[
+                        ('name',{'xl_title':u'kho_am','func':None,'key':True,'required':True}),
+#                         ('usage',{'xl_title':u'usage','func':None,'key':False,'required':False}),
+                        ('active',{'set_val':True,'key':False,'required':False}),
+                        ('is_kho_cha',{'set_val':True}),
+                        ('cho_phep_am',{'set_val':True}),
+                        ('stock_type',{'set_val':'tram'}),
+                        ('location_id',{'func':lambda v,needdata:needdata['vof_dict']['default_location_id']['val'] }),
+                        ('partner_id_of_stock_for_report',{'model':'res.partner','func':lambda v,needdata:needdata['vof_dict']['partner_id']['val']}),
+                        ('department_id',
+                                             {'model':'hr.department','fields':[
+                                                 ('name',{'func':lambda v,needdata:needdata['vof_dict']['name']['val'],'key':True,'required':True}),
+                                                        ]
+                                              }),
+                                                                                ]
+                                                                    }),
                     
                     
             
@@ -162,7 +179,7 @@ def gen_user_department_model_dict():
                 ('password',{'func':None,'required':True,'set_val':'123456', 'write_field':False}),
 #                 ('lang',{'set_val':'vi_VN'}),
                 ('phone',{'func':None,'xl_title':u'Số điện thoại','key':False, 'offset_write_xl_diff':1}),
-                ('cac_sep_ids',{'key':False,'required':False,'only_get':True,
+                ('cac_sep_ids',{'key':False,'required':False,'allow_create':False,
                                         'fields':[
                                                  ('login',{'xl_title':u'Cấp trên',  'key':True, 'required':True, 'st_is_x2m_field':True}),
                                                  ]
@@ -226,7 +243,7 @@ def gen_user_department_model_dict():
                       ('thiet_bi_id',{'fields':[
                           ('name',{'required':True,'xl_title':u'Thiết bị','skip_field_if_not_found_column_in_some_sheet':True})
                           ]}),
-                      ('tvcv_id',{'key':True,'only_get':True,'fields':[
+                      ('tvcv_id',{'key':True,'allow_create': False,'fields':[
                           ('name',{'key':True,'required':True,'xl_title':[u'TVCV/ Loại sự cố/ Loại sự vụ',u'Thư Viện Công Việc']})
                           ]}
                        ),

@@ -75,12 +75,14 @@ class Quant(models.Model):
 #                 rs = self.env['stock.quant'].search([('lot_id','=',self.lot_id.id),('quantity','>',0)])
 #                 if len(rs)>1:
 #                     raise UserError(u'Không được có quants nội bộ chung lot_id và quantity > 0 product:%s-sn: %s'%(self.product_id.name,self.lot_id.name))
-    @api.constrains('location_id','quantity')
-    def not_allow_negative_qty(self):
-        for r in self:
-            if not r.location_id.cho_phep_am:
-                if r.quantity < 0:
-                    raise UserError ( u' Kho:%s, không cho phép tạo âm- sản phẩm:%s-Serial number:%s'%(r.location_id.name,r.product_id.name,r.lot_id.name))
+#     @api.constrains('location_id','quantity')
+#     def not_allow_negative_qty(self):
+#         for r in self:
+# #             raise UserError('%s-%s'%(str(self._context),self._context.get('cho_phep_am')))
+#             cho_phep_am = self._context.get('cho_phep_am', True)
+# #             if not r.location_id.cho_phep_am:
+#             if not cho_phep_am and r.quantity < 0:
+#                 raise UserError ( u' Kho:%s, không cho phép tạo âm- sản phẩm:%s-Serial number:%s'%(r.location_id.name,r.product_id.name,r.lot_id.name))
    
     # GHI ĐÈ CÁI XEM DỊCH CHUYỂN KHO, KHÔNG CẦN LỌC VỊ TRÍ KHO
     def action_view_stock_moves(self):

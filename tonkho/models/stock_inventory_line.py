@@ -13,7 +13,7 @@ class InventoryLine(models.Model):
     stt = fields.Integer(string=u'STT')
     tracking =  fields.Selection(related='product_id.tracking', store=True,string=u'Có SN hay không')
     ghi_chu = fields.Text(string=u'Ghi chú')
-    barcode_sn = fields.Char(related = 'prod_lot_id.barcode_sn',store=True)
+#     barcode_sn = fields.Char(related = 'prod_lot_id.barcode_sn',store=True)
     quant_ids =  fields.One2many('stock.quant','inventory_line_id')
     stock_quant_id = fields.Many2one('stock.quant', string=u"Lấy vật tư có trong kho")
     @api.onchange('stock_quant_id')

@@ -13,6 +13,7 @@
                     <field name="partner_id_of_stock_for_report"></field>
                     <field name="location_id"></field>
                     <field name="cho_phep_khac_tram_chon"></field>
+                    <field name="cho_phep_am"></field>
                     <field name="is_kho_cha"></field>
                     <field name="stock_type" required="1"></field>
                     <!-- <field name="complete_name_khong_dau"></field> -->

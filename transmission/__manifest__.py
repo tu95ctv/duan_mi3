@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "import excel",
+    'name': "Transmission",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,13 +20,15 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': [],
+    'depends': ['base','importexcel'],
 
     # always loaded
     'data': [
-#         'security/ir.model.access.csv',
-        'views/importexcel.xml',
+        # 'security/ir.model.access.csv',
+        'views/views.xml',
         'views/templates.xml',
+        'views/do_cap_quang.xml',
+        'views/download_tran.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

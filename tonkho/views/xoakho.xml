@@ -15,10 +15,11 @@
                   <button name="xoa_stock_move_line" string="xoa_stock_move_line" type="object" class="btn-primary" />
                   <button name="xoa_stock_picking" string="xoa_stock_picking" type="object" class="btn-primary" />
                   <button name="xoa_product_template" string="xoa_product_template" type="object" class="btn-primary" />
+                  <button name="xoa_location" string="xoa_location" type="object" class="btn-primary" />
                </header>
                <sheet>
                   <group>
-                     
+                     <field name="len_rs"/>
                   </group>
                </sheet>
             </form>

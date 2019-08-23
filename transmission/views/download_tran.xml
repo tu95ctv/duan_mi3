@@ -1,0 +1,5 @@
+<odoo>
+    <data>
+        <act_window id="download_dcquang_action" name="Download phương án" res_model="downloadwizard.download" src_model="dcquang.dcquang" view_mode="form" multi="True" target="new" key2="client_action_multi" />
+    </data>
+</odoo>

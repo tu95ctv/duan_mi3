@@ -1,0 +1,90 @@
+<odoo>
+	<data>
+		 <record model="ir.ui.view" id="dcquang_form">
+            <field name="name">dcquang.form</field>
+            <field name="model">dcquang.dcquang</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+            		<field name="name" />
+                    <field name="huong" />
+                    <field name="stt" />
+                    <field name="stt_he_thong" />
+                    <field name="he_thong" />
+                    <field name="thiet_bi" />
+                    <field name="odf_tg" />
+                    <field name="odf_tg_toa_do" />
+                    <field name="odf_line" />
+                    <field name="odf_line_toa_do" />
+                    <field name="chay_chinh_hay_du_phong" />
+                    <field name="cap" />
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+         
+      <record model="ir.ui.view" id="dcquang_list">
+            <field name="name">dcquang.list</field>
+            <field name="model">dcquang.dcquang</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                    <field name="huong" />
+                    <field name="stt" />
+                    <field name="stt_he_thong" />
+                    <field name="he_thong" />
+                    <field name="thiet_bi" />
+                    <field name="odf_tg" />
+                    <field name="odf_tg_toa_do" />
+                    
+                    <field name="odf_line" />
+                    <field name="odf_line_toa_do" />
+                    
+                    <field name="chay_chinh_hay_du_phong" />
+                    <field name="cap" />
+                </tree>
+            </field>
+        </record>
+        
+      
+      
+         <record id="dcquang_search" model="ir.ui.view">
+         <field name="name">dcquang_search</field>
+         <field name="model">dcquang.dcquang</field>
+         <field name="arch" type="xml">
+            <search string="Search dc quang">
+               <field name="thiet_bi" />
+              <!-- 
+               <field name="user_id" />
+               <field name="tvcv_id" string="Search Theo mã thư viện hoặc tên thư viện" filter_domain="['|','|',('tvcv_id.name','ilike',self),('tvcv_id.name_khong_dau','ilike',self),('tvcv_id.code','ilike',self)]" />
+               <field name="noi_dung" string="Search Theo nội dung (không dấu hoặc có dấu)" filter_domain="['|',('noi_dung','ilike',self),('noi_dung_khong_dau','ilike',self)]" />
+               <field name="ngay_bat_dau" />
+               <filter name="this month" string="CV Tháng này" domain="[('ngay_bat_dau','&lt;',(context_today()+relativedelta(months=1)).strftime('%Y-%m-01')), ('ngay_bat_dau','&gt;=',time.strftime('%Y-%m-01'))]" help="Chọn tháng này" />
+               <filter name="last month" string="CV Tháng Trước" domain="[('ngay_bat_dau','&gt;=',(context_today()+relativedelta(months=-1)).strftime('%Y-%m-01')), ('ngay_bat_dau','&lt;',time.strftime('%Y-%m-01'))]" help="Chọn tháng này" />
+                -->
+               <group expand="0" string="Group By">
+                  <filter name="huong" string="huong" context="{'group_by':'huong'}" />
+                  <filter name="thiet_bi" string="thiet_bi" context="{'group_by':'thiet_bi'}" />
+                  <filter name="he_thong" string="he_thong" context="{'group_by':'he_thong'}" />
+                  
+               </group>
+            </search>
+         </field>
+      </record>
+      
+      
+        
+        
+      <record model="ir.actions.act_window" id="action_dcquang">
+      <field name="name">Truyền dẫn</field>
+      <field name="res_model">dcquang.dcquang</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+        
+    <menuitem name="Đo cáp quang" id="dcquang_menu" parent="menu_tran_root" action="action_dcquang" sequence="1" />
+       
+
+	</data>
+</odoo>

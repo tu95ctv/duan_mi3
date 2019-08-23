@@ -13,7 +13,6 @@
                          <field name="function_key" readonly="1" invisible="1"></field> 
                          <field name="verbal_function_key" ></field> 
                          <field name="is_not_skip_field_stt"  attrs="{'invisible':[('function_key','!=','stock.quant')]}"></field> 
-                         <field name="is_cho_phep_dl_right_now" groups="base.group_erp_manager" ></field> 
                          <field name="font_height" ></field>
                         </group>
                     </sheet>

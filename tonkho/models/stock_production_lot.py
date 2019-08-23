@@ -36,7 +36,7 @@ class StockProductionLot(models.Model):
     the_tai_san = fields.Char(string=u'Thẻ tài sản')
     ngay_su_dung = fields.Date(string=u'Ngày sử dụng')
     #chưa xài
-    barcode_sn = fields.Char()
+#     barcode_sn = fields.Char()
     
     ml_ids = fields.One2many('stock.move.line','lot_id',compute='ml_ids_',string=u'Các dòng điều chỉnh')
     @api.depends('is_done_ml_filter','is_your_department_filter','id_show')

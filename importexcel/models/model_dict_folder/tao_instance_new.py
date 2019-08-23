@@ -12,8 +12,13 @@ from odoo.addons.importexcel.models.model_dict_folder.recursive_func import expo
 from odoo.tools.float_utils import  float_round
 from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import BreakRowException
 
-
-def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, check_file = False, gen_model_dict_kargs= {}):
+def trust_sheet(a, sh_names):
+    for i in sh_names:
+        rs = re.search('^'+a+'$',i,re.I)
+        if rs:
+            return i
+    raise UserError(u'Không có sheet_name nào tên là %s'%a)
+def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, check_file = False, gen_model_dict_kargs= {}, is_in_transfer = None):
     gen_model_dict_kargs['check_file'] = check_file
     self = odoo_or_self_of_wizard
     key_tram =  getattr(self,'key_tram',False) or key_tram
@@ -25,7 +30,7 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
 #     if cach_tim_location_goc:
     gen_model_dict_kargs['cach_tim_location_goc'] = cach_tim_location_goc
     if callable(MD):
-        MD = MD(self=self, key_tram=key_tram, gen_model_dict_kargs=gen_model_dict_kargs)
+        MD = MD(self=self, key_tram=key_tram, gen_model_dict_kargs=gen_model_dict_kargs, is_in_transfer = is_in_transfer )
     key_allow = MD.get('key_allow',False)
     key_tram = key_allow and key_tram
     if key_allow and not key_tram:
@@ -53,7 +58,7 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
     #R2
     ordereddict_fields( MD)
     #R2A
-#     check_val_of_attrs_is_true_type(MD)
+    check_val_of_attrs_is_true_type(MD)
     
     setting = MD.get('setting',{})
     setting.setdefault('allow_write', MD.get('allow_write', True))
@@ -67,7 +72,7 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
    
     imported_model = self.env[MD.get('model')]
     rs = imported_model.default_get([])#imported_model._fields)
-    all_field_attr_dict, dict_of_att_vs_set_vals = export_some_key_value_of_fields_MD(MD, exported_attrs_list = ['field_type','xl_title'], dict_of_att_vs_set_vals = {})
+    all_field_attr_dict, dict_of_att_vs_set_vals = export_some_key_value_of_fields_MD(MD, exported_attrs_list = ['allow_create'], dict_of_att_vs_set_vals = {})
     self.all_field_attr_dict = all_field_attr_dict
 #     raise UserError(u'%s-%s'%(a,b))
     sheet_names=gen_sheet_names(self,MD, xl_workbook, gen_model_dict_kargs)
@@ -76,10 +81,14 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
     needdata['sheet_names'] = sheet_names
     needdata['key_tram'] = key_tram
     needdata['check_file'] = check_file
+    is_admin = self.user_has_groups('base.group_erp_manager')
+    needdata['is_admin'] = is_admin
     sh_names = xl_workbook.sheet_names()
     if check_file:
         workbook_copy = copy(xl_workbook)
     for sheet_name in sheet_names:
+        
+        sheet_name = trust_sheet(sheet_name, sh_names)
         COPIED_MD = deepcopy(MD)
         needdata['vof_dict'] = COPIED_MD.get('fields') 
         needdata['sheet_name'] = sheet_name
@@ -123,7 +132,9 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
                                               sheet_of_copy_wb = sheet_of_copy_wb,
                                               setting=setting,
                                               sheet_of_copy_wb_para = {'sheet_of_copy_wb':sheet_of_copy_wb,'row':row,'sheet':sheet },
-                                              main_call = True
+                                              f_name_call = 'main_call'
+#                                               main_call = True
+                            
                                )
             obj_list.append(obj)
             
@@ -148,7 +159,7 @@ def create_instance (self,
                     sheet_of_copy_wb = False,
                     setting={},
                     sheet_of_copy_wb_para = None,
-                    main_call = False,
+#                     main_call = False,
                     f_name_call = None
                     ):
     a_row_instance_build_noti_dict = {}
@@ -221,6 +232,8 @@ def create_instance (self,
             if break_condition_func_for_main_instance:
                 break_condition_func_for_main_instance(needdata)
             search_code = u'Empty1:%s'%collection_dict['break_field']
+            if f_name_call == 'main_call':
+                print ('***f_name_call:%s-search_code:%s'%(f_name_call,search_code))
             obj_id = False
         elif collection_dict.get('one_field_equal_none'):
             search_code = u'NoneField:%s'%collection_dict['one_field_equal_none']
@@ -245,7 +258,7 @@ def create_instance (self,
 #                     is_write = True
                      
                     
-            if main_call:
+            if f_name_call == 'main_call':
                 print ('search_dict',search_dict,'update_dict', update_dict)
             search_code = 'co search'
             x2m_fields = MD.get('x2m_fields')
@@ -259,10 +272,10 @@ def create_instance (self,
                                                                     check_file=check_file,
                                                                     is_search=is_search,
                                                                     is_write=is_write,
-                                                                    main_call=main_call, 
+#                                                                     main_call=main_call, 
                                                                     x2m_fields = x2m_fields,
                                                                     needdata = needdata,
-                                                                    field_name = f_name_call
+                                                                    f_name_call = f_name_call
                                                                     
                                                                     )
             for k,v in a_row_instance_build_noti_dict.items():
@@ -286,7 +299,7 @@ def create_instance (self,
     
             
    
-    if main_call:
+    if f_name_call == 'main_call':
         print ('a_row_instance_build_noti_dict', a_row_instance_build_noti_dict)
     
     if exist_val != None:
@@ -310,21 +323,7 @@ def create_instance (self,
                 write_more_val = write_more_func(self, MD, searched_obj, collection_dict, search_code)
                 sheet_of_copy_wb.write(row, sheet.ncols + offset_col, write_more_val, wrap_center_vert_border_style)
     
-#     MD['instance_none_when_check_file'] = None
-    
-#     
-#     if x2m_fields:
-#         remove_all_or_just_add_one_x2m = MD.get('remove_all_or_just_add_one_x2m', 'add_one')
-#         if remove_all_or_just_add_one_x2m == 'remove_all':
-#             obj_id =  [(6,False, obj.mapped('id'))]
-#         else:
-#             obj_id  = list(map(lambda x: (4, x.id, False), obj)) 
-#     else:
-#         if check_file and ((search_code =='co search'  and (not obj or not all(obj))) or u'NoneField' in search_code ):
-#             MD['instance_none_when_check_file'] = True
-#         obj_id = obj.id
-        
-        
+
 
     return obj, obj_id 
 
@@ -348,7 +347,7 @@ def get_a_field_val(self,
                                sheet_of_copy_wb_para,
                                f_name_call=None, 
                            ):
-    print ('**field_name**', field_name)
+#     print ('**field_name**', field_name)
     skip_this_field = field_attr.get('skip_this_field', False)
     if callable(skip_this_field):
             skip_this_field = skip_this_field(self)
@@ -418,6 +417,14 @@ def get_a_field_val(self,
                     val = func(val,**karg)
         if isinstance(val,tuple):
             obj,val = val
+            
+    func_after_func = field_attr.get('func_after_func')
+    if func_after_func:
+        val =  func_after_func(val, needdata,self,obj)
+        if isinstance(val,tuple):
+            obj,val = val
+        
+        
 #         print ('func read model_name:%s field_name:%s'%(model_name,field_name),'val',val)
     
     val = replace_val_for_ci (field_attr,val,needdata)
@@ -474,14 +481,17 @@ def get_a_field_val(self,
     valid_field_func = field_attr.get('valid_field_func')
     if valid_field_func:
         kargs_valid_field_func = field_attr.get('kargs_valid_field_func', {})
+        notice_demo = {'field_name':field_name,'f_name_call':f_name_call }
+        needdata['notice_demo'] = notice_demo
         if kargs_valid_field_func ==None:
             kargs_valid_field_func ={}
+        kargs_valid_field_func
         print ('f_name_call' ,f_name_call, '***kargs_valid_field_func', kargs_valid_field_func, 'field_attr', field_attr)
         valid_field_func(val,obj,needdata,self, **kargs_valid_field_func)
         
         
     print ("row:", row,'f_name_call', f_name_call, 'model_name: ', model_name,'-field: ', field_name, '-val: ', val)
-    check_type_of_val(field_attr, val, field_name, model_name)
+    check_trust_type_of_value_after_all(field_attr, val, field_name, model_name)
     return a_field_code        
 
 
@@ -496,7 +506,8 @@ def replace_val_for_ci(field_attr, val, needdata):
     if  replace_string and check_is_string_depend_python_version(val):
         for pattern,repl in replace_string:
             pattern = pattern.replace('(','\(').replace(')','\)')
-            val = re.sub(pattern, repl, val)
+            val = re.sub(pattern, repl, val, flags=re.I)
+            
     #### end  deal replace string ####
     
     
@@ -512,8 +523,9 @@ def replace_val_for_ci(field_attr, val, needdata):
     if replace_val:
         replace_val_tuple = replace_val.get(needdata['sheet_name']) or replace_val.get('all')
         if replace_val_tuple:
-            for k,v in replace_val_tuple:
-                if val ==k:
+            for k,v in replarce_val_tuple:
+                rs = re.search('^'+k+'$',val,re.I)
+                if rs:
                     val = v
                     break
     return val
@@ -535,7 +547,7 @@ MAP_TYPE = {
                       'many2many':list,
                       'one2many':list,
                       }
-def check_type_of_val(field_attr, val, field_name, model_name):        
+def check_trust_type_of_value_after_all(field_attr, val, field_name, model_name):        
     if field_attr.get('bypass_check_type'):
         return True
     char_field_type = field_attr.get('field_type')
@@ -582,7 +594,7 @@ def xac_dinh_title_rows(self,MD,set_is_largest_map_row_choosing, nrows, sheet_na
                 title_rows = range(range_1-1,range_2)
             else:
                 if set_is_largest_map_row_choosing:
-                    title_rows = range(0,nrows)
+                    title_rows = range(0,30)
                 else:
                     title_rows_some_sheets = MD.get('title_rows_some_sheets',{})
                     if title_rows_some_sheets:

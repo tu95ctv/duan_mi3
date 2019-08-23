@@ -80,9 +80,12 @@ class StockPicking(models.Model):
    
     write_field_pn = fields.Boolean()
     allow_create_uom_id = fields.Boolean()
-    BreakRowException_if_raise_only_get = fields.Boolean()
+    BreakRowException_if_raise_allow_create = fields.Boolean()
     cate_from_sheetname = fields.Boolean()
-    location_id_to_location_dest_id = fields.Boolean()
+    is_dieu_chinh = fields.Boolean()
+    allow_create_sub_location = fields.Boolean()
+    
+    cho_phep_am = fields.Boolean()
     # Field chính trong biên bản
 
     name = fields.Char(
@@ -168,15 +171,15 @@ class StockPicking(models.Model):
     
     
     sheet_name = fields.Char()
-    sheet_name_select = fields.Selection([
-                                   (u'All',u'All'),
-                                   (u'Vô tuyến',u'Vô tuyến'),
-                                   (u'Chuyển mạch',u'Chuyển mạch'),
-                                   (u'Truyền dẫn',u'Truyền dẫn'),
-                                   (u'IP',u'IP'),
-                                   (u'GTGT',u'GTGT'),
-                                   (u'Khác',u'Khác'),
-                                   (u'XFP, SFP các loại',u'XFP, SFP các loại')  ],rejquired=True)
+#     sheet_name_select = fields.Selection([
+#                                    (u'All',u'All'),
+#                                    (u'Vô tuyến',u'Vô tuyến'),
+#                                    (u'Chuyển mạch',u'Chuyển mạch'),
+#                                    (u'Truyền dẫn',u'Truyền dẫn'),
+#                                    (u'IP',u'IP'),
+#                                    (u'GTGT',u'GTGT'),
+#                                    (u'Khác',u'Khác'),
+#                                    (u'XFP, SFP các loại',u'XFP, SFP các loại')  ],required=True)
     
     
     sheet_name =  fields.Char()
@@ -347,6 +350,14 @@ class StockPicking(models.Model):
     def onchange_picking_type(self):
         pass
     #button
+    
+    @api.multi
+    def action_take_kho_am(self):
+        for r in self:
+            for ml in r.move_line_ids:
+                if ml.sltk < 1:
+                    print (r.location_id, r.location_id.department_id)
+                    ml.location_id = r.location_id.department_id.kho_am_id
     @api.multi
     def action_confirm(self):
         self.ghom_stock_move_lines()
@@ -519,7 +530,7 @@ class StockPicking(models.Model):
             return {
              'type' : 'ir.actions.act_url',
 #              'url': '/web/binary/download_checked_import_sml_file?model=stock.picking&id=%s'%(self.id),
-             'url': '/web/binary/download_model?download_model=stock.picking&download_model_id=%s&download_key=%s'%(self.id,'check_imported_file_sml'),
+             'url': '/web/binary/download_model?download_model=stock.picking&download_model_id=%s&download_key=%s&is_in_transfer=True'%(self.id,'check_imported_file_sml'),
              'target': 'new',
              }
         dl_obj = self

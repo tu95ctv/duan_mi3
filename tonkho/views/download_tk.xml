@@ -20,9 +20,9 @@
                 </field>
             </field>
         </record>
-        <act_window id="downloadquants" name="Download số lượng trong kho" res_model="downloadwizard.download" src_model="stock.quant" view_mode="form" multi="True" target="new" key2="client_action_multi" context="{'download_from_model':'tonkho'}" />
-        <act_window id="download_product" name="Download vật tư" res_model="downloadwizard.download" src_model="product.product" view_mode="form" multi="True" target="new" key2="client_action_multi" context="{'download_from_model':'tonkho'}" />
-        <act_window id="download_template" name="Download Template" res_model="downloadwizard.download" src_model="product.template" view_mode="form" multi="True" target="new" key2="client_action_multi" context="{'download_from_model':'tonkho'}" />
+        <act_window id="downloadquants" name="Download số lượng trong kho" res_model="downloadwizard.download" src_model="stock.quant" view_mode="form" multi="True" target="new" key2="client_action_multi"  />
+        <act_window id="download_product" name="Download vật tư" res_model="downloadwizard.download" src_model="product.product" view_mode="form" multi="True" target="new" key2="client_action_multi"  />
+        <act_window id="download_template" name="Download Template" res_model="downloadwizard.download" src_model="product.template" view_mode="form" multi="True" target="new" key2="client_action_multi" />
         
         <record model="ir.actions.act_window" id="download_quants_action">
             <field name="name">Download </field>
@@ -30,7 +30,7 @@
             <field name="view_mode">form</field>
             <field name="view_type">form</field>
             <field name="target">new</field>
-            <field name="context">{'function_key':'stock.quant', 'download_from_model':'tonkho'}</field>
+            <field name="context">{'function_key':'stock.quant'}</field>
         </record>
         <menuitem name="Download Kho" id="dl_stock_quant" parent="stock.menu_stock_inventory_control" action="download_quants_action" sequence="8" />
     </data>

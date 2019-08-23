@@ -16,7 +16,7 @@ class DownloadWizard(models.TransientModel):
     data = fields.Binary('File', readonly=True)
     is_moi_sheet_moi_loai = fields.Boolean(string=u' Chia nhóm',default=True)
     is_not_skip_field_stt = fields.Boolean(string=u'Không xuất trường STT')
-    is_cho_phep_dl_right_now = fields.Boolean(default=True,string=u'Cho phép download ngay')
+#     is_cho_phep_dl_right_now = fields.Boolean(default=True,string=u'Cho phép download ngay')
     font_height = fields.Integer(default=12)
     def model_(self):
         model = self._context.get('active_model')
@@ -41,14 +41,14 @@ class DownloadWizard(models.TransientModel):
     @api.multi
     def gen_pick_func(self): 
         return {}
+    
+    
     @api.multi
     def download_all_model(self):
         active_domain = self._context.get('active_domain',[])
         self.domain_text = self._context
-        if self._context.get('download_right_now') and self.is_cho_phep_dl_right_now:#self.is_dl_right_now:
-#             download_from_model = self._context.get('download_from_model') or ''
+        if self._context.get('download_right_now') :#self.is_dl_right_now:
             url = '/web/binary/download_model?download_model=downloadwizard.download&download_model_id=%s&active_domain=%s'%( self.id,quote(u'%s'%active_domain))
-            print ('url',url)
             return {
                  'type' : 'ir.actions.act_url',
                  'url': url,

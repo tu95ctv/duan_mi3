@@ -15,6 +15,7 @@ def gen_model_dict_categ_and_location_partner():
                          ('usage',{'set_val':'supplier'}),
                          ('is_kho_cha',{'set_val':True}),
                          ('department_id',{'set_val':False}),
+                        ('cho_phep_am',{'set_val':True}),
                          ('cho_phep_khac_tram_chon',{'set_val':True}),
                          ('not_show_in_bb',{'func':lambda v,n: True if v else False,'xl_title':u'not_show_in_bb','for_excel_readonly':True}),
                          ('partner_id_of_stock_for_report',{

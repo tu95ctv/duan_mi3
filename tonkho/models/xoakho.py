@@ -39,6 +39,7 @@ from odoo.tools.float_utils import float_is_zero
 #         return super(StockMove, self).unlink()
 class XoaKho(models.TransientModel):
     _name = 'tonkho.xoakho'
+    len_rs = fields.Integer()
     @api.multi
     def xoakho_action(self):
         for model_name in ['stock.quant','stock.production.lot','stock.inventory',]:#'stock.move','stock_move','product_product,'stock.picking'
@@ -61,7 +62,16 @@ class XoaKho(models.TransientModel):
         for model_name in ['product.template']:#'stock.move','stock_move','product_product,'stock.picking'
             print ('xoa %s'%model_name)
             self.env[model_name].search([]).unlink()
-                   
+              
+    def xoa_location(self):
+        for model_name in ['stock.location']:#'stock.move','stock_move','product_product,'stock.picking'
+            print ('xoa %s'%model_name)
+            rs = self.env[model_name].search([('is_kho_cha','=',False),('department_id','!=',False),('name','!=','Đài HCM dự phòng'),('name','!=','Đài HCM đang chạy')])
+            self.len_rs = len(rs)
+            rs.unlink()
+#             for r in rs:
+#                 print (r.name,r.location_id.name)
+#                 r.unlink()     
             
             
             # xoa theo thu tu sau o phppgadmin, stock_move, stock_move_line,stock_picking,(product_template-->product_product)

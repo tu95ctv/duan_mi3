@@ -11,6 +11,22 @@ class StockMoveLine(models.Model):
     tracking = fields.Boolean(string=u'Có SN hay không', store=False,compute='tracking_')
     id_pr = fields.Integer(related='product_id.id')
     is_recent_edit = fields.Boolean(related='product_id.is_recent_edit')
+    
+    def _action_done(self):
+        
+#         for r in self:
+#             raise UserError(r.qty_done)
+        if 'action_done_from_stock_inventory' in self._context:
+            self =  self.with_context(update_inventory={'stt':self.stt, 'inventory_line_id':self.inventory_line_id.id})
+        rs =  super(StockMoveLine,self )._action_done()
+        raise UserError('kakakaka action_done in sml %s'%self)
+        return rs
+    
+#     
+#     def _action_done(self):
+#         rs = super(StockMoveLine, self)._action_done()
+#         raise UserError('action_done in sml %s'%rs)
+#         return rs
     @api.depends('product_id.tracking')
     def tracking_(self):
         for r in self:
@@ -26,7 +42,11 @@ class StockMoveLine(models.Model):
             if quants:
                 r.sltk = quants[0].quantity
                 
-                
+    @api.constrains('qty_done')
+    def _check_positive_qty_done(self):
+        pass
+#         if any([ml.qty_done < 0 for ml in self]):
+#             raise ValidationError(_('You can not enter negative quantities!'))       
     categ_id = fields.Many2one('product.category',related='product_id.categ_id', store=False,readonly=True)
     thiet_bi_id = fields.Many2one('tonkho.thietbi',related='product_id.thiet_bi_id' ,string = u'Thiết bị',readonly=True)
     ghi_chu = fields.Text(string=u'Ghi chú vật tư')
@@ -83,10 +103,7 @@ class StockMoveLine(models.Model):
                 res['warning'] = {'title': _('Warning'), 'message': message}
         return res
     
-    def _action_done(self):
-        if 'action_done_from_stock_inventory' in self._context:
-            self =  self.with_context(update_inventory={'stt':self.stt, 'inventory_line_id':self.inventory_line_id.id})
-        return super(StockMoveLine,self )._action_done()
+   
     
         
     # Constrans viết mới

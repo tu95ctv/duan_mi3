@@ -15,7 +15,7 @@
     'category': 'Uncategorized',
     'version': '0.1',
     # any module necessary for this one to work correctly
-    'depends': ['base','base_import','hr','stock','downloadwizard','importexcel','setaction','module_test'],
+    'depends': ['base_import','hr','stock','downloadwizard','importexcel','setaction','module_test'],
     # always loaded
     'data': [
         'views/ctr.xml',

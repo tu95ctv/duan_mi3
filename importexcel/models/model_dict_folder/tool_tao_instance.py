@@ -14,6 +14,10 @@ def get_width(num_characters):
 # header_bold_style = xlwt.easyxf("font: bold on, name Times New Roman, height 240 ; align:  vert centre;  pattern: pattern solid, fore_colour gray25;borders: left thin, right thin, top thin, bottom thin")
 
 EMPTY_CHAR = [u'',u' ',u'\xa0',u'#N/A',u'N/A',u'NA']
+empty_char2 = [u'NA',u"'",u"`",u'N/C', u'-',u'--']
+EMPTY_CHAR.extend(empty_char2)
+
+
 pt = '^('+'|'.join(EMPTY_CHAR)+')$'
 def check_is_string_depend_python_version(val):
     if VERSION_INFO==2:

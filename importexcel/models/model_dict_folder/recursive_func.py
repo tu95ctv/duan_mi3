@@ -27,6 +27,7 @@ ATT_TYPE_LIST ={
   'func_check_if_excel_is_same_existence': ['function'],
   'func_map_database_existence': ['function'],
   'func_pre_func': ['function'],
+  'kargs_valid_field_func': ['dict'],
   'karg': ['dict'],
   'key': ['bool', 'str'],
   'key_allow': ['bool'],
@@ -39,7 +40,7 @@ ATT_TYPE_LIST ={
   'offset_write_xl_for_searched_obj': ['int'],
   'check_file_write_more': ['list'],
 
-  'only_get': ['bool'],
+  'allow_create': ['bool'],
   'operator_search': ['str'],
 #   'prepare_func': ['function'],
   'required_pre': ['bool'],
@@ -54,6 +55,7 @@ ATT_TYPE_LIST ={
   'required_when_check_file': ['bool'],
   'requried': ['bool'],
   'search_func': ['function'],
+  'func_after_func': ['function'],
   'remove_out_item_func': ['function'],
   'set_is_largest_map_row_choosing': ['bool'],
   'set_val': ['str', 'function', 'int', 'NoneType'],
@@ -63,7 +65,7 @@ ATT_TYPE_LIST ={
   'sheet_names': ['function','list'],
   'allow_not_match_xl_title': ['bool', 'NoneType'],
   'skip_this_field': ['bool'],
-  'BreakRowException_if_raise_only_get': ['bool'],
+  'BreakRowException_if_raise_allow_create': ['bool'],
   'string': ['str'],
   'title_rows': ['range', 'list'],
   'title_rows_some_sheets': ['dict'],
@@ -71,8 +73,14 @@ ATT_TYPE_LIST ={
   'type_allow': ['list'],
   'valid_field_func': ['function', 'NoneType'],
   'write_field': ['bool', 'NoneType'],
-  'xl_title': ['list', 'NoneType', 'str']
+  'xl_title': ['list', 'NoneType', 'str'],
+  'dong_test':['int'],
+  'func_in_write_handle':['function']
 }
+
+DEFAULT_VAL_DICT_OF_ATTR = {'write_field':{'not_allow_equal_None':True, 'default_value': True},
+                            'set_val':{'check_type':False}, 'allow_create': {'not_allow_equal_None':True, 'default_value': True}}
+
 
 
   
@@ -128,17 +136,13 @@ def rut_gon_key(MD, key_tram):
     for key, val in MD.items():
         
         if isinstance(val, dict) and key_tram:
-            val =  val.get(key_tram) if key_tram in val else val.get('all_key_tram')
+            val =  val.get(key_tram) if key_tram in val else val.get('all_key_tram', DEFAULT_VAL_DICT_OF_ATTR.get(key,{}).get('default_value',None))
         
         MD[key] = val
         if key == 'fields' :
             for fname, field_MD in val: 
                 rut_gon_key(field_MD, key_tram)
                     
-# def convert_val_depend_key_tram(value, key_tram):
-#     if isinstance(value, dict) and key_tram:
-#         value =  value.get(key_tram) if key_tram in value else value.get('all_key_tram')
-#     return value
 
 ###R2
 def ordereddict_fields(MD):
@@ -154,7 +158,8 @@ def check_val_of_attrs_is_true_type(MD):
         if attr == 'fields':
             for field_MD in val.values():
                 check_val_of_attrs_is_true_type(field_MD)
-        if not check_set_val_is_true_type(attr, val):
+        check_type = DEFAULT_VAL_DICT_OF_ATTR.get(attr,{}).get('check_type',True)
+        if check_type and not check_set_val_is_true_type(attr, val):
             raise UserError (u'attr %s val %s không thỏa hàm check_set_val_is_true_type'%(attr,val))
             
             
@@ -167,12 +172,15 @@ def check_set_val_is_true_type(attr, val):
         raise UserError(u'attr:%s chưa có liệt kê  trong ATT_TYPE_LIST'%attr)
     if allow_type_list ==[]:
         return True
-    if  callable(val):
-        str_val_type = 'function'
+#     if  callable(val):
+#         str_val_type = 'function'
     elif val == None :
+        not_allow_equal_None = DEFAULT_VAL_DICT_OF_ATTR.get('attr',{}).get('not_allow_equal_None')
+        if not_allow_equal_None:
+            raise UserError('not_allow_equal_None')
         return True
     else:
-        str_val_type =convert_name_class_to_string(val)
+        str_val_type = convert_name_class_to_string(val)
     if str_val_type not in allow_type_list:
         raise UserError (u'attr %s val %s, type:%s, không đúng dữ liệu %s'%(attr,val, str_val_type, allow_type_list))
         return False
@@ -196,7 +204,8 @@ def add_more_attrs_to_field_MD(self, MD, field_stt = 0, setting={}):# add x2m_fi
             write_false = field_MD['write_false'] if 'write_false' in field_MD else st_write_false
             field_MD['write_false'] = write_false
             field_MD['field_stt'] = field_stt
-            
+            write_field = field_MD.get('write_field', DEFAULT_VAL_DICT_OF_ATTR.get('write_field').get('default_value'))
+            field_MD['write_field'] = write_field
             if not field_MD.get('for_excel_readonly') :# and not skip_this_field
                 field = fields[f_name]
                 field_MD['field_type'] = field.type
@@ -212,22 +221,15 @@ def add_more_attrs_to_field_MD(self, MD, field_stt = 0, setting={}):# add x2m_fi
             if f_name in default_dict and field_MD.get('default_val') ==None:
                 default_val = default_dict[f_name]
                 field_MD['default_val']=  default_val
-            
             if field_MD.get('empty_val'):
                 partern_empty_val =  '^('+  '|'.join(field_MD.get('empty_val')) +')$'
                 field_MD['partern_empty_val'] = partern_empty_val
-            
-            
             if 'st_is_x2m_field' in field_MD:
                 x2m_fields = MD.setdefault('x2m_fields',[])
                 x2m_fields.append(f_name)
-                
             if field_MD.get('fields'):
                     field_stt = add_more_attrs_to_field_MD(self, field_MD, field_stt =  field_stt, setting=setting)
-            
-            
     return field_stt
-
 
  # R4        
 def define_col_index_common(title_rows, sheet, COPY_MODEL_DICT, set_is_largest_map_row_choosing = False):
@@ -307,45 +309,7 @@ def add_more_attrs_to_field_MD_after_add_col_index(self, MD, field_stt = 0, sett
             if field_MD.get('fields'):
                     field_stt = add_more_attrs_to_field_MD(self, field_MD, field_stt =  field_stt, setting=setting)
             
-            
-
-
-
-
-# def define_col_index(title_rows, sheet, MD):
-#     title_col_dict = {}
-#     for row in title_rows:
-#         if row >= sheet.nrows:
-#             break
-#         for col in range(0, sheet.ncols):
-#             read_excel_value = str(sheet.cell_value(row,col))
-#             title_col_dict[read_excel_value] = {'col':col, 'row':row}
-#     look_col_index_for_field_md(MD, title_col_dict)
-#     
-# 
-# def look_col_index_for_field_md(MD, title_col_dict):
-#     for field_MD in MD['fields'].values():
-#         xl_titles = field_MD.get('xl_title')
-#         if xl_titles and field_MD.get( 'col_index') != None:
-#             if isinstance(xl_titles, str):
-#                 xl_titles = [xl_titles]
-#             field_map = False
-#             for xl_title in xl_titles:
-#                 xl_title_partern = u'^%s$'%xl_title
-#                 xl_title_partern = xl_title_partern.replace('\\','\\\\').replace('(','\(').replace(')','\)') #không thể thể hiện chuổi \ nên thể hiện bằng \\                for xl_read_val, col in title_col_dict.items():
-#                 for read_excel_val, col_dict in title_col_dict.items():
-#                     rs = re.search(xl_title_partern, read_excel_val, re.IGNORECASE)
-#                     if rs:
-#                         field_map = True
-#                         break
-#                 if field_map:
-#                     break
-#             if field_map:
-#                 field_MD['col_index'] = col_dict['col']
-#         if 'fields' in field_MD:
-#             look_col_index_for_field_md(field_MD, title_col_dict)
-            
-        
+     
 
 #R5           
 def check_compatible_col_index_and_xl_title(self, MD, needdata):
@@ -399,21 +363,7 @@ def write_get_or_create_title(MD, sheet, sheet_of_copy_wb, title_row, fname=None
     sheet_ncols = sheet.ncols
     for k,v in [(offset_write_xl, u' có sẵn hay phải tạo'),(offset_write_xl_for_searched_obj, u'theo cách tìm'), (offset_write_xl_diff,  u'ở excel giống hay khác trong database')]:
         asmall_func(MD, fname,  sheet_ncols, k, sheet_of_copy_wb, title_row, v)
-    
-#     if offset_write_xl !=None:
-#         asmall_func(MD, fname,  sheet_ncols, offset_write_xl, sheet_of_copy_wb, title_row)
-#     if offset_write_xl_for_searched_obj !=None:
-#         col =  sheet.ncols + offset_write_xl_for_searched_obj 
-#         title = MD.get('string', fname)  + u' for searched obj'
-#         sheet_of_copy_wb.col(col).width =  get_width(len(title))
-#         sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
-#     if offset_write_xl_diff != None:
-#         col =  sheet.ncols + offset_write_xl_diff 
-#         title = MD.get('string', fname)  + u' Diff'
-#         sheet_of_copy_wb.col(col).width =  get_width(len(title))
-#         sheet_of_copy_wb.write(title_row, col, title, header_bold_style)
-    
-    
+
     if check_file_write_more:
         for more_offset, func, more_title in check_file_write_more:
             col =  sheet.ncols + more_offset 

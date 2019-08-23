@@ -1,0 +1,191 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="hcmaccount.list">
+      <field name="name">hcmaccount list</field>
+      <field name="model">hcmaccount.hcmaccount</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="hcmaccount.action_window">
+      <field name="name">hcmaccount window</field>
+      <field name="res_model">hcmaccount.hcmaccount</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="hcmaccount.action_server">
+      <field name="name">hcmaccount server</field>
+      <field name="model_id" ref="model_hcmaccount_hcmaccount"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="hcmaccount" id="hcmaccount.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="hcmaccount.menu_1" parent="hcmaccount.menu_root"/>
+    <menuitem name="Menu 2" id="hcmaccount.menu_2" parent="hcmaccount.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="hcmaccount.menu_1_list" parent="hcmaccount.menu_1"
+              action="hcmaccount.action_window"/>
+    <menuitem name="Server to list" id="hcmaccount" parent="hcmaccount.menu_2"
+              action="hcmaccount.action_server"/>
+    -->
+    
+ <menuitem name="Transmission" id="menu_tran_root" />
+    
+    <record model="ir.ui.view" id="form_luong">
+            <field name="name">luong.form</field>
+            <field name="model">tran.luong</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+            	<field name="name"></field>
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+        
+      <record model="ir.ui.view" id="list_luong">
+            <field name="name">luong.list</field>
+            <field name="model">tran.luong</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+        
+        
+       
+       <!--  -->
+       
+       <record model="ir.ui.view" id="truyendan_form">
+            <field name="name">truyendan.form</field>
+            <field name="model">tran.truyendan</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+            	<field name="name"></field>
+            	<field name="diem_ids">
+            	</field>
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+        
+      <record model="ir.ui.view" id="truyendan_list">
+            <field name="name">truyendan.list</field>
+            <field name="model">tran.truyendan</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+        
+        
+        
+      <record model="ir.actions.act_window" id="action_truyendan">
+      <field name="name">Truyền dẫn</field>
+      <field name="res_model">tran.truyendan</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+        
+        
+    
+    <record model="ir.actions.act_window" id="action_luong">
+      <field name="name">Luồng</field>
+      <field name="res_model">tran.luong</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    
+    
+    <record model="ir.ui.view" id="diem_form">
+            <field name="name">diem.form</field>
+            <field name="model">tran.diem</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+            	<field name="name"></field>
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+        
+        
+        
+      <record model="ir.ui.view" id="diem_list">
+            <field name="name">diem.list</field>
+            <field name="model">tran.diem</field>
+            <field name="priority">15</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="stt" />
+                    <field name="truyendan_id" />
+                    <field name="porttb_id" />
+                    <field name="luong_id" />
+                </tree>
+            </field>
+        </record>
+        
+       
+       
+       <record model="ir.ui.view" id="diem_list_for_form">
+            <field name="name">diem.list</field>
+            <field name="model">tran.diem</field>
+            <field name="priority">14</field>
+            <field name="inherit_id" ref="diem_list"></field>
+            <field name="arch" type="xml">
+            	<xpath expr="//tree" position="attributes">
+            		<attribute name="editable">bottom</attribute>
+            	</xpath>
+            </field>
+        </record>
+        
+        
+        
+      <record model="ir.actions.act_window" id="action_diem">
+      <field name="name">Điểm</field>
+      <field name="res_model">tran.diem</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    
+    
+    
+     <menuitem name="Luong" id="luong_menu" parent="menu_tran_root" action="action_luong" sequence="1" />
+     <menuitem name="TR Dẫn" id="truyendan_menu" parent="menu_tran_root" action="action_truyendan" sequence="1" />
+     <menuitem name="Điểm" id="diem_menu" parent="menu_tran_root" action="action_diem" sequence="1" />
+  </data>
+</odoo>

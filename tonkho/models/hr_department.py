@@ -11,6 +11,7 @@ class Department(models.Model):
     default_location_id =fields.Many2one('stock.location',string=u'Kho mặc định')
     default_location_running_id =fields.Many2one('stock.location',string=u'Kho mặc định đang chạy')
     kho_tam_id =fields.Many2one('stock.location',string=u'Kho tạm')
+    kho_am_id =fields.Many2one('stock.location',string=u'Kho âm')
     @api.model
     def create(self, vals):
         try:

@@ -104,8 +104,7 @@ def download_model_new_ml(dl_obj, Export_Para=None,workbook=None,
         worksheet = workbook.add_sheet(sheet_name,cell_overwrite_ok=True)
         worksheet.header_str = 'not thing'
         worksheet.footer_str = 'not thing'
-#         worksheet.PageSetup.CenterHeader = ''
-#         worksheet.PageSetup.CenterFooter = ''
+
     needdata = {'a_instance_dict':{'move_line_ids.stt_not_model':{'val':0}}}
     needdata['dl_obj'] = dl_obj
     if gen_domain:
@@ -117,19 +116,13 @@ def download_model_new_ml(dl_obj, Export_Para=None,workbook=None,
     order = Export_Para.get('search_para',{})
     print ('order',order)
     all_objs = request.env[exported_model].search(domain,**order)
-#     all_objs = all_objs.sorted(key=lambda r: r.move_line_ids[0].stt)
     model_fields = request.env[exported_model]._fields
-    
-    
-#     skip_tinh_trang_field = set(dl_obj.move_line_ids.mapped('tinh_trang')) ==set(['tot']) and   dl_obj.is_ghom_tot
-#     FIELDNAME_FIELDATTR['move_line_ids.tinh_trang']['skip_field'] = skip_tinh_trang_field
     
     add_title(worksheet, FIELDNAME_FIELDATTR, 
               model_fields, ROW_TITLE=row_index,
                offset_column=0,
                is_set_width = False,
                font_height=font_height
-#                is_auto_width = False
                )
     nrow = 0
     row_index +=1
@@ -141,7 +134,9 @@ def download_model_new_ml(dl_obj, Export_Para=None,workbook=None,
             add_1_row_new_ml(worksheet, move , FIELDNAME_FIELDATTR, 
                              row_index, offset_column=0,
                              needdata=needdata,
-                             save_ndata=True, ml=ml, ml_index=ml_index,rowspan=rowspan,
+                             save_ndata=True, ml=ml,
+                             ml_index=ml_index,
+                             rowspan=rowspan,
                              font_height=font_height,
                              wrap_center_vert_border_style = wrap_center_vert_border_style
 
