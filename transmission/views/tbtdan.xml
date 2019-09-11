@@ -1,0 +1,135 @@
+<odoo>
+	<data>
+		
+		<!-- tbtd -->
+     	<record model="ir.ui.view" id="tbtd_form">
+            <field name="name">tbtd.form</field>
+            <field name="model">tran.tbtdan</field>
+            <field name="priority">15</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+            		<field name="soi_or_thiet_bi" />
+            		<field name="name" />
+                    <field name="ten_he_thong" />
+                    <field name="he_thong_id" />
+                    <field name="slot" />
+                    <field name="port" />
+                    <field name="odf" />
+                    <field name="port_odf" />
+                    <field name="rate" />
+                    <field name="ten" />
+                    <field name="near" />
+                    <field name="far" />
+                    <field name="tb_or_cq" />
+                    <field name="port_tb_or_cq" />
+                    <field name="cap_quang" />
+                    <field name="soi" />
+                    <field name="luong" />
+                    <field name="thiet_bi_phia_truoc_id" />
+                    <field name="thiet_bi_form_view_ref"></field>
+                    <field name="thiet_bi_tree_view_ref"></field>
+                    <field name="thiet_bi_search_view_ref"></field>
+                    <field name="thiet_bi_type"></field>
+                    <field name="refect_thiet_bi_id" />
+                    <field name="thiet_bi_id" domain="[('soi_or_thiet_bi','=',thiet_bi_type)]" context="{'form_view_ref': thiet_bi_form_view_ref ,'tree_view_ref': '' , 'search_view_ref':'transmission.soi_search'}" />
+                    <!--   <field name="thiet_bi_tree_view_ref"></field>
+                    <field name="thiet_bi_form_view_ref"></field>
+                    <field name="thiet_bi_search_view_ref"></field>
+                    <field name="thiet_bi_type"></field>
+                    <field name="thiet_bi_id" domain="[('soi_or_thiet_bi','=',thiet_bi_type)]" context="{'form_view_ref':'transmission.tbtd_form', 'tree_view_ref':thiet_bi_tree_view_ref ,  'search_view_ref':thiet_bi_search_view_ref}" /> -->
+                    <field name="odf_ids" />
+                    <field name="luong_txt" />
+                    <field name="trig_field" />
+                    <field name="nhan_txt" />
+                    <field name="day_nhay_ids" />
+                    
+                    
+                    
+                    <!-- 
+                    <field name="number_partner_odf" />
+                     -->
+                    
+                    <!-- <field name="file_name" /> -->
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+    
+    
+    
+      <record model="ir.ui.view" id="tbtd_list">
+            <field name="name">tbtd.list</field>
+            <field name="model">tran.tbtdan</field>
+            <field name="priority">15</field>
+            <field name="arch" type="xml">
+                <tree>
+                	<field name="soi_or_thiet_bi" />
+                    <field name="name" />
+                    <field name="ten_he_thong" />
+                    <field name="he_thong_id" />
+                    <field name="slot" />
+                    <field name="port" />
+                    <field name="odf" />
+                    <field name="port_odf" />
+                    <field name="rate" />
+                    <field name="ten" />
+                    <field name="near" />
+                    <field name="far" />
+                    <field name="tb_or_cq" />
+                    <field name="port_tb_or_cq" />
+                    <field name="cap_quang" />
+                    <field name="soi" />
+                    <field name="luong" />
+                    <field name="test1" />
+                    <field name="test2" />
+                    <field name="nhan_txt" />
+                    <field name="thiet_bi_phia_truoc_id" />
+                    <field name="refect_thiet_bi_id" />
+                    <field name="thiet_bi_id" context="{'form_view_ref':'transmission.soi_form'}" />
+                    <field name="odf_ids" />
+                    <field name="luong_txt" />
+                   <!-- <field name="file_name" /> --> 
+                </tree>
+            </field>
+        </record>
+        
+        
+        <record id="tbtdan_search" model="ir.ui.view">
+         <field name="name">tbtdan_search</field>
+         <field name="model">tran.tbtdan</field>
+         <field name = "priority">15</field>
+         <field name="arch" type="xml">
+            <search string="Search tbtdan">
+               <field name="port" />
+               <group expand="0" string="Group By">
+                  <filter name="ten_he_thong" string="ten_he_thong" context="{'group_by':'ten_he_thong'}" />
+                  <filter name="tb_or_cq" string="tb_or_cq" context="{'group_by':'tb_or_cq'}" />
+                  <filter name="cap_quang" string="cap_quang" context="{'group_by':'cap_quang'}" />
+               </group>
+            </search>
+         </field>
+      </record>
+      
+      
+      
+        
+      <record model="ir.actions.act_window" id="action_tbtd">
+      <field name="name">Thiết bị TD</field>
+      <field name="res_model">tran.tbtdan</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'default_soi_or_thiet_bi':'thiet_bi'}</field>
+      <field name="domain">[('soi_or_thiet_bi','=','thiet_bi')]</field>
+    </record>
+     <menuitem name="TBDT" id="tbtd1_menu" parent="menu_tran_root" action="action_tbtd" sequence="1" />
+     
+     
+     <!-- end tbtd -->
+     
+     
+     
+     
+	</data>
+</odoo>

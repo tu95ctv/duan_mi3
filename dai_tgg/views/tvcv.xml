@@ -187,7 +187,7 @@
          <field name="res_model">tvcv</field>
          <field name="context">{'default_loai_record':'Sự Cố'}</field>
          <field name="domain">[('loai_record','=','Sự Cố')]</field>
-         <field name="search_view_id" ref="loai_suco_suvu_search" />
+         <field name="search_3" ref="loai_suco_suvu_search" />
          <field name="view_mode">tree,form</field>
       </record>
       <record model="ir.actions.act_window" id="loai_suvu_action">

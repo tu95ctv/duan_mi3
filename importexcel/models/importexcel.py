@@ -52,9 +52,12 @@ class Importexcel(models.Model):
     _inherit = 'importexcel.commonsetting'
     _auto = True
     setting= fields.Char()
+    department_id = fields.Many2one('hr.department')
     import_key = fields.Selection([
         (u'stock.inventory.line.tong.hop.ltk.dp.tti.dp',u'stock.inventory.line.tong.hop'),
         (u'do_cap_quang',u'do_cap_quang'),
+        (u'import_soi',u'import_soi'),
+        (u'tbtdan',u'tbtdan'),
         (u'Product',u'Product'),
         (u'Thư viện công việc',u'Thư viện công việc'),
         (u'User',u'User')
@@ -75,9 +78,10 @@ class Importexcel(models.Model):
 #     create_number=fields.Integer()
 #     skipupdate_number=fields.Integer()
 #     thong_bao_khac = fields.Char()
-    trigger_model = fields.Selection([(u'kiemke',u'kiemke'),
-                                    (u'vattu',u'vattu'),
-                                    (u'kknoc',u'kknoc'),
+    trigger_model = fields.Selection([
+                                    (u'tran.soi','tran.soi'),
+                                    (u'tran.tbtdan','tran.tbtdan'),
+                                    (u'tran.odf','tran.odf'),
                                     (u'cvi',u'cvi'),
                                     (u'stock.production.lot',u'stock.production.lot')
                                     ])
@@ -144,13 +148,84 @@ class Importexcel(models.Model):
         self.test_result_2 =len(rs2)
         self.test_result_3= rs3
         
+    def look_soi(self):
+        for r in self.env['tran.tbtdan'].search([]):
+            cap_quang = r.cap_quang
+            soi = r.soi
+            if soi:
+                soi = soi.split(',')[0]
+            if soi and cap_quang:
+                rs = self.env['tran.tbtdan'].search([('tuyen_cap','=', cap_quang),('stt_soi','=',soi)])
+                if rs:
+                    r.thiet_bi_id = rs[0]
+            
+            
+            
+        
     def test_code(self):
-#         t = self.env['tvcv'].create({'name':'aa','diem':None,'code':None})
-#         print (t.name, t.diem, t.code)
-            t = self.env['tvcv']
-            t1 = self.env['tvcv'].search([('code','ilike','HCM.QL009')])
-            t2 = t |t1 | t
-            raise UserError(u'%s'%all(t))
+        thiet_bi_list = ['P2.LTK-MX2020', 'HW8800-LTK']
+        for r in self.env['tran.tbtdan'].search([]):
+#             ten_he_thong = r.ten_he_thong
+            ten_he_thong = r.he_thong_id.name
+            port_tb_or_cq = r.port_tb_or_cq
+            if port_tb_or_cq:
+                rs = re.search('(.*?)\s',port_tb_or_cq)
+                if rs:
+                    port_tb_or_cq = rs.group(1)
+                    r.test1 =port_tb_or_cq
+                tb_or_cq = r.tb_or_cq
+                if tb_or_cq =='P2-MX2020':
+                    tb_or_cq = 'P2.LTK-MX2020'
+                try:
+                    tb_or_cq_index = thiet_bi_list.index(tb_or_cq)
+                except ValueError:
+                    tb_or_cq_index = None
+                try:
+                    ten_he_thong_index = thiet_bi_list.index(ten_he_thong)
+                except ValueError:
+                    ten_he_thong_index = None
+                     
+                if tb_or_cq_index!=None and ten_he_thong_index!=None:
+                    tb_or_cq_id = self.env['tran.hethong'].search([('name','=',tb_or_cq)]).id
+                    if not tb_or_cq_id:
+                        raise UserError('Không tìm thấy tb_or_cq_id')
+                    mapping = self.env['tran.tbtdan'].search([('port', '=',port_tb_or_cq ), ('he_thong_id','=', tb_or_cq_id)])
+                    if mapping:
+                        if len(mapping)==1:
+                            r.test2 = mapping[0].name
+                            if ten_he_thong_index < tb_or_cq_index:
+                                attr_name = 'thiet_bi_id'
+                            else:
+                                attr_name = 'thiet_bi_phia_truoc_id'
+                            setattr(r, attr_name, mapping[0])
+                        else:
+                            r.test2 = mapping.mapped('name')
+                else:
+                    r.test2  = False
+                    
+    def test_code_2(self):
+        for r in self.env['tran.tbtdan'].search([]):
+            r.thiet_bi_id = False
+            r.thiet_bi_phia_truoc_id = False
+            
+        
+                    
+#         for r in self.env['tran.tbtdan'].search([]):
+#             port_tb_or_cq = r.port_tb_or_cq
+#             if port_tb_or_cq:
+#                 rs = re.search('(.*?) ',port_tb_or_cq)
+#                 if rs:
+#                     r.test1 = rs.group(1)
+        
+#         if self.trigger_model:
+#             count = 0
+#             self.env[self.trigger_model].search([]).write({'trig_field':'ok'})
+# 
+#         else:
+#             raise UserWarning(u'Bạn phải chọn trigger model')
+#         
+#         return True
+
         
 #             print ('t.department_id, t.diem, t.name,t.id',t.department_id, t.diem, t.name, t.id)
 #         fl =  float_compare(1.667, 1.67, precision_rounding=2)
@@ -173,13 +248,14 @@ class Importexcel(models.Model):
 #         self.env['stock.inventory'].browse([13]).line_ids.unlink()
     def trigger(self):
         if self.trigger_model:
-            count = 0
-            self.env[self.trigger_model].search([]).write({'trig_field':'ok'})
+            
+            rs = self.env[self.trigger_model].search([])
+            for r in rs:
+                r.write({'trig_field':True})
 
         else:
             raise UserWarning(u'Bạn phải chọn trigger model')
   
-    
     def import_strect(self):
         pass
         return True

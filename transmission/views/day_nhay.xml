@@ -1,0 +1,44 @@
+<odoo>
+	<data>
+		 <record model="ir.ui.view" id="daynhay_form">
+            <field name="name">daynhay.form</field>
+            <field name="model">tran.daynhay</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+					<field name="name" />
+                    <field name="tbtd_id" />
+            	
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+        
+      <record model="ir.ui.view" id="daynhay_list">
+            <field name="name">daynhay.list</field>
+            <field name="model">tran.daynhay</field>
+            <field name="arch" type="xml">
+                <tree>
+                
+                    <field name="name" />
+                    <field name="tbtd_id" />
+                    
+                </tree>
+            </field>
+        </record>
+        
+        
+       
+      
+      
+        
+      <record model="ir.actions.act_window" id="action_daynhay">
+      <field name="name">daynhay</field>
+      <field name="res_model">tran.daynhay</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+     <menuitem name="daynhay" id="daynhay_menu" parent="menu_tran_root" action="action_daynhay" sequence="1" />
+	</data>
+</odoo>

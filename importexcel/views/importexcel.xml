@@ -14,6 +14,9 @@
                   <button name="check_file" string="check_file" type="object" class="btn-primary" />
                   <button name="set_parameter_tonkho" string="set_parameter_tonkho" type="object" class="btn-primary" />
                   <button name="test_code" string="test_code" type="object" class="btn-primary" />
+                  <button name="look_soi" string="look_soi" type="object" class="btn-primary" />
+                  <button name="test_code_2" string="test_code_2" type="object" class="btn-primary" />
+                  <button name="trigger" string="trigger" type="object" class="btn-primary" />
                </header>
                <sheet>
                   <group>
@@ -27,6 +30,7 @@
                         <field name="dong_test"></field>
                         <field name="begin_row"></field>
                      	<field name="trigger_model" />
+                     	<field name="department_id" />
                      </group>
                      <group string = "Default">
                          <field name="filename" />

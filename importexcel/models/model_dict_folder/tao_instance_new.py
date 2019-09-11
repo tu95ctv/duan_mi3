@@ -11,10 +11,13 @@ from odoo.addons.importexcel.models.model_dict_folder.get_or_create_func import 
 from odoo.addons.importexcel.models.model_dict_folder.recursive_func import export_all_key_list_vals_key_list_type_of_val,rut_gon_key,ordereddict_fields, check_val_of_attrs_is_true_type, add_more_attrs_to_field_MD,define_col_index_common,check_compatible_col_index_and_xl_title,write_get_or_create_title, convert_dict_to_order_dict_string, export_some_key_value_of_fields_MD 
 from odoo.tools.float_utils import  float_round
 from odoo.addons.importexcel.models.model_dict_folder.tool_tao_instance import BreakRowException
+from builtins import map
 
 def trust_sheet(a, sh_names):
     for i in sh_names:
-        rs = re.search('^'+a+'$',i,re.I)
+        pt = '^'+a+'$'
+        pt = pt.replace('(','\(').replace(')','\)')
+        rs = re.search(pt,i,re.I)
         if rs:
             return i
     raise UserError(u'Không có sheet_name nào tên là %s'%a)
@@ -48,6 +51,7 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
 
     if not self.file:
         raise UserError(u'Bạn phải upload file để import')
+    filename = self.filename
     file_content = base64.decodestring(self.file)
     formatting_info = False if '.xlsx' in self.filename else True
     xl_workbook = xlrd.open_workbook(file_contents = file_content, formatting_info=formatting_info)
@@ -79,6 +83,7 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
     needdata = {}
     needdata['self'] = self
     needdata['sheet_names'] = sheet_names
+    needdata['file_name'] = filename
     needdata['key_tram'] = key_tram
     needdata['check_file'] = check_file
     is_admin = self.user_has_groups('base.group_erp_manager')
@@ -98,8 +103,8 @@ def importexcel_func(odoo_or_self_of_wizard, import_key=False, key_tram=False, c
         title_rows = xac_dinh_title_rows(self, MD, set_is_largest_map_row_choosing, nrows, sheet_name)
         #R4
         row_title_index, largest_map_row, new_title_rows = define_col_index_common(title_rows, sheet, COPIED_MD, set_is_largest_map_row_choosing)
-        if set_is_largest_map_row_choosing:
-            row_title_index = largest_map_row
+#         if set_is_largest_map_row_choosing:
+#             row_title_index = largest_map_row
 #         raise UserError(str(new_title_rows))
 
         #R5
@@ -283,7 +288,7 @@ def create_instance (self,
             if x2m_fields:
                 remove_all_or_just_add_one_x2m = MD.get('remove_all_or_just_add_one_x2m', 'add_one')
                 if remove_all_or_just_add_one_x2m == 'remove_all':
-                    obj_id =  [(6,False, obj.mapped('id'))]
+                    obj_id =  [(6,False, list(map(lambda i:i.id,obj)))]
                 else:
                     obj_id  = list(map(lambda x: (4, x.id, False), obj)) 
             else:
@@ -366,11 +371,7 @@ def get_a_field_val(self,
         val = empty_string_to_False(xl_val)
         if field_attr.get('partern_empty_val'):
             val = empty_string_to_False(val, pt = field_attr.get('partern_empty_val'))
-        if val != False and field_attr.get('st_is_x2m_field'):
-            val = val.split(',')
-            val = list(map(lambda i: empty_string_to_False(i.strip()),val))
-            if False in val:
-                    raise UserError(u'Không được có phần tử = False')
+        
     elif field_attr.get('fields') :
         fields_noti_dict = instance_not_dict.setdefault('fields', {})
         obj, val = create_instance (self,
@@ -427,6 +428,8 @@ def get_a_field_val(self,
         
 #         print ('func read model_name:%s field_name:%s'%(model_name,field_name),'val',val)
     
+    
+    
     val = replace_val_for_ci (field_attr,val,needdata)
     field_attr['val_goc'] = val
     
@@ -442,8 +445,11 @@ def get_a_field_val(self,
         except:
             raise UserError(u'%s-%s'%(val,type(val)))
         
-        
-    
+    if val != False and field_attr.get('st_is_x2m_field'):
+            val = val.split(',')
+            val = list(map(lambda i: empty_string_to_False(i.strip()),val))
+            if False in val:
+                    raise UserError(u'Không được có phần tử = False')
     field_attr['val'] = val
     field_attr['obj'] = obj
     key_or_not = field_attr.get('key')
@@ -491,7 +497,7 @@ def get_a_field_val(self,
         
         
     print ("row:", row,'f_name_call', f_name_call, 'model_name: ', model_name,'-field: ', field_name, '-val: ', val)
-    check_trust_type_of_value_after_all(field_attr, val, field_name, model_name)
+#     check_trust_type_of_value_after_all(field_attr, val, field_name, model_name)
     return a_field_code        
 
 

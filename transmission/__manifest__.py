@@ -20,15 +20,18 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','importexcel'],
+    'depends': ['base','hr', 'importexcel'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
+        'views/soi.xml',
+        'views/tbtdan.xml',
         'views/templates.xml',
         'views/do_cap_quang.xml',
         'views/download_tran.xml',
+        'views/day_nhay.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -183,7 +183,99 @@
     </record>
     
     
+    <!-- Sợi -->
+     
+     <record model="ir.ui.view" id="soi_form">
+            <field name="name">soi.form</field>
+            <field name="model">tran.soi</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+            	     <field name="tuyen_cap" />
+                    <field name="stt_soi" />
+                    <field name="name" />
+                    <field name="odf_dau" />
+                    <field name="odf_cuoi" />
+                    <field name="odf_cuoi_khac_tram" />
+                    <field name="odf_cuoi_khac_tram_toa_do" />
+                    <field name="des_1" />
+                    <field name="des_2" />
+                    <field name="chi_tiet_dau_noi" />
+                    <field name="ten" />
+                    <field name="luong" />
+                    <field name="odf_ids" />
+                    <field name="soi_id" />
+                    <field name="thiet_bi_id" />
+                    <field name="nhan_txt" />
+                    <field name="luong_txt" />
+                    
+                     <field name="partner_odf_id" />
+                    <field name="number_partner_odf" />
+                    
+                    
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+        
+      <record model="ir.ui.view" id="soi_list">
+            <field name="name">soi.list</field>
+            <field name="model">tran.soi</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="tuyen_cap" />
+                    <field name="stt_soi" />
+                    <field name="name" />
+                    <field name="odf_dau" />
+                    <field name="odf_cuoi" />
+                    <field name="odf_cuoi_khac_tram" />
+                    <field name="odf_cuoi_khac_tram_toa_do" />
+                    <field name="des_1" />
+                    <field name="des_2" />
+                    <field name="chi_tiet_dau_noi" />
+                    <field name="ten" />
+                    <field name="luong" />
+                    <field name="soi_id" />
+                    <field name="thiet_bi_id" />
+                    <field name="nhan_txt" />
+                    <field name="luong_txt" />
+                  <!--  <field name="file_name" /> --> 
+                </tree>
+            </field>
+        </record>
+        
+        
+          <record id="soi_search" model="ir.ui.view">
+         <field name="name">soi_search</field>
+         <field name="model">tran.soi</field>
+         <field name="arch" type="xml">
+            <search string="Search soi">
+               <field name="tuyen_cap" />
+               <group expand="0" string="Group By">
+                  <filter name="tuyen_cap" string="tuyen_cap" context="{'group_by':'tuyen_cap'}" />
+               </group>
+            </search>
+         </field>
+      </record>
+      
+      
+      
+        
+        
+      <record model="ir.actions.act_window" id="action_soi">
+      <field name="name">Sợi</field>
+      <field name="res_model">tran.soi</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+     <menuitem name="Sợi" id="soi_menu" parent="menu_tran_root" action="action_soi" sequence="1" />
+     
+     
+     
+     
     
+    <!--  end sợi -->
     
     <!-- odf -->
     
@@ -242,8 +334,114 @@
      <!-- end ODF -->
      
      
+     <!-- tbtd -->
+     	<record model="ir.ui.view" id="tbtd_form">
+            <field name="name">tbtd.form</field>
+            <field name="model">tran.tbtdan</field>
+            <field name="arch" type="xml">
+            	<form>
+            	<group>
+            		 <field name="name" />
+                    <field name="ten_he_thong" />
+                    <field name="he_thong_id" />
+                    <field name="slot" />
+                    <field name="port" />
+                    <field name="odf" />
+                    <field name="port_odf" />
+                    <field name="rate" />
+                    <field name="ten" />
+                    <field name="near" />
+                    <field name="far" />
+                    <field name="tb_or_cq" />
+                    <field name="port_tb_or_cq" />
+                    <field name="cap_quang" />
+                    <field name="soi" />
+                    <field name="luong" />
+                    <field name="thiet_bi_phia_truoc_id" />
+                    <field name="soi_id" />
+                    <field name="thiet_bi_id" />
+                    <field name="odf_ids" />
+                    <field name="luong_txt" />
+                    <field name="nhan_txt" />
+                    
+                    <field name="partner_odf_id" />
+                    <field name="number_partner_odf" />
+                    
+                    
+                    <!-- <field name="file_name" /> -->
+            	</group>
+            	</form>
+            
+            </field>
+        </record>
+        
+    
+    
+    
+      <record model="ir.ui.view" id="tbtd_list">
+            <field name="name">tbtd.list</field>
+            <field name="model">tran.tbtdan</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                    <field name="ten_he_thong" />
+                    <field name="he_thong_id" />
+                    <field name="slot" />
+                    <field name="port" />
+                    <field name="odf" />
+                    <field name="port_odf" />
+                    <field name="rate" />
+                    <field name="ten" />
+                    <field name="near" />
+                    <field name="far" />
+                    <field name="tb_or_cq" />
+                    <field name="port_tb_or_cq" />
+                    <field name="cap_quang" />
+                    <field name="soi" />
+                    <field name="luong" />
+                    <field name="test1" />
+                    <field name="test2" />
+                    <field name="nhan_txt" />
+                    <field name="thiet_bi_phia_truoc_id" />
+                    <field name="soi_id" />
+                    <field name="thiet_bi_id" />
+                    <field name="odf_ids" />
+                    <field name="luong_txt" />
+                   <!-- <field name="file_name" /> --> 
+                </tree>
+            </field>
+        </record>
+        
+        
+        <record id="tbtdan_search" model="ir.ui.view">
+         <field name="name">tbtdan_search</field>
+         <field name="model">tran.tbtdan</field>
+         <field name="arch" type="xml">
+            <search string="Search tbtdan">
+               <field name="port" />
+               <group expand="0" string="Group By">
+                  <filter name="ten_he_thong" string="ten_he_thong" context="{'group_by':'ten_he_thong'}" />
+                  <filter name="tb_or_cq" string="tb_or_cq" context="{'group_by':'tb_or_cq'}" />
+                  <filter name="cap_quang" string="cap_quang" context="{'group_by':'cap_quang'}" />
+               </group>
+            </search>
+         </field>
+      </record>
+      
+      
+      
+        
+      <record model="ir.actions.act_window" id="action_tbtd">
+      <field name="name">Thiết bị TD</field>
+      <field name="res_model">tran.tbtdan</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+     <menuitem name="TBDT" id="tbtd1_menu" parent="menu_tran_root" action="action_tbtd" sequence="1" />
      
-     <!-- luongline 
+     
+     <!-- end tbtd -->
+     
+     <!-- luongline -->
      
      <record model="ir.ui.view" id="luongline_form">
             <field name="name">luongline.form</field>
@@ -285,7 +483,6 @@
       <field name="res_model">tran.luongline</field>
       <field name="view_mode">tree,form</field>
     </record>
-    -->
     <!-- 
      <menuitem name="Luong Line" id="luongline1_menu" parent="menu_tran_root" action="action_luongline" sequence="1" />
       -->

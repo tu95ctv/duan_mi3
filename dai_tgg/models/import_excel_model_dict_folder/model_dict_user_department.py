@@ -188,7 +188,6 @@ def gen_user_department_model_dict():
                                     'offset_write_xl_diff':2,
                                     'offset_write_xl':3,
                                     'required':False ,
-                                    'bypass_this_field_if_value_equal_False':True,
                                     'remove_all_or_just_add_one_x2m': 'add_one',
                                     'fields':[
                                              ('name',{'xl_title':u'groups_id',  'key':True, 'required': True,'st_is_x2m_field':True}),     

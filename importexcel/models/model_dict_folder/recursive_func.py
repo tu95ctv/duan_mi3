@@ -13,11 +13,9 @@ ATT_TYPE_LIST ={
   'default_val':[],
   'begin_data_row_offset_with_title_row': ['int'],
   'break_condition_func_for_main_instance': ['NoneType', 'function'],
-  'bypass_this_field_if_value_equal_False': ['bool'],
   'inactive_include_search': ['bool'],
   'st_is_x2m_field': ['bool'],
   'remove_all_or_just_add_one_x2m': ['bool','str'],
-  'bypass_this_field_if_value_equal_False_default': ['bool'],
   'st_write_false':['bool'], 
   'write_false':['bool'], 
   'col_index': ['int', 'NoneType'],
@@ -133,19 +131,22 @@ def convert_dict_to_order_dict_string(x):
 
 # R1
 def rut_gon_key(MD, key_tram): 
-    for key, val in MD.items():
-        
-        if isinstance(val, dict) and key_tram:
-            val =  val.get(key_tram) if key_tram in val else val.get('all_key_tram', DEFAULT_VAL_DICT_OF_ATTR.get(key,{}).get('default_value',None))
-        
-        MD[key] = val
-        if key == 'fields' :
-            for fname, field_MD in val: 
-                rut_gon_key(field_MD, key_tram)
+    if key_tram:
+        for key, val in MD.items():
+            
+            if isinstance(val, dict) and key_tram:
+                val =  val.get(key_tram) if key_tram in val else val.get('all_key_tram', DEFAULT_VAL_DICT_OF_ATTR.get(key,{}).get('default_value',None))
+            
+            MD[key] = val
+            if key == 'fields' :
+                for fname, field_MD in val: 
+                    rut_gon_key(field_MD, key_tram)
                     
 
 ###R2
 def ordereddict_fields(MD):
+    print ("MD['fields']****",MD['fields'])
+    print ("len MD['fields']****",len(MD['fields']))
     for fname, field_MD in MD['fields']:
         if 'fields' in field_MD :
             ordereddict_fields (field_MD)
@@ -246,6 +247,7 @@ def define_col_index_common(title_rows, sheet, COPY_MODEL_DICT, set_is_largest_m
         title_rows = range(lowest_row,largest_map_row+3)
         row_title_index, largest_map_row = define_col_index(title_rows, sheet, COPY_MODEL_DICT)
     return row_title_index, largest_map_row, title_rows
+
 def define_col_index(title_rows, sheet, COPY_MODEL_DICT, is_write = True):
     row_title_index =None
     number_map_dict = {}

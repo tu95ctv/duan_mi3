@@ -205,13 +205,14 @@ def check_diff_write_val_with_exist_obj(orm_field_val, field_dict_val, field_MD,
             converted_orm_val_to_dict_val = orm_field_val
     
     if '2many' in field_type:
-        is_write = False
-        if not all(field_MD['obj']):
-            is_write = True
-        else:
-            for field_dict_val_item in field_MD['obj']:
-                is_write_item = field_dict_val_item not in orm_field_val
-                is_write = is_write or is_write_item
+        is_write = True
+#         is_write = False
+#         if not all(field_MD['obj']):
+#             is_write = True
+#         else:
+#             for field_dict_val_item in field_MD['obj']:
+#                 is_write_item = field_dict_val_item not in orm_field_val
+#                 is_write = is_write or is_write_item
     elif field_type=='float':
         is_write = float_compare(orm_field_val, field_dict_val, precision_rounding=0.01)# 1 la khac, 0 la giong
     else:

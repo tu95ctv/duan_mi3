@@ -10,7 +10,7 @@ def generate_easyxf (font='Times New Roman',
                      bold = False,
                      underline=False,
                      height=12, 
-                     align_wrap = False,
+                     align_wrap = True,
                      vert = False,
                      horiz = False,
                      borders = False,
@@ -98,66 +98,7 @@ bold_center_18_style = xlwt.easyxf(generate_easyxf(bold=True,height=18, vert = '
 
 
 
-def add_1_row(worksheet,r ,FIELDNAME_FIELDATTR, row_index, 
-            offset_column=0,
-            needdata=None,
-            save_ndata=False,
-            dl_model_para=None,
-            center_vert_border_style=center_vert_border_style,
-#             font_height= 12
-            ):
-    if save_ndata:
-        a_instance_dict =  needdata.get('a_instance_dict', {})
-    else:
-        a_instance_dict = {}
-    writen_column_number = 0
-    col_index = 0
-    col_index += offset_column
-    for  f_name,FIELDATTR in FIELDNAME_FIELDATTR.items():
-        skip_field = FIELDATTR.get('skip_field')
-        if callable(skip_field):
-            skip_field = skip_field(dl_model_para)
-        if skip_field:
-            continue
-        is_not_model_field = FIELDATTR.get('is_not_model_field')
-        split = FIELDATTR.get('split')
-        write_to_excel = FIELDATTR.get('write_to_excel',True)
-        transfer_fname = FIELDATTR.get('transfer_fname')
-        f_name_real =transfer_fname or  f_name
-        if is_not_model_field:
-            val = False
-        else:
-            val = getattr(r, f_name_real)
-        one_field_val = a_instance_dict.setdefault(f_name,{})
-        one_field_val['val_before_func'] = val
-        func = FIELDATTR.get('func',None)
-        kargs = FIELDATTR.get('kargs',{})
-        if func:
-            val = func(val,needdata, **kargs)
-        else:
-            if hasattr(val, 'name'):
-                val = val.name
-        if val == False:
-            val = u''
-        one_field_val['val']=val 
-        max_len_field_val =  FIELDATTR.setdefault('max_len_field_val',0)
-        val_len = len(val) if isinstance(val, str) else 0
-        if val_len > max_len_field_val:
-            FIELDATTR['max_len_field_val'] = val_len
-        if  write_to_excel:
-            style = FIELDATTR.get('style',center_vert_border_style)
-            worksheet.write(row_index, col_index, val, style)
-            writen_column_number +=1
-            col_index +=1
-        else:
-            pass
-        if split:
-            a_instance_dict,writen_column_number_children = add_1_row(worksheet,r ,split, row_index, offset_column=col_index  ,needdata=needdata)
-            offset_column += writen_column_number_children -1 +  (1 if write_to_excel else 0)
-            writen_column_number += writen_column_number_children
-            one_field_val['split'] = a_instance_dict
-            col_index +=writen_column_number_children
-    return a_instance_dict, writen_column_number
+
 
 
 def add_title(worksheet,FIELDNAME_FIELDATTR,model_fields,ROW_TITLE=0, offset_column=0,
@@ -261,7 +202,7 @@ def download_model(dl_obj,
             workbook = xlwt.Workbook()
         if sheet_name ==None:
             sheet_name =  u'Sheet 1'
-        worksheet = workbook.add_sheet(sheet_name)# cell_overwrite_ok=True
+        worksheet = workbook.add_sheet(sheet_name, cell_overwrite_ok=True)# cell_overwrite_ok=True
 
         
         
@@ -291,15 +232,18 @@ def download_model(dl_obj,
     row_index = ROW_TITLE 
     if  recs:
         for r in recs:#request.env['cvi'].search([]):
-            row_index +=  1
-            add_1_row(worksheet,r, 
-                      FIELDNAME_FIELDATTR, 
-                       row_index,
-                       offset_column=OFFSET_COLUMN,
-                       needdata=needdata,
-                       save_ndata=True,
-                       dl_model_para=dl_model_para,
-                       center_vert_border_style = center_vert_border_style)
+            for double_count in range(0,2):
+                row_index +=  1
+                needdata['double_count'] = double_count
+                add_1_row(worksheet,r, 
+                          FIELDNAME_FIELDATTR, 
+                           row_index,
+                           offset_column=OFFSET_COLUMN,
+                           needdata=needdata,
+                           save_ndata=True,
+                           dl_model_para=dl_model_para,
+                           center_vert_border_style = center_vert_border_style,
+                           )
         n_row_recs = row_index - (ROW_TITLE + 1) + 1
     else:
         n_row_recs = 0       
@@ -312,6 +256,90 @@ def download_model(dl_obj,
     if return_more_thing_for_bcn:
         return n_row_recs + n_row_title
     return workbook
+
+
+def add_1_row(worksheet,r ,FIELDNAME_FIELDATTR, row_index, 
+            offset_column=0,
+            needdata=None,
+            save_ndata=False,
+            dl_model_para=None,
+            center_vert_border_style=center_vert_border_style,
+#             font_height= 12
+            ):
+    if save_ndata:
+        a_instance_dict =  needdata.get('a_instance_dict', {})
+    else:
+        a_instance_dict = {}
+    writen_column_number = 0
+    col_index = 0
+    col_index += offset_column
+    for  f_name, FIELDATTR in FIELDNAME_FIELDATTR.items():
+        skip_field = FIELDATTR.get('skip_field')
+        if callable(skip_field):
+            skip_field = skip_field(dl_model_para)
+        if skip_field:
+            continue
+        is_not_model_field = FIELDATTR.get('is_not_model_field')
+        split = FIELDATTR.get('split')
+        write_to_excel = FIELDATTR.get('write_to_excel',True)
+        transfer_fname = FIELDATTR.get('transfer_fname')
+        f_name_real =transfer_fname or  f_name
+        if is_not_model_field:
+            val = False
+        else:
+            val = getattr(r, f_name_real)
+        one_field_val = a_instance_dict.setdefault(f_name,{})
+        one_field_val['val_before_func'] = val
+        func = FIELDATTR.get('func',None)
+        kargs = FIELDATTR.get('kargs',{})
+        if func:
+            val = func(val,needdata, **kargs)
+        else:
+            if hasattr(val, 'name'):
+                val = val.name
+        if val == False:
+            val = u''
+        pre_instance_val = one_field_val.get('val', None)
+        one_field_val['val']=val 
+        max_len_field_val =  FIELDATTR.setdefault('max_len_field_val',0)
+        val_len = len(val) if isinstance(val, str) else 0
+        if val_len > max_len_field_val:
+            FIELDATTR['max_len_field_val'] = val_len
+        
+        if  write_to_excel:
+#             merge_row = FIELDATTR.get('merge_row', None)
+            
+                
+            style = FIELDATTR.get('style',center_vert_border_style)
+            
+            
+#             worksheet.write(row_index, col_index, val, style)
+            allow_write_merge = FIELDATTR.get('allow_write_merge', True)
+            double_merge = FIELDATTR.get('double_merge', False)
+            can_merge_now = True
+            if double_merge:
+                if needdata['double_count'] ==0:
+                    can_merge_now = False
+                    FIELDATTR['merge_row'] = row_index
+            if val == pre_instance_val and ( allow_write_merge or double_merge) and can_merge_now:
+                worksheet.write_merge(FIELDATTR['merge_row'], row_index, col_index, col_index,  val, style)
+            else:
+                worksheet.write(row_index, col_index, val, style)
+                
+            if val != pre_instance_val:
+                FIELDATTR['merge_row'] = row_index
+            writen_column_number +=1
+            col_index +=1
+        else:
+            pass
+        if split:
+            a_instance_dict,writen_column_number_children = add_1_row(worksheet,r ,split, row_index, offset_column=col_index  ,needdata=needdata)
+            offset_column += writen_column_number_children -1 +  (1 if write_to_excel else 0)
+            writen_column_number += writen_column_number_children
+            one_field_val['split'] = a_instance_dict
+            col_index +=writen_column_number_children
+    return a_instance_dict, writen_column_number
+
 def recursive_OrderedDict (FIELDNAME_FIELDATTR):
     if isinstance(FIELDNAME_FIELDATTR,list):
         obj_loop= FIELDNAME_FIELDATTR

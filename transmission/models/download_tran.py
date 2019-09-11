@@ -15,6 +15,13 @@ from copy import deepcopy
 #         return ','.join(v.mapped('login'))
 #     else:
 #         return ''
+
+def odf_tg_toa_do_(val,needdata):
+    if val:
+        double_count = needdata['double_count']
+        vals= val.split(',')
+        return vals[double_count]
+    return val
 def download_dcquang_(dl_obj,append_domain = []):
 
     FIELDNAME_FIELDATTR_quants = [
@@ -22,8 +29,8 @@ def download_dcquang_(dl_obj,append_domain = []):
           ('thiet_bi',{}),
           ('he_thong',{}),
           ('stt_he_thong',{}),
-          ('odf_tg',{}),
-          ('odf_tg_toa_do',{}),
+          ('odf_tg',{'allow_write_merge':False,  'double_merge':True}),
+          ('odf_tg_toa_do',{'func':odf_tg_toa_do_}),
           ('odf_line',{}),
           ('odf_line_toa_do',{}),
           ('chay_chinh_hay_du_phong',{}),
@@ -33,7 +40,7 @@ def download_dcquang_(dl_obj,append_domain = []):
     Export_Para_quants = {
         'exported_model':'dcquang.dcquang',
         'FIELDNAME_FIELDATTR':FIELDNAME_FIELDATTR_quants,
-        'search_para':{'order': 'stt_he_thong asc'},#desc
+        'search_para':{'order': 'stt_he_thong asc, chay_chinh_hay_du_phong asc'},#desc
         }
     
     filename = 'users'
